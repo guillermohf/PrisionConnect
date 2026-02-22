@@ -499,20 +499,20 @@ Este proyecto es desarrollado como proyecto de tesis universitaria.
 
 ## 👨‍💻 Autor
 
-**[Tu Nombre]**
+**[Guillermo Herrera]**
 
 - 🎓 Estudiante de Ingeniería en Sistemas
-- 🏫 [Tu Universidad]
-- 📧 Email: tu.email@ejemplo.com
-- 💼 LinkedIn: [Tu LinkedIn]
-- 🐙 GitHub: [@tu-usuario](https://github.com/guillermohf)
+- 🏫 [Universidad Pedro Henriquez Ureña]
+- 📧 Email: guillermohf045@gmail.com
+- 💼 LinkedIn: [(https://www.linkedin.com/in/guillermo-herrera-1ab24520a?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app)]
+- 🐙 GitHub: [@guillermohf](https://github.com/guillermohf)
 
 ---
 
 ## 🙏 Agradecimientos
 
-- **[Tu Universidad]** - Por el apoyo institucional
-- **[Tu Asesor]** - Por la guía y mentoría
+- **[UNPHU]** - Por el apoyo institucional
+- **[Leonel Savery]** - Por la guía y mentoría
 - **Comunidad de Angular** - Por los recursos y documentación
 - **Firebase** - Por la plataforma BaaS
 - **Tailwind CSS** - Por el framework de estilos
