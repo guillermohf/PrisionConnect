@@ -1,0 +1,54 @@
+<div class="min-h-screen flex items-center justify-center bg-teal-50 p-4">
+  <div class="bg-white rounded-xl shadow-md p-8 w-full max-w-sm text-center space-y-6">
+    <!-- Logo -->
+    <img src="/assets/logo.png" alt="Prission Connect" class="mx-auto w-32 mb-2" />
+
+    <p class="text-sm text-gray-600">Inicia sesión en tu cuenta</p>
+
+    <!-- Formulario -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <input
+        type="email"
+        formControlName="email"
+        placeholder="Correo electrónico"
+        class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
+      />
+      <input
+        type="password"
+        formControlName="password"
+        placeholder="Contraseña"
+        class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-teal-500"
+      />
+
+      <div *ngIf="errorMessage" class="text-red-500 text-sm">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botón Login -->
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-teal-600 text-white font-semibold py-2 rounded hover:bg-teal-700 transition"
+      >
+        {{ loading ? 'Cargando...' : 'Entrar' }}
+      </button>
+
+      <!-- Botón Google -->
+      <button
+        type="button"
+        (click)="loginWithGoogle()"
+        class="w-full flex items-center justify-center gap-3 border border-gray-300 py-2 rounded hover:bg-gray-100 transition text-sm"
+      >
+        <!-- Ícono de Google -->
+        <img src="/assets/icons8-google-48.png" alt="Google Icon" class="w-5 h-5" />
+        Continuar con Google
+      </button>
+    </form>
+
+    <!-- Recuperar contraseña -->
+    <p class="text-xs text-gray-500">
+      ¿Olvidaste tu contraseña?
+      <a href="#" class="text-teal-600 hover:underline">Recupérala</a>
+    </p>
+  </div>
+</div>

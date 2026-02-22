@@ -1,0 +1,335 @@
+<!-- src/app/features/historial/historial.component.html -->
+<div class="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 lg:space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-[#006666] to-[#008080] rounded-lg p-4 sm:p-5 lg:p-6 text-white shadow-lg">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+      <div class="flex-1">
+        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold">Historial de Visitas</h1>
+        <p class="text-[#FEEBDD] text-xs sm:text-sm mt-1">
+          Registro completo de visitas finalizadas y canceladas
+        </p>
+      </div>
+      <button
+        (click)="exportarCSV()"
+        [disabled]="visitasFiltradas.length === 0"
+        class="w-full sm:w-auto px-4 sm:px-5 lg:px-6 py-2.5 sm:py-3 bg-white text-[#006666] rounded-lg hover:bg-[#FEEBDD] transition-all duration-200 font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span class="text-sm sm:text-base">Exportar CSV</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3 lg:gap-4">
+
+    <!-- Total Visitas -->
+    <div class="bg-gradient-to-br from-[#006666] to-[#008080] rounded-lg shadow-lg p-4 sm:p-5 text-white transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[#FEEBDD] text-xs sm:text-sm font-medium">Total Visitas</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-[#FEEBDD]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold">{{ totalVisitas() }}</p>
+    </div>
+
+    <!-- Finalizadas -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 border-2 border-green-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Finalizadas</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-600">{{ visitasFinalizadas() }}</p>
+    </div>
+
+    <!-- Canceladas -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 border-2 border-red-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Canceladas</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600">{{ visitasCanceladas() }}</p>
+    </div>
+
+    <!-- Con Incidencias -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 border-2 border-orange-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Con Incidencias</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-orange-600">{{ visitasConIncidencias() }}</p>
+    </div>
+
+    <!-- Duración Promedio -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 border-2 border-purple-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Duración Prom.</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-600">{{ duracionPromedio() }}<span class="text-base sm:text-lg lg:text-xl">min</span></p>
+    </div>
+
+  </div>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 border-2 border-gray-200">
+    <h2 class="text-sm sm:text-base lg:text-lg font-bold text-[#006666] mb-3 sm:mb-4 flex items-center gap-2">
+      <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+      Filtros de Búsqueda
+    </h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4">
+
+      <div class="lg:col-span-2">
+        <label class="block text-xs sm:text-sm text-gray-600 mb-1.5 font-medium">Búsqueda</label>
+        <input
+          type="text"
+          [(ngModel)]="busqueda"
+          (ngModelChange)="aplicarFiltros()"
+          placeholder="Buscar por recluso, área o ID..."
+          class="w-full px-3 py-2 sm:py-2.5 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#006666] focus:ring-2 focus:ring-[#008080]/20 transition-all">
+      </div>
+
+      <div>
+        <label class="block text-xs sm:text-sm text-gray-600 mb-1.5 font-medium">Desde</label>
+        <input
+          type="date"
+          [(ngModel)]="fechaInicio"
+          (ngModelChange)="aplicarFiltros()"
+          class="w-full px-3 py-2 sm:py-2.5 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#006666] focus:ring-2 focus:ring-[#008080]/20 transition-all">
+      </div>
+
+      <div>
+        <label class="block text-xs sm:text-sm text-gray-600 mb-1.5 font-medium">Hasta</label>
+        <input
+          type="date"
+          [(ngModel)]="fechaFin"
+          (ngModelChange)="aplicarFiltros()"
+          class="w-full px-3 py-2 sm:py-2.5 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#006666] focus:ring-2 focus:ring-[#008080]/20 transition-all">
+      </div>
+
+      <div class="flex items-end">
+        <button
+          (click)="limpiarFiltros()"
+          class="w-full px-4 py-2 sm:py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Limpiar
+        </button>
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4">
+      
+      <div>
+        <label class="block text-xs sm:text-sm text-gray-600 mb-1.5 font-medium">Estado</label>
+        <select
+          [(ngModel)]="filtros.estado"
+          (ngModelChange)="aplicarFiltros()"
+          class="w-full px-3 py-2 sm:py-2.5 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#006666] focus:ring-2 focus:ring-[#008080]/20 transition-all">
+          <option [value]="undefined">Todos</option>
+          <option [value]="EstadoVisita.FINALIZADA">Finalizadas</option>
+          <option [value]="EstadoVisita.CANCELADA">Canceladas</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs sm:text-sm text-gray-600 mb-1.5 font-medium">Tipo</label>
+        <select
+          [(ngModel)]="filtros.tipo"
+          (ngModelChange)="aplicarFiltros()"
+          class="w-full px-3 py-2 sm:py-2.5 text-sm border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#006666] focus:ring-2 focus:ring-[#008080]/20 transition-all">
+          <option [value]="undefined">Todos</option>
+          <option [value]="TipoVisita.FAMILIAR">Familiar</option>
+          <option [value]="TipoVisita.LEGAL">Legal</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-12 sm:py-16 lg:py-20">
+      <div class="relative">
+        <div class="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-[#006666] border-t-transparent"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div class="w-4 h-4 sm:w-6 sm:h-6 bg-[#006666] rounded-full animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Mensaje sin resultados -->
+  @if (visitasFiltradas.length === 0 && !loading()) {
+    <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 sm:p-12 text-center">
+      <svg class="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <p class="text-base sm:text-xl font-medium text-gray-600 mb-2">No se encontraron visitas</p>
+      <p class="text-sm text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+    </div>
+  }
+
+  <!-- ========================================= -->
+  <!-- MOBILE: CARDS (< 768px)                  -->
+  <!-- ========================================= -->
+  @if (!loading() && visitasFiltradas.length > 0) {
+    <div class="md:hidden space-y-3">
+      @for (visita of visitasFiltradas; track visita.id) {
+        <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden transform transition-all duration-200 hover:shadow-xl">
+          
+          <!-- Header con Estado y Tipo -->
+          <div class="px-3 py-2.5 bg-gradient-to-r from-[#006666] to-[#008080] flex items-center justify-between">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap"
+                    [ngClass]="visita.estado === EstadoVisita.FINALIZADA ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                {{ visita.estado }}
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap"
+                    [ngClass]="visita.tipo === TipoVisita.FAMILIAR ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'">
+                {{ visita.tipo }}
+              </span>
+              @if (visita.incidencias && visita.incidencias.length > 0) {
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  {{ visita.incidencias.length }}
+                </span>
+              }
+            </div>
+            <button
+              (click)="verDetalle(visita)"
+              class="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200">
+              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Contenido -->
+          <div class="p-3.5 space-y-3">
+            
+            <!-- Recluso -->
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-[#006666] flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs text-gray-500 font-medium">Recluso</p>
+                <p class="font-bold text-gray-900 truncate text-sm">{{ visita.reclusoNombre }}</p>
+              </div>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="grid grid-cols-2 gap-2.5">
+              
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Fecha</p>
+                <p class="text-sm font-semibold text-gray-900">{{ formatearFecha(visita.fechaVisita) }}</p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Duración</p>
+                <p class="text-sm font-semibold text-gray-900">{{ visita.duracionVisitaReal || '-' }} min</p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Área</p>
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ visita.areaVisita }}</p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Visitantes</p>
+                <p class="text-sm font-semibold text-gray-900">{{ visita.totalVisitantes }}</p>
+              </div>
+
+            </div>
+
+            <!-- Botón Ver Detalle -->
+            <button
+              (click)="verDetalle(visita)"
+              class="w-full px-3 py-2.5 bg-[#006666] hover:bg-[#008080] text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              Ver Detalle Completo
+            </button>
+
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ========================================= -->
+  <!-- DESKTOP: TABLA (≥ 768px)                 -->
+  <!-- ========================================= -->
+  @if (!loading() && visitasFiltradas.length > 0) {
+    <div class="hidden md:block bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <prisionConnect-data-table 
+          [data]="visitasFiltradas" 
+          [columns]="columnas" 
+          (detail)="verDetalle($event)">
+
+          <ng-template #customActions let-visita>
+            
+            <button
+              (click)="verDetalle(visita)"
+              class="p-1.5 sm:p-2 text-[#006666] hover:bg-[#FEEBDD] rounded-lg transition-all duration-200"
+              title="Ver Detalle">
+              <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+
+            @if (visita.incidencias && visita.incidencias.length > 0) {
+              <div class="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-bold">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                {{ visita.incidencias.length }}
+              </div>
+            }
+
+          </ng-template>
+
+        </prisionConnect-data-table>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Detalle -->
+  <prisionConnect-visita-detalle-modal
+    [(isOpen)]="mostrarModalDetalle"
+    [visita]="visitaSeleccionada">
+  </prisionConnect-visita-detalle-modal>
+
+</div>

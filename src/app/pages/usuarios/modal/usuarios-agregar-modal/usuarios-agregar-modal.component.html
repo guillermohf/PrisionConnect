@@ -1,0 +1,118 @@
+<prisionConnect-modal
+  [isOpen]="isOpen"
+  [title]="'Registrar Nuevo Usuario'"
+  (close)="cerrar()">
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    
+    <div class="p-6 space-y-6">
+
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg flex gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="text-sm text-blue-800">
+          <p class="font-semibold mb-1">Contraseña de acceso</p>
+          <p>La contraseña temporal será asignada automáticamente como: <strong>PrisionConnect2026!</strong>. Se le pedirá al usuario que la cambie en su primer inicio de sesión.</p>
+        </div>
+      </div>
+
+      <section>
+        <h2 class="text-sm font-semibold text-teal-700 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          Datos del Perfil
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Nombre *</label>
+            <input type="text" formControlName="nombre" placeholder="Ej: Ana"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006666] outline-none transition-all"
+              [class.border-red-500]="campoInvalido('nombre')">
+            @if (campoInvalido('nombre')) {
+              <p class="text-red-500 text-xs mt-1 font-medium">{{ obtenerMensajeError('nombre') }}</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Apellido *</label>
+            <input type="text" formControlName="apellido" placeholder="Ej: Rodríguez"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006666] outline-none transition-all"
+              [class.border-red-500]="campoInvalido('apellido')">
+            @if (campoInvalido('apellido')) {
+              <p class="text-red-500 text-xs mt-1 font-medium">{{ obtenerMensajeError('apellido') }}</p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-sm font-semibold text-teal-700 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
+          Credenciales y Acceso
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Correo Electrónico Corporativo *</label>
+            <input type="email" formControlName="email" placeholder="usuario@prisionconnect.gob.do"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006666] outline-none transition-all"
+              [class.border-red-500]="campoInvalido('email')">
+            @if (campoInvalido('email')) {
+              <p class="text-red-500 text-xs mt-1 font-medium">{{ obtenerMensajeError('email') }}</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Nivel de Acceso (Rol) *</label>
+            <div class="relative">
+              <select formControlName="rol"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#006666] outline-none transition-all appearance-none bg-white"
+                [class.border-red-500]="campoInvalido('rol')">
+                <option value="" disabled selected>Selecciona un rol...</option>
+                @for (rol of rolesDisponibles; track rol.valor) {
+                  <option [value]="rol.valor">{{ rol.nombre }}</option>
+                }
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            @if (campoInvalido('rol')) {
+              <p class="text-red-500 text-xs mt-1 font-medium">{{ obtenerMensajeError('rol') }}</p>
+            }
+          </div>
+        </div>
+      </section>
+
+      <div class="border-t border-gray-200 pt-4"></div>
+
+      <div class="flex justify-end gap-3">
+        <button type="button" (click)="cerrar()" [disabled]="guardando"
+          class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50">
+          Cancelar
+        </button>
+
+        <button type="submit" [disabled]="guardando || form.invalid"
+          class="px-5 py-2.5 text-sm font-medium text-white bg-[#006666] rounded-lg hover:bg-[#004d4d] shadow-sm transition-colors disabled:opacity-50 flex items-center gap-2">
+          @if (guardando) {
+            <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            Procesando...
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+            Crear Usuario
+          }
+        </button>
+      </div>
+
+    </div>
+  </form>
+</prisionConnect-modal>

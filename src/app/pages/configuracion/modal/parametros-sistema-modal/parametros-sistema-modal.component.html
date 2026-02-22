@@ -1,0 +1,153 @@
+<div class="p-6 space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg p-6 text-white shadow-md">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 bg-white/20  bg-opacity-20 rounded-lg flex items-center justify-center">
+        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold ">Parámetros del Sistema</h1>
+        <p class="text-teal-100 text-sm">
+          Configura los límites y restricciones del sistema de visitas
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de Parámetros -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    @for (parametro of parametros; track parametro.key) {
+      <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-all">
+
+        <!-- Header -->
+        <div class="flex items-start gap-3 mb-4">
+          <div
+            class="p-3 rounded-lg"
+            [class]="'bg-' + parametro.color + '-100'">
+
+            <svg
+              class="w-6 h-6"
+              [class]="'text-' + parametro.color + '-600'"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor">
+
+              @if (parametro.icono === 'clock') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              }
+              @if (parametro.icono === 'users') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M12 7a3 3 0 110 6 3 3 0 010-6z" />
+              }
+              @if (parametro.icono === 'group') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4a4 4 0 110 8 4 4 0 010-8zM4 20a8 8 0 0116 0" />
+              }
+              @if (parametro.icono === 'bell') {
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1" />
+              }
+            </svg>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-gray-900">{{ parametro.label }}</h3>
+            <p class="text-xs text-gray-600">{{ parametro.descripcion }}</p>
+          </div>
+        </div>
+
+        <!-- Valor Actual -->
+        <div
+          class="mb-4 p-4 rounded-lg shadow-inner"
+          [class]="'bg-' + parametro.color + '-50'">
+          <p class="text-xs text-gray-600 mb-1">Valor Actual</p>
+          <p
+            class="text-4xl font-bold"
+            [class]="'text-' + parametro.color + '-700'">
+            {{ formatearValor(parametro) }}
+          </p>
+        </div>
+
+        <!-- Slider -->
+        <input
+          type="range"
+          [(ngModel)]="parametro.valor"
+          [min]="parametro.min"
+          [max]="parametro.max"
+          (change)="actualizarParametro(parametro)"
+          [disabled]="guardando"
+          class="w-full h-2 rounded-lg cursor-pointer disabled:opacity-50 mb-4"
+          [style.accent-color]="obtenerColorTexto(parametro.color)">
+
+        <!-- Controles -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+
+          <div class="flex gap-1">
+            <button
+              (click)="decrementar(parametro, 10)"
+              [disabled]="guardando || parametro.valor - 10 < parametro.min"
+              class="px-3 py-1 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+              -10
+            </button>
+            <button
+              (click)="decrementar(parametro, 1)"
+              [disabled]="guardando || parametro.valor - 1 < parametro.min"
+              class="px-3 py-1 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+              -1
+            </button>
+          </div>
+
+          <input
+            type="number"
+            [(ngModel)]="parametro.valor"
+            [min]="parametro.min"
+            [max]="parametro.max"
+            (blur)="actualizarParametro(parametro)"
+            [disabled]="guardando"
+            class="w-20 px-2 py-1 text-center font-bold rounded-lg shadow-inner focus:outline-none disabled:opacity-50">
+
+          <div class="flex gap-1">
+            <button
+              (click)="incrementar(parametro, 1)"
+              [disabled]="guardando || parametro.valor + 1 > parametro.max"
+              class="px-3 py-1 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+              +1
+            </button>
+            <button
+              (click)="incrementar(parametro, 10)"
+              [disabled]="guardando || parametro.valor + 10 > parametro.max"
+              class="px-3 py-1 text-sm bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+              +10
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Rango -->
+        <p class="text-xs text-center text-gray-500">
+          Rango: {{ parametro.min }} – {{ parametro.max }} {{ parametro.unidad }}
+        </p>
+
+      </div>
+    }
+
+  </div>
+
+  <!-- Información -->
+  <div class="bg-yellow-50 rounded-lg p-4 shadow-inner">
+    <h3 class="text-sm font-semibold text-yellow-900 mb-2">Importante</h3>
+    <ul class="text-sm text-yellow-800 space-y-1">
+      <li>• Los cambios se aplican inmediatamente</li>
+      <li>• Ajusta los valores según la capacidad</li>
+      <li>• Mantienen orden y seguridad</li>
+      <li>• Puedes usar slider o botones</li>
+    </ul>
+  </div>
+
+</div>

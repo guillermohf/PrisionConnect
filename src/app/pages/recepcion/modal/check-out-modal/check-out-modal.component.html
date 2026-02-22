@@ -1,0 +1,134 @@
+@if (isOpen && visita) {
+  <prisionConnect-modal
+    [isOpen]="isOpen"
+    title="Check-Out de Visitantes"
+    (close)="cerrar()">
+
+    <div class="p-6 space-y-6">
+
+      <!-- Info Visita -->
+      <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-5 border-2 border-orange-200">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <p class="text-sm font-medium text-gray-600">Recluso:</p>
+            </div>
+            <p class="font-bold text-lg text-orange-700">{{ visita.reclusoNombre }}</p>
+          </div>
+
+          <div class="text-right">
+            <p class="text-sm text-gray-600 mb-1">Área de Visita:</p>
+            <p class="font-medium text-orange-600">{{ visita.areaVisita }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visitantes -->
+      <div class="space-y-3">
+
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-bold text-orange-700">Visitantes con Check-In</h3>
+          <span class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full">
+            {{ visita.visitantesPresentes }} activos
+          </span>
+        </div>
+
+        @for (visitante of visita.visitantes; track visitante.visitanteId) {
+          @if (puedeHacerCheckOut(visitante)) {
+
+            <div class="border-2 border-orange-200 rounded-lg p-4 bg-orange-50 transition-all hover:shadow-md">
+
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-12 h-12 rounded-full bg-orange-200 flex items-center justify-center">
+                  <svg class="w-7 h-7 text-orange-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+
+                <div class="flex-1">
+                  <p class="font-bold text-gray-900">{{ visitante.nombre }}</p>
+                  <p class="text-sm text-gray-600">{{ visitante.cedula }}</p>
+
+                  <div class="flex items-center gap-2 mt-1 text-sm">
+                    <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-gray-700">
+                      Check-In: <span class="font-medium">{{ formatearHora(visitante.checkIn) }}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="block text-xs text-gray-600 mb-1">Observaciones de salida (opcional)</label>
+                <textarea
+                  [(ngModel)]="observaciones[visitante.visitanteId]"
+                  placeholder="Ej: Salida normal, sin incidentes..."
+                  rows="2"
+                  class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-600 text-sm resize-none">
+                </textarea>
+              </div>
+
+              <button
+                (click)="realizarCheckOut(visitante.visitanteId)"
+                [disabled]="procesando"
+                class="w-full px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
+                @if (procesando) {
+                  <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                  Procesando...
+                }
+                @if (!procesando) {
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7" />
+                  </svg>
+                  Realizar Check-Out
+                }
+              </button>
+            </div>
+
+          }
+        }
+      </div>
+
+      <!-- Sin Pendientes -->
+      @if (todosSinPendienteCheckout()) {
+        <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+          <svg class="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-gray-600 font-medium">No hay visitantes pendientes de check-out</p>
+          <p class="text-sm text-gray-500 mt-1">Todos los visitantes ya han salido o no han ingresado</p>
+        </div>
+      }
+
+      <!-- Instrucciones -->
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+        <div class="flex items-start">
+          <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="text-sm text-blue-800">
+            <p class="font-medium">Instrucciones:</p>
+            <ul class="list-disc list-inside mt-1 space-y-1 text-xs">
+              <li>El check-out registra la hora exacta de salida</li>
+              <li>Puedes agregar observaciones sobre la visita</li>
+              <li>Una vez realizado el check-out, se calculará la duración de la visita</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </prisionConnect-modal>
+}

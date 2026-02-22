@@ -1,0 +1,343 @@
+@if (isOpen) {
+  <prisionConnect-modal
+    [isOpen]="isOpen"
+    title="Nueva Visita"
+    (close)="cerrar()">
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      
+      <div class="p-6 space-y-6">
+
+        <!-- Tipo -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            Tipo de Visita
+          </h2>
+
+          <div class="grid grid-cols-3 gap-4">
+            <button
+              type="button"
+              (click)="form.patchValue({ tipo: TipoVisita.FAMILIAR })"
+              class="p-4 rounded-lg border-2 transition-all"
+              [class.border-teal-600]="form.get('tipo')?.value === TipoVisita.FAMILIAR"
+              [class.bg-teal-50]="form.get('tipo')?.value === TipoVisita.FAMILIAR"
+              [class.border-gray-300]="form.get('tipo')?.value !== TipoVisita.FAMILIAR">
+              <svg class="w-8 h-8 mx-auto mb-2"
+                   [class.text-teal-600]="form.get('tipo')?.value === TipoVisita.FAMILIAR"
+                   [class.text-gray-400]="form.get('tipo')?.value !== TipoVisita.FAMILIAR"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <p class="font-medium text-center text-sm"
+                 [class.text-teal-700]="form.get('tipo')?.value === TipoVisita.FAMILIAR"
+                 [class.text-gray-700]="form.get('tipo')?.value !== TipoVisita.FAMILIAR">
+                Familiar
+              </p>
+            </button>
+
+            <button
+              type="button"
+              (click)="form.patchValue({ tipo: TipoVisita.AMISTADES })"
+              class="p-4 rounded-lg border-2 transition-all"
+              [class.border-teal-600]="form.get('tipo')?.value === TipoVisita.AMISTADES"
+              [class.bg-teal-50]="form.get('tipo')?.value === TipoVisita.AMISTADES"
+              [class.border-gray-300]="form.get('tipo')?.value !== TipoVisita.AMISTADES">
+              <svg class="w-8 h-8 mx-auto mb-2"
+                   [class.text-teal-600]="form.get('tipo')?.value === TipoVisita.AMISTADES"
+                   [class.text-gray-400]="form.get('tipo')?.value !== TipoVisita.AMISTADES"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <p class="font-medium text-center text-sm"
+                 [class.text-teal-700]="form.get('tipo')?.value === TipoVisita.AMISTADES"
+                 [class.text-gray-700]="form.get('tipo')?.value !== TipoVisita.AMISTADES">
+                Amistades
+              </p>
+            </button>
+
+            <button
+              type="button"
+              (click)="form.patchValue({ tipo: TipoVisita.LEGAL })"
+              class="p-4 rounded-lg border-2 transition-all"
+              [class.border-teal-600]="form.get('tipo')?.value === TipoVisita.LEGAL"
+              [class.bg-teal-50]="form.get('tipo')?.value === TipoVisita.LEGAL"
+              [class.border-gray-300]="form.get('tipo')?.value !== TipoVisita.LEGAL">
+              <svg class="w-8 h-8 mx-auto mb-2"
+                   [class.text-teal-600]="form.get('tipo')?.value === TipoVisita.LEGAL"
+                   [class.text-gray-400]="form.get('tipo')?.value !== TipoVisita.LEGAL"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+              <p class="font-medium text-center text-sm"
+                 [class.text-teal-700]="form.get('tipo')?.value === TipoVisita.LEGAL"
+                 [class.text-gray-700]="form.get('tipo')?.value !== TipoVisita.LEGAL">
+                Legal
+              </p>
+            </button>
+          </div>
+        </section>
+
+        <!-- Recluso -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Información del Recluso
+          </h2>
+
+          <div>
+            <label class="block text-xs text-gray-600 mb-1">Recluso *</label>
+            <select
+              formControlName="reclusoId"
+              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              <option value="">Seleccionar recluso...</option>
+              @for (recluso of reclusos(); track recluso.id) {
+                <option [value]="recluso.id">
+                  {{ recluso.nombreCompleto }} - {{ recluso.pabellon }} / {{ recluso.celda }}
+                </option>
+              }
+            </select>
+          </div>
+        </section>
+
+        <!-- Visitantes Familiares -->
+        @if (form.get('tipo')?.value === TipoVisita.FAMILIAR && visitantes.length > 0) {
+          <section>
+            <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Visitantes Familiares *
+            </h2>
+
+            <div class="border-2 border-gray-300 rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto bg-gray-50">
+              @for (visitante of visitantes; track visitante.visitanteId) {
+                <label class="flex items-center gap-3 p-3 hover:bg-white rounded cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    [checked]="estaSeleccionado(visitante.visitanteId)"
+                    (change)="toggleVisitante(visitante.visitanteId)"
+                    class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ visitante.nombre }}</p>
+                    <p class="text-sm text-gray-500">{{ visitante.cedula }} - {{ visitante.parentesco }}</p>
+                  </div>
+                </label>
+              }
+            </div>
+            @if (form.get('visitantes')?.invalid && form.get('visitantes')?.touched) {
+              <p class="text-red-500 text-xs mt-1">Selecciona al menos un visitante</p>
+            }
+          </section>
+        }
+
+        @if (form.get('tipo')?.value === TipoVisita.FAMILIAR && form.get('reclusoId')?.value && visitantes.length === 0) {
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+            <p class="text-yellow-800 text-sm">
+              No hay visitantes familiares autorizados para este recluso. Por favor, autoriza visitantes primero.
+            </p>
+          </div>
+        }
+
+        <!-- Visitantes Amistades -->
+        @if (form.get('tipo')?.value === TipoVisita.AMISTADES && amigos.length > 0) {
+          <section>
+            <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Amistades Autorizadas *
+            </h2>
+
+            <div class="border-2 border-gray-300 rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto bg-gray-50">
+              @for (amigo of amigos; track amigo.visitanteId) {
+                <label class="flex items-center gap-3 p-3 hover:bg-white rounded cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    [checked]="estaSeleccionado(amigo.visitanteId)"
+                    (change)="toggleVisitante(amigo.visitanteId)"
+                    class="w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ amigo.nombre }}</p>
+                    <p class="text-sm text-gray-500">{{ amigo.cedula }} - {{ amigo.parentesco }}</p>
+                  </div>
+                </label>
+              }
+            </div>
+            @if (form.get('visitantes')?.invalid && form.get('visitantes')?.touched) {
+              <p class="text-red-500 text-xs mt-1">Selecciona al menos un visitante</p>
+            }
+          </section>
+        }
+
+        @if (form.get('tipo')?.value === TipoVisita.AMISTADES && form.get('reclusoId')?.value && amigos.length === 0) {
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+            <p class="text-yellow-800 text-sm">
+              No hay amistades autorizadas para este recluso. Por favor, autoriza visitantes primero.
+            </p>
+          </div>
+        }
+
+        <!-- Abogado Legal -->
+        @if (form.get('tipo')?.value === TipoVisita.LEGAL && abogados.length > 0) {
+          <section>
+            <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+              </svg>
+              Abogado Asignado
+            </h2>
+
+            <select
+              formControlName="abogadoId"
+              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              <option value="">Seleccionar abogado...</option>
+              @for (abogado of abogados; track abogado.abogadoId) {
+                <option [value]="abogado.abogadoId">
+                  {{ abogado.nombre }} - {{ abogado.exequatur }}
+                </option>
+              }
+            </select>
+            @if (form.get('abogadoId')?.invalid && form.get('abogadoId')?.touched) {
+              <p class="text-red-500 text-xs mt-1">Selecciona un abogado</p>
+            }
+          </section>
+        }
+
+        @if (form.get('tipo')?.value === TipoVisita.LEGAL && form.get('reclusoId')?.value && abogados.length === 0) {
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+            <p class="text-yellow-800 text-sm">
+              No hay abogados asignados a este recluso. Por favor, asigna un abogado primero.
+            </p>
+          </div>
+        }
+
+        <!-- Programación -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Programación de la Visita
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Fecha *</label>
+              <input
+                type="date"
+                formControlName="fechaVisita"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (form.get('fechaVisita')?.invalid && form.get('fechaVisita')?.touched) {
+                <p class="text-red-500 text-xs mt-1">Fecha requerida</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Hora Inicio *</label>
+              <input
+                type="time"
+                formControlName="horaInicioProgramada"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (form.get('horaInicioProgramada')?.invalid && form.get('horaInicioProgramada')?.touched) {
+                <p class="text-red-500 text-xs mt-1">Hora requerida</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Hora Fin *</label>
+              <input
+                type="time"
+                formControlName="horaFinProgramada"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (form.get('horaFinProgramada')?.invalid && form.get('horaFinProgramada')?.touched) {
+                <p class="text-red-500 text-xs mt-1">Hora requerida</p>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- Área -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            Área de Visita
+          </h2>
+
+          <select
+            formControlName="areaVisita"
+            class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <option value="">Seleccionar área...</option>
+            @for (area of areas; track area) {
+              <option [value]="area">{{ area }}</option>
+            }
+          </select>
+          @if (form.get('areaVisita')?.invalid && form.get('areaVisita')?.touched) {
+            <p class="text-red-500 text-xs mt-1">Área requerida</p>
+          }
+        </section>
+
+        <!-- Observaciones -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Observaciones
+          </h2>
+
+          <textarea
+            formControlName="observaciones"
+            rows="3"
+            placeholder="Observaciones adicionales..."
+            class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 resize-none">
+          </textarea>
+        </section>
+
+        <div class="border-t border-gray-300 pt-4"></div>
+
+        <div class="flex justify-end gap-3">
+
+          <button
+            type="button"
+            (click)="cerrar()"
+            [disabled]="guardando"
+            class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="!esFormularioValido() || guardando"
+            class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 flex items-center gap-2">
+            @if (guardando) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              Creando...
+            }
+            @if (!guardando) {
+              Crear Visita
+            }
+          </button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </prisionConnect-modal>
+}

@@ -1,0 +1,179 @@
+@if (isOpen && abogado) {
+<prisionConnect-modal
+  [isOpen]="isOpen"
+  title="Detalles del Abogado"
+  (close)="cerrar()">
+
+  <div class="p-4 sm:p-6 space-y-6">
+
+    <!-- Header Card -->
+    <div class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl p-4 sm:p-6 text-white">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+
+        <!-- IZQUIERDA -->
+        <div class="flex items-start gap-4">
+          <!-- FOTO / INICIALES -->
+          <div class="flex-shrink-0">
+            @if (abogado.fotoUrl) {
+              <img
+                [src]="abogado.fotoUrl"
+                [alt]="abogado.nombreCompleto"
+                class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-white">
+            }
+            @if (!abogado.fotoUrl) {
+              <div
+                class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white bg-opacity-20 flex items-center justify-center border-4 border-white">
+                <span class="text-2xl sm:text-3xl font-bold text-teal-600">
+                  {{ abogado.nombre.charAt(0) }}{{ abogado.apellido.charAt(0) }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- DATOS -->
+          <div>
+            <h2 class="text-lg sm:text-2xl font-bold mb-1">
+              {{ abogado.nombreCompleto }}
+            </h2>
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-teal-100 text-sm">
+
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5" />
+                </svg>
+                {{ abogado.cedula }}
+              </span>
+
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6" />
+                </svg>
+                Exequatur: {{ abogado.exequatur }}
+              </span>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- TIPO -->
+        <span
+          class="self-start px-3 py-1 text-teal-800 bg-white bg-opacity-20 backdrop-blur rounded-full text-xs sm:text-sm font-medium">
+          {{ abogado.tipo }}
+        </span>
+
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    @if (abogado.estadisticas) {
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <p class="text-xs text-gray-500 mb-1">Total Reclusos</p>
+        <p class="text-2xl sm:text-3xl font-bold">{{ abogado.estadisticas.totalReclusos || 0 }}</p>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <p class="text-xs text-gray-500 mb-1">Activos</p>
+        <p class="text-2xl sm:text-3xl font-bold text-green-600">
+          {{ abogado.estadisticas.reclusosActivos || 0 }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <p class="text-xs text-gray-500 mb-1">Visitas</p>
+        <p class="text-2xl sm:text-3xl font-bold text-blue-600">
+          {{ abogado.estadisticas.totalVisitas || 0 }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <p class="text-xs text-gray-500 mb-1">Última Visita</p>
+        <p class="text-sm font-semibold">
+          {{ formatearFecha(abogado.estadisticas.ultimaVisita) }}
+        </p>
+      </div>
+
+    </div>
+    }
+
+    <!-- Información -->
+    <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+
+      <!-- Profesional -->
+      <div class="border-b border-gray-200">
+        <div class="bg-gray-50 px-4 sm:px-6 py-3">
+          <h3 class="text-sm font-semibold text-teal-700">Información Profesional</h3>
+        </div>
+        <div class="px-4 sm:px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-gray-500">Institución</p>
+            <p class="text-sm font-medium">{{ abogado.institucion }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Tipo</p>
+            <span class="inline-flex px-2 py-1 bg-teal-100 text-teal-800 rounded-full text-xs font-medium">
+              {{ abogado.tipo }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacto -->
+      <div class="border-b border-gray-200">
+        <div class="bg-gray-50 px-4 sm:px-6 py-3">
+          <h3 class="text-sm font-semibold text-teal-700">Información de Contacto</h3>
+        </div>
+        <div class="px-4 sm:px-6 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-gray-500">Teléfono</p>
+            <p class="text-sm font-medium">{{ abogado.telefono }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Email</p>
+            <p class="text-sm font-medium break-all">{{ abogado.email }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sistema -->
+      <div>
+        <div class="bg-gray-50 px-4 sm:px-6 py-3">
+          <h3 class="text-sm font-semibold text-teal-700">Información del Sistema</h3>
+        </div>
+        <div class="px-4 sm:px-6 py-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <p class="text-xs text-gray-500">Fecha Registro</p>
+            <p class="text-sm font-medium">{{ formatearFecha(abogado.fechaRegistro) }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">ID</p>
+            <p class="text-xs font-mono text-gray-600 break-all">{{ abogado.id }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Estado</p>
+            <span
+              class="inline-flex px-2 py-1 rounded-full text-xs font-medium"
+              [class]="abogado.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              {{ abogado.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Botón -->
+    <div class="flex justify-end pt-4">
+      <prisionConnect-button type="button" variant="primary" (click)="cerrar()">
+        Cerrar
+      </prisionConnect-button>
+    </div>
+
+  </div>
+
+</prisionConnect-modal>
+}

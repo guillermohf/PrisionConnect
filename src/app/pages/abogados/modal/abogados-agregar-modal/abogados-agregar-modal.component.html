@@ -1,0 +1,140 @@
+@if (isOpen) {
+  <prisionConnect-modal
+    [isOpen]="isOpen"
+    title="Registrar Nuevo Abogado"
+    (close)="cerrar()">
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      
+      <div class="p-6 space-y-6">
+
+        <!-- Información Personal -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Información Personal
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+            <prisionConnect-input cedulaMask
+              label="Cédula"
+              [formControl]="$any(form.controls['cedula'])"
+              placeholder="000-0000000-0"
+              [required]="true"
+              (inputChange)="aplicarMascaraCedula($event)">
+            </prisionConnect-input>
+
+            <prisionConnect-input
+              label="Exequatur"
+              [formControl]="$any(form.controls['exequatur'])"
+              [required]="true">
+            </prisionConnect-input>
+
+            <prisionConnect-input
+              label="Nombre"
+              [formControl]="$any(form.controls['nombre'])"
+              [required]="true">
+            </prisionConnect-input>
+
+            <prisionConnect-input
+              label="Apellido"
+              [formControl]="$any(form.controls['apellido'])"
+              [required]="true">
+            </prisionConnect-input>
+
+          </div>
+        </section>
+
+        <!-- Información Profesional -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Información Profesional
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+            <prisionConnect-input
+              label="Tipo"
+              type="select"
+              [formControl]="$any(form.controls['tipo'])"
+              [required]="true"
+              [options]="[
+                { value: TipoAbogado.PUBLICO, label: 'Público' },
+                { value: TipoAbogado.PRIVADO, label: 'Privado' }
+              ]">
+            </prisionConnect-input>
+
+            <prisionConnect-input
+              label="Institución"
+              [formControl]="$any(form.controls['institucion'])"
+              [required]="true">
+            </prisionConnect-input>
+
+          </div>
+        </section>
+
+        <!-- Información de Contacto -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Información de Contacto
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+            <prisionConnect-input telefonoMask
+              label="Teléfono"
+              type="tel"
+              [formControl]="$any(form.controls['telefono'])"
+              [required]="true">
+            </prisionConnect-input>
+
+            <prisionConnect-input
+              label="Email"
+              type="email"
+              [formControl]="$any(form.controls['email'])"
+              [required]="true">
+            </prisionConnect-input>
+
+          </div>
+        </section>
+
+        <!-- Línea Divisoria -->
+        <div class="border-t border-gray-300 pt-4"></div>
+
+        <!-- Botones -->
+        <div class="flex justify-end gap-3">
+
+          <prisionConnect-button
+            type="button"
+            variant="secondary"
+            (click)="cerrar()">
+            Cancelar
+          </prisionConnect-button>
+
+          <prisionConnect-button
+            type="submit"
+            variant="primary"
+            [disabled]="form.invalid">
+            Registrar Abogado
+          </prisionConnect-button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </prisionConnect-modal>
+}

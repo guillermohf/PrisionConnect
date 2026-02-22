@@ -1,0 +1,20 @@
+<button
+  [type]="type"
+  (click)="onClick($event)"
+  [ngClass]="getButtonClasses()"
+  [style.width]="width"
+  [disabled]="disabled || loading">
+  
+  @if (loading) {
+    <div class="animate-spin rounded-full h-4 w-4 border-2 border-current border-r-transparent"></div>
+  }
+  
+  @if (icon && !loading) {
+    <i class="material-icons" [ngClass]="getIconSize()">{{ icon }}</i>
+  }
+  
+  @if (!iconOnly) {
+    <ng-content></ng-content>
+  }
+  
+</button>

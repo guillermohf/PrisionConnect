@@ -1,0 +1,27 @@
+/* src/app/shared/components/sidebar/side-menu-header/side-menu-header.component.scss */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Evitar que el botón cause overflow */
+button {
+  min-width: 0;
+}
+
+/* Animación suave del logo */
+img {
+  transition: transform 0.3s ease;
+}
+
+button:hover img {
+  transform: scale(1.1);
+}
+
+/* Perfil de usuario */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

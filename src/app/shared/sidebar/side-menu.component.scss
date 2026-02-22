@@ -1,0 +1,50 @@
+/* src/app/shared/components/sidebar/side-menu/side-menu.component.scss */
+
+/* Scrollbar personalizado usando colores del branding */
+:host ::ng-deep {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #008080 #1A2626;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1A2626;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #008080;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #006666;
+  }
+}
+
+/* Animaciones suaves */
+aside {
+  will-change: transform, width;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Asegurar que el sidebar no cause overflow */
+aside {
+  max-width: 100vw;
+}
+
+@media (min-width: 1024px) {
+  aside {
+    max-width: none;
+  }
+}
+
+/* Transiciones suaves para el sidebar mobile */
+@media (max-width: 1023px) {
+  aside {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}

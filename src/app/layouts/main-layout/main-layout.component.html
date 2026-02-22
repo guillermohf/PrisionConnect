@@ -1,0 +1,26 @@
+<!-- src/app/shared/layouts/main-layout/main-layout.component.html -->
+
+<div class="flex h-screen overflow-hidden bg-gray-50">
+  <!-- SIDEBAR -->
+  <prisionConnect-side-menu #sideMenu></prisionConnect-side-menu>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div 
+    prisionConnectEdgeSwipe
+    (edgeSwipeRight)="openSidebarMobile()"
+    class="flex-1 flex flex-col overflow-hidden relative"
+  >
+    <!-- INDICADOR DE SWIPE - Línea minimalista en el borde -->
+    <div class="lg:hidden fixed top-1/2 left-0 -translate-y-1/2 z-20 pointer-events-none">
+      <div class="bg-[#008080] h-20 w-2 rounded-r-full opacity-40"></div>
+    </div>
+
+    <!-- HEADER (si tienes un header component) -->
+    <!-- <prisionConnect-header></prisionConnect-header> -->
+
+    <!-- CONTENIDO -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

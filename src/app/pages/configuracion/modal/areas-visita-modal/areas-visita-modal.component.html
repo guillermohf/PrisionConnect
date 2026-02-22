@@ -1,0 +1,136 @@
+<div class="p-4 sm:p-6 space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-xl p-5 text-white shadow-md">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold">Áreas de Visita</h1>
+        <p class="text-teal-100 text-xs sm:text-sm">
+          Gestiona las áreas disponibles para realizar visitas
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+      <p class="text-2xl font-bold text-teal-700">{{ areas.length }}</p>
+      <p class="text-xs text-gray-500">Total</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+      <p class="text-2xl font-bold text-green-700">{{ areas.length }}</p>
+      <p class="text-xs text-gray-500">Activas</p>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm col-span-2 sm:col-span-1">
+      <p class="text-2xl font-bold text-gray-700">{{ 20 - areas.length }}</p>
+      <p class="text-xs text-gray-500">Disponibles</p>
+    </div>
+  </div>
+
+  <!-- Agregar Área -->
+  <section class="space-y-3">
+    <h2 class="text-sm font-semibold text-teal-700">
+      Nueva Área
+    </h2>
+
+    <div class="bg-teal-50 rounded-xl p-4 sm:p-5 space-y-3">
+      <input
+        type="text"
+        [(ngModel)]="nuevaArea"
+        placeholder="Ej: Sala de Conferencias"
+        [disabled]="agregando || guardando"
+        (keyup.enter)="agregarArea()"
+        maxlength="50"
+        class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50">
+
+      <button
+        (click)="agregarArea()"
+        [disabled]="!nuevaArea.trim() || agregando || guardando"
+        class="w-full py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 disabled:opacity-50">
+        Agregar Área
+      </button>
+
+      <p class="text-xs text-teal-700 text-center">
+        Entre 3 y 50 caracteres
+      </p>
+    </div>
+  </section>
+
+  <!-- Lista de Áreas -->
+  <section class="space-y-3">
+    <h2 class="text-sm font-semibold text-teal-700">
+      Áreas Configuradas
+    </h2>
+
+    @if (areas.length === 0) {
+      <div class="text-center py-14 bg-gray-50 rounded-xl">
+        <h3 class="font-semibold text-gray-900">
+          No hay áreas configuradas
+        </h3>
+        <p class="text-sm text-gray-500">
+          Agrega una para comenzar
+        </p>
+      </div>
+    }
+
+    <div class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+      @for (area of areas; track area; let index = $index) {
+
+        <div
+          class="bg-white rounded-xl p-4 shadow-sm space-y-3"
+          [class.bg-teal-50]="areaEditando === area">
+
+          <!-- Info -->
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center">
+              <span class="font-bold text-teal-700 text-sm">
+                {{ index + 1 }}
+              </span>
+            </div>
+
+            <div class="flex-1">
+              @if (areaEditando === area) {
+                <input
+                  type="text"
+                  [(ngModel)]="valorEditando"
+                  class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+              }
+              @if (areaEditando !== area) {
+                <p class="font-medium text-gray-900">{{ area }}</p>
+                <p class="text-xs text-gray-500">Área {{ index + 1 }}</p>
+              }
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex gap-2">
+            <button
+              (click)="iniciarEdicion(area)"
+              class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+              Editar
+            </button>
+
+            <button
+              (click)="eliminarArea(area)"
+              [disabled]="!puedeEliminar()"
+              class="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm">
+              Eliminar
+            </button>
+          </div>
+
+        </div>
+
+      }
+    </div>
+  </section>
+
+</div>

@@ -1,0 +1,159 @@
+@if (isOpen && abogado) {
+  <prisionConnect-modal
+    [isOpen]="isOpen"
+    [title]="'Editar Abogado: ' + abogado.nombreCompleto"
+    (close)="cerrar()">
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      
+      <div class="p-6 space-y-6">
+
+        <!-- Info Card -->
+        <div class="bg-teal-50 border-l-4 border-teal-600 p-4 rounded-r-lg">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+              <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold text-teal-900 mb-1">Información No Editable</h3>
+              <p class="text-xs text-teal-700">Los campos de cédula, exequatur y tipo no pueden ser modificados</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información Registrada -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Información Registrada
+          </h2>
+
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <dl class="grid grid-cols-2 gap-4">
+              <div>
+                <dt class="text-xs text-gray-500 mb-1">Cédula</dt>
+                <dd class="text-sm font-medium text-gray-900">{{ abogado.cedula }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-gray-500 mb-1">Exequatur</dt>
+                <dd class="text-sm font-medium text-gray-900">{{ abogado.exequatur }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-gray-500 mb-1">Nombre Completo</dt>
+                <dd class="text-sm font-medium text-gray-900">{{ abogado.nombreCompleto }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-gray-500 mb-1">Tipo</dt>
+                <dd>
+                  <span class="inline-flex px-2 py-1 bg-teal-100 text-teal-800 rounded-full text-xs font-medium">
+                    {{ abogado.tipo }}
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <!-- Información Profesional -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Información Profesional
+          </h2>
+
+          <div class="grid grid-cols-1 gap-4">
+            <prisionConnect-input
+              label="Institución"
+              [formControl]="$any(form.controls['institucion'])"
+              [required]="true">
+            </prisionConnect-input>
+          </div>
+        </section>
+
+        <!-- Información de Contacto -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Información de Contacto
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+            <prisionConnect-input telefonoMask
+              label="Teléfono"
+              type="tel"
+              [formControl]="$any(form.controls['telefono'])"
+              [required]="true"
+              (inputChange)="aplicarMascaraTelefono($event)">
+            </prisionConnect-input>
+
+            <prisionConnect-input
+              label="Email"
+              type="email"
+              [formControl]="$any(form.controls['email'])"
+              [required]="true">
+            </prisionConnect-input>
+
+          </div>
+        </section>
+
+        <!-- Observaciones -->
+        <section>
+          <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Observaciones
+          </h2>
+
+          <prisionConnect-input
+            label="Observaciones"
+            type="textarea"
+            [rows]="3"
+            [formControl]="$any(form.controls['observaciones'])">
+          </prisionConnect-input>
+        </section>
+
+        <!-- Línea Divisoria -->
+        <div class="border-t border-gray-300 pt-4"></div>
+
+        <!-- Botones -->
+        <div class="flex justify-end gap-3">
+
+          <prisionConnect-button
+            type="button"
+            variant="secondary"
+            [disabled]="guardando"
+            (click)="cerrar()">
+            Cancelar
+          </prisionConnect-button>
+
+          <prisionConnect-button
+            type="submit"
+            variant="primary"
+            [disabled]="guardando || form.invalid"
+            [loading]="guardando">
+            Guardar Cambios
+          </prisionConnect-button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </prisionConnect-modal>
+}

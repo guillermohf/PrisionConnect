@@ -1,0 +1,183 @@
+<prisionConnect-modal
+  [isOpen]="isOpen"
+  [title]="'Cambiar Estado de Usuario'"
+  (close)="cerrar()">
+
+  <div class="p-6 space-y-6">
+
+    <!-- Info Usuario -->
+    <div class="bg-teal-50 rounded-lg p-4 border-l-4 border-teal-600">
+      <p class="text-sm text-teal-600 font-medium">Usuario</p>
+      <p class="text-lg font-bold text-teal-900">{{ usuario?.nombreCompleto }}</p>
+      <div class="flex items-center gap-3 mt-2">
+        <span class="text-sm text-teal-700">{{ usuario?.email }}</span>
+        <span 
+          class="px-2 py-1 rounded-full text-xs font-medium"
+          [ngClass]="obtenerColorRol()">
+          {{ obtenerNombreRol() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Estado Actual -->
+    <div class="text-center py-4">
+      <p class="text-sm text-gray-600 mb-2">Estado Actual</p>
+      <span 
+        class="inline-flex items-center px-4 py-2 rounded-full text-base font-semibold border-2"
+        [class.bg-green-100]="usuario?.activo"
+        [class.text-green-800]="usuario?.activo"
+        [class.border-green-300]="usuario?.activo"
+        [class.bg-red-100]="!usuario?.activo"
+        [class.text-red-800]="!usuario?.activo"
+        [class.border-red-300]="!usuario?.activo">
+        <svg class="w-5 h-5 mr-2" 
+             [class.text-green-800]="usuario?.activo"
+             [class.text-red-800]="!usuario?.activo"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          @if (usuario?.activo) {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          }
+          @if (!usuario?.activo) {
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          }
+        </svg>
+        {{ usuario?.activo ? 'Activo' : 'Inactivo' }}
+      </span>
+    </div>
+
+    <!-- Opciones -->
+    <section>
+      <h2 class="text-sm font-semibold text-teal-700 mb-4">Cambiar Estado</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <button
+          type="button"
+          (click)="cambiarEstado(true)"
+          [disabled]="usuario?.activo || guardando"
+          class="flex flex-col items-center justify-center p-6 rounded-lg border-2 transition-all"
+          [class.border-green-600]="!usuario?.activo && !guardando"
+          [class.bg-green-50]="!usuario?.activo && !guardando"
+          [class.hover:bg-green-100]="!usuario?.activo && !guardando"
+          [class.cursor-pointer]="!usuario?.activo && !guardando"
+          [class.border-gray-300]="usuario?.activo || guardando"
+          [class.bg-gray-50]="usuario?.activo || guardando"
+          [class.cursor-not-allowed]="usuario?.activo || guardando"
+          [class.opacity-50]="usuario?.activo || guardando">
+          
+          <svg class="w-12 h-12 mb-3" 
+               [class.text-green-600]="!usuario?.activo"
+               [class.text-gray-400]="usuario?.activo"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          
+          <h3 class="text-lg font-semibold mb-1"
+              [class.text-green-900]="!usuario?.activo"
+              [class.text-gray-500]="usuario?.activo">
+            Activar Usuario
+          </h3>
+          
+          <p class="text-sm text-center"
+             [class.text-green-700]="!usuario?.activo"
+             [class.text-gray-500]="usuario?.activo">
+            Permitir acceso al sistema
+          </p>
+
+          @if (usuario?.activo) {
+            <span class="mt-2 text-xs text-gray-500">(Ya está activo)</span>
+          }
+        </button>
+
+        <button
+          type="button"
+          (click)="cambiarEstado(false)"
+          [disabled]="!usuario?.activo || guardando"
+          class="flex flex-col items-center justify-center p-6 rounded-lg border-2 transition-all"
+          [class.border-red-600]="usuario?.activo && !guardando"
+          [class.bg-red-50]="usuario?.activo && !guardando"
+          [class.hover:bg-red-100]="usuario?.activo && !guardando"
+          [class.cursor-pointer]="usuario?.activo && !guardando"
+          [class.border-gray-300]="!usuario?.activo || guardando"
+          [class.bg-gray-50]="!usuario?.activo || guardando"
+          [class.cursor-not-allowed]="!usuario?.activo || guardando"
+          [class.opacity-50]="!usuario?.activo || guardando">
+          
+          <svg class="w-12 h-12 mb-3" 
+               [class.text-red-600]="usuario?.activo"
+               [class.text-gray-400]="!usuario?.activo"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          
+          <h3 class="text-lg font-semibold mb-1"
+              [class.text-red-900]="usuario?.activo"
+              [class.text-gray-500]="!usuario?.activo">
+            Desactivar Usuario
+          </h3>
+          
+          <p class="text-sm text-center"
+             [class.text-red-700]="usuario?.activo"
+             [class.text-gray-500]="!usuario?.activo">
+            Bloquear acceso al sistema
+          </p>
+
+          @if (!usuario?.activo) {
+            <span class="mt-2 text-xs text-gray-500">(Ya está inactivo)</span>
+          }
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Advertencias -->
+    @if (usuario?.activo) {
+      <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+        <div class="flex items-start gap-3">
+          <svg class="w-6 h-6 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div class="flex-1">
+            <h3 class="text-sm font-medium text-red-800 mb-1">Al Desactivar el Usuario:</h3>
+            <ul class="text-sm text-red-700 list-disc list-inside space-y-1">
+              <li>No podrá iniciar sesión en el sistema</li>
+              <li>Las sesiones activas se cerrarán automáticamente</li>
+              <li>Los datos del usuario se conservarán</li>
+              <li>Puede ser reactivado en cualquier momento</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (!usuario?.activo) {
+      <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+        <div class="flex items-start gap-3">
+          <svg class="w-6 h-6 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="flex-1">
+            <h3 class="text-sm font-medium text-green-800 mb-1">Al Activar el Usuario:</h3>
+            <ul class="text-sm text-green-700 list-disc list-inside space-y-1">
+              <li>Podrá volver a iniciar sesión</li>
+              <li>Tendrá los permisos de su rol asignado</li>
+              <li>Podrá acceder a los módulos permitidos</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Botón -->
+    <div class="flex justify-end pt-4 border-t border-gray-300">
+      <button
+        type="button"
+        (click)="cerrar()"
+        [disabled]="guardando"
+        class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50">
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</prisionConnect-modal>

@@ -1,0 +1,163 @@
+<div class="p-6 space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg p-6 text-white shadow-md">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 bg-white/20  rounded-lg flex items-center justify-center">
+          <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold">Horarios de Visita</h1>
+          <p class="text-teal-100 text-sm">
+            Configura los horarios de atención para cada día de la semana
+          </p>
+        </div>
+      </div>
+
+      <button
+        (click)="aplicarATodos()"
+        [disabled]="guardando"
+        class="px-4 py-2 bg-white text-teal-700 rounded-lg font-medium
+               hover:bg-teal-50 transition-colors flex items-center gap-2
+               disabled:opacity-50">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+        </svg>
+        Aplicar Lunes a Todos
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+      <p class="text-3xl font-bold text-green-700">{{ obtenerDiasActivos() }}</p>
+      <p class="text-xs text-gray-600">Días Activos</p>
+    </div>
+
+    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+      <p class="text-3xl font-bold text-teal-700">
+        {{ calcularHorasSemanales().toFixed(1) }}h
+      </p>
+      <p class="text-xs text-gray-600">Horas Semanales</p>
+    </div>
+
+    <div class="bg-white rounded-lg p-4 text-center shadow-sm">
+      <p class="text-3xl font-bold text-red-700">{{ obtenerDiasCerrados() }}</p>
+      <p class="text-xs text-gray-600">Días Cerrados</p>
+    </div>
+  </div>
+
+  <!-- Configuración por Día -->
+  <section>
+    <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-teal-700">
+      Configuración por Día
+    </h2>
+
+    <div class="space-y-3">
+      @for (diaConfig of diasSemana; track diaConfig.dia) {
+        <div
+          class="bg-white rounded-lg p-4 transition-all shadow-sm"
+          [class.opacity-60]="!diaConfig.horario.activo">
+
+          <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+
+            <!-- Día -->
+            <div class="w-full lg:w-32">
+              <div class="flex items-center gap-3 mb-2">
+                <button
+                  (click)="toggleDia(diaConfig)"
+                  [disabled]="guardando"
+                  class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                  [class.bg-teal-600]="diaConfig.horario.activo"
+                  [class.bg-gray-300]="!diaConfig.horario.activo">
+                  <span
+                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                    [class.translate-x-6]="diaConfig.horario.activo"
+                    [class.translate-x-1]="!diaConfig.horario.activo">
+                  </span>
+                </button>
+              </div>
+
+              <h3 class="font-bold text-gray-900">{{ diaConfig.label }}</h3>
+              <p class="text-xs"
+                [class.text-green-600]="diaConfig.horario.activo"
+                [class.text-red-600]="!diaConfig.horario.activo">
+                {{ diaConfig.horario.activo ? 'Activo' : 'Cerrado' }}
+              </p>
+            </div>
+
+            <!-- Hora Inicio -->
+            <div class="flex-1">
+              <label class="block text-xs text-gray-600 mb-1">Hora Inicio</label>
+              <input
+                type="time"
+                [(ngModel)]="diaConfig.horario.inicio"
+                (blur)="actualizarHorario(diaConfig)"
+                [disabled]="!diaConfig.horario.activo || guardando"
+                class="w-full px-3 py-2 rounded-lg focus:outline-none
+                       focus:ring-2 focus:ring-teal-500
+                       disabled:opacity-50 disabled:bg-gray-100">
+            </div>
+
+            <!-- Hora Fin -->
+            <div class="flex-1">
+              <label class="block text-xs text-gray-600 mb-1">Hora Fin</label>
+              <input
+                type="time"
+                [(ngModel)]="diaConfig.horario.fin"
+                (blur)="actualizarHorario(diaConfig)"
+                [disabled]="!diaConfig.horario.activo || guardando"
+                class="w-full px-3 py-2 rounded-lg focus:outline-none
+                       focus:ring-2 focus:ring-teal-500
+                       disabled:opacity-50 disabled:bg-gray-100">
+            </div>
+
+            <!-- Duración -->
+            <div class="w-full lg:w-28">
+              <label class="block text-xs text-gray-600 mb-1">Duración</label>
+              <div
+                class="px-3 py-2 rounded-lg text-center font-bold"
+                [class.bg-teal-50]="diaConfig.horario.activo"
+                [class.text-teal-700]="diaConfig.horario.activo"
+                [class.bg-gray-100]="!diaConfig.horario.activo"
+                [class.text-gray-500]="!diaConfig.horario.activo">
+                {{ diaConfig.horario.activo
+                  ? calcularDuracion(diaConfig.horario.inicio, diaConfig.horario.fin)
+                  : 'Cerrado' }}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Información -->
+  <div class="bg-blue-50 rounded-lg p-4 shadow-sm">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="text-sm font-semibold text-blue-900 mb-2">
+          Información sobre Horarios
+        </h3>
+        <ul class="text-sm text-blue-800 space-y-1">
+          <li>• Los cambios se guardan automáticamente</li>
+          <li>• Debe haber al menos 1 día activo</li>
+          <li>• Hora inicio &lt; hora fin</li>
+          <li>• No afecta visitas ya programadas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>

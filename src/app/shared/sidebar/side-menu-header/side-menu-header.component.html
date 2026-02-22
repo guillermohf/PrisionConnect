@@ -1,0 +1,70 @@
+<!-- src/app/shared/components/sidebar/side-menu-header/side-menu-header.component.html -->
+
+<div class="w-full">
+
+  <!-- BOTÓN TOGGLE (solo desktop) -->
+  <button
+    (click)="onToggle()"
+    class="hidden lg:flex items-center w-full px-4 py-3 border-b border-[#008080] transition-all duration-300 hover:bg-[#008080]"
+    [ngClass]="{
+      'justify-start': expanded(),
+      'justify-center': !expanded()
+    }"
+  >
+    <!-- Figura (solo cuando está colapsado) -->
+    <img
+      *ngIf="!expanded()"
+      src="/assets/figura.png"
+      alt="Prision Connect"
+      class="w-14 h-14 shrink-0"
+    />
+
+    <!-- Logo horizontal blanco (solo cuando está expandido) -->
+    <img
+      *ngIf="expanded()"
+      src="/assets/logoblanco.png"
+      alt="Prision Connect"
+      class="h-10 w-auto"
+    />
+  </button>
+
+  <!-- LOGO (mobile) - Solo el logo horizontal -->
+  <div class="flex lg:hidden items-center justify-center w-full px-4 py-3 border-b border-[#008080]">
+    <img
+      src="/assets/logoblanco.png"
+      alt="Prision Connect"
+      class="h-12 w-auto"
+    />
+  </div>
+
+  <!-- PERFIL USUARIO -->
+  <div
+    class="flex items-center px-4 py-3 border-b border-[#008080] transition-all duration-300 hover:bg-[#008080]"
+    [ngClass]="{
+      'justify-start gap-3': expanded(),
+      'justify-center': !expanded()
+    }"
+  >
+    <img
+      [src]="user()?.photoURL || '/assets/avatar.png'"
+      alt="Usuario"
+      class="w-10 h-10 rounded-full shrink-0 border-2 border-[#FCD2C9]"
+    />
+
+    <div
+      class="text-sm overflow-hidden transition-all duration-300"
+      [ngClass]="{
+        'opacity-100 max-w-xs ml-3': expanded(),
+        'opacity-0 max-w-0 ml-0': !expanded()
+      }"
+    >
+      <div class="font-bold leading-tight">
+        {{ user()?.displayName || 'Usuario' }}
+      </div>
+      <div class="text-xs text-[#FEEBDD] truncate">
+        {{ user()?.email }}
+      </div>
+    </div>
+  </div>
+
+</div>

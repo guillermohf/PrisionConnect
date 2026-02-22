@@ -1,0 +1,10 @@
+<!-- Visible solo en móvil -->
+<div class="space-y-3 sm:hidden">
+
+  <ng-container
+    *ngFor="let item of items; trackBy: trackBy"
+    [ngTemplateOutlet]="cardTemplate"
+    [ngTemplateOutletContext]="{ $implicit: item }">
+  </ng-container>
+
+</div>

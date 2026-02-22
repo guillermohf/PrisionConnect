@@ -1,0 +1,100 @@
+<div class="flex flex-col w-full" [ngClass]="class">
+  <label class="mb-1 text-xs text-gray-600">
+    {{ label }}
+    @if (required) {
+      <span class="text-red-500">*</span>
+    }
+  </label>
+
+  <!-- Input normal -->
+  @if (!isTextarea && !isSelect) {
+    <input
+      class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none
+             focus:ring-2 focus:ring-teal-600 focus:border-teal-600 transition-all"
+      [class.border-red-500]="invalid"
+      [class.focus:ring-red-500]="invalid"
+      [class.bg-gray-100]="isReadonlyOrDisabled"
+      [class.cursor-not-allowed]="isReadonlyOrDisabled"
+      [attr.name]="name"
+      [type]="type"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      [readonly]="readonly"
+      (input)="onInputChange($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+      [mask]="mask || ''"
+      [dropSpecialCharacters]="false"
+    />
+  }
+
+  <!-- Select -->
+  @if (isSelect) {
+    <select
+      class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none
+             focus:ring-2 focus:ring-teal-600 focus:border-teal-600 transition-all"
+      [class.border-red-500]="invalid"
+      [class.focus:ring-red-500]="invalid"
+      [class.bg-gray-100]="disabled"
+      [class.cursor-not-allowed]="disabled"
+      [attr.name]="name"
+      [value]="value"
+      [disabled]="disabled"
+      (change)="onInputChange($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()">
+      @if (placeholder) {
+        <option value="" disabled selected>{{ placeholder }}</option>
+      }
+      @for (option of options; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  }
+
+  <!-- Textarea -->
+  @if (isTextarea) {
+    <textarea
+      class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg outline-none
+             focus:ring-2 focus:ring-teal-600 focus:border-teal-600 transition-all resize-none"
+      [class.border-red-500]="invalid"
+      [class.focus:ring-red-500]="invalid"
+      [class.bg-gray-100]="isReadonlyOrDisabled"
+      [class.cursor-not-allowed]="isReadonlyOrDisabled"
+      [attr.name]="name"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      [readonly]="readonly"
+      [rows]="rows"
+      (input)="onInputChange($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()">
+    </textarea>
+  }
+
+  <!-- Mensajes de error -->
+  @if (invalid) {
+    <small class="text-red-500 text-xs mt-1">
+      @if (errors['required']) {
+        <span>Este campo es obligatorio</span>
+      }
+      @if (errors['maxlength']) {
+        <span>Máximo {{ errors['maxlength'].requiredLength }} caracteres</span>
+      }
+      @if (errors['minlength']) {
+        <span>Mínimo {{ errors['minlength'].requiredLength }} caracteres</span>
+      }
+      @if (errors['email']) {
+        <span>El formato del email no es válido</span>
+      }
+      @if (errors['pattern']) {
+        <span>El formato ingresado no es válido</span>
+      }
+      @if (errors['duplicado']) {
+        <span>Este valor ya existe en el sistema</span>
+      }
+    </small>
+  }
+</div>

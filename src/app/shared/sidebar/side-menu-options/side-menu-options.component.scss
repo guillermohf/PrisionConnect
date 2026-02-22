@@ -1,0 +1,73 @@
+/* src/app/shared/components/sidebar/side-menu-options/side-menu-options.component.scss */
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Links del menú */
+nav a {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Badge de notificaciones */
+.badge {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .8;
+  }
+}
+
+/* Tooltip */
+.group:hover .opacity-0 {
+  animation: fadeIn 0.2s ease-in-out forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Transiciones suaves */
+.transition {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Botón de logout */
+button {
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Iconos de Material Icons */
+.material-icons {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

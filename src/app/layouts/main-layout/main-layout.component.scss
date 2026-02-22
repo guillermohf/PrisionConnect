@@ -1,0 +1,32 @@
+/* src/app/shared/layouts/main-layout/main-layout.component.scss */
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Botón hamburguesa flotante */
+button {
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Animación del botón hamburguesa */
+@media (max-width: 767px) {
+  button {
+    animation: slideIn 0.3s ease-out;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

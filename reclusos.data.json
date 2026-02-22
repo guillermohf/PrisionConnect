@@ -1,0 +1,104 @@
+{
+  "reclusos": {
+    "recluso001": {
+      "numeroIdentificacion": "R-2024-001",
+      "nombre": "Juan",
+      "apellido": "García",
+      "nombreCompleto": "Juan García",
+      "fechaNacimiento": "1985-05-15",
+      "edad": 39,
+      "fotoUrl": "",
+      "pabellon": "A",
+      "celda": "12",
+      "fechaIngreso": "2023-01-10",
+      "situacionLegal": "Condenado",
+      "activo": true,
+      "observaciones": "Sin observaciones especiales",
+      "estadisticas": {
+        "totalVisitantes": 0,
+        "totalAbogados": 0,
+        "totalVisitas": 0
+      }
+    },
+    "recluso002": {
+      "numeroIdentificacion": "R-2024-002",
+      "nombre": "Pedro",
+      "apellido": "Martínez",
+      "nombreCompleto": "Pedro Martínez",
+      "fechaNacimiento": "1990-08-20",
+      "edad": 34,
+      "fotoUrl": "",
+      "pabellon": "B",
+      "celda": "05",
+      "fechaIngreso": "2023-06-15",
+      "situacionLegal": "Procesado",
+      "activo": true,
+      "observaciones": "En espera de sentencia definitiva",
+      "estadisticas": {
+        "totalVisitantes": 0,
+        "totalAbogados": 0,
+        "totalVisitas": 0
+      }
+    },
+    "recluso003": {
+      "numeroIdentificacion": "R-2024-003",
+      "nombre": "Carlos",
+      "apellido": "Sánchez",
+      "nombreCompleto": "Carlos Sánchez",
+      "fechaNacimiento": "1988-03-12",
+      "edad": 36,
+      "fotoUrl": "",
+      "pabellon": "A",
+      "celda": "08",
+      "fechaIngreso": "2023-03-20",
+      "situacionLegal": "Prisión Preventiva",
+      "activo": true,
+      "observaciones": "Comparecencia programada para febrero 2025",
+      "estadisticas": {
+        "totalVisitantes": 0,
+        "totalAbogados": 0,
+        "totalVisitas": 0
+      }
+    },
+    "recluso004": {
+      "numeroIdentificacion": "R-2024-004",
+      "nombre": "Miguel",
+      "apellido": "Rodríguez",
+      "nombreCompleto": "Miguel Rodríguez",
+      "fechaNacimiento": "1982-11-30",
+      "edad": 42,
+      "fotoUrl": "",
+      "pabellon": "C",
+      "celda": "15",
+      "fechaIngreso": "2022-09-05",
+      "situacionLegal": "Condenado",
+      "activo": true,
+      "observaciones": "Buen comportamiento. Elegible para reducción de pena",
+      "estadisticas": {
+        "totalVisitantes": 0,
+        "totalAbogados": 0,
+        "totalVisitas": 0
+      }
+    },
+    "recluso005": {
+      "numeroIdentificacion": "R-2024-005",
+      "nombre": "José",
+      "apellido": "Fernández",
+      "nombreCompleto": "José Fernández",
+      "fechaNacimiento": "1995-07-18",
+      "edad": 29,
+      "fotoUrl": "",
+      "pabellon": "B",
+      "celda": "22",
+      "fechaIngreso": "2024-02-14",
+      "situacionLegal": "Procesado",
+      "activo": true,
+      "observaciones": "Primera ofensa. Colaborando con las autoridades",
+      "estadisticas": {
+        "totalVisitantes": 0,
+        "totalAbogados": 0,
+        "totalVisitas": 0
+      }
+    }
+  }
+}

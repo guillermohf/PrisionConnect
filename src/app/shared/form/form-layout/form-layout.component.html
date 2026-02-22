@@ -1,0 +1,14 @@
+<div [class]="padding + ' space-y-6'">
+
+  <!-- CONTENIDO DEL FORMULARIO -->
+  <ng-content></ng-content>
+
+  <!-- LÍNEA DIVISORIA -->
+  @if (showDivider) {
+    <div class="border-t border-gray-300 pt-4"></div>
+  }
+
+  <!-- BOTONES -->
+  <ng-content select="[buttons]"></ng-content>
+
+</div>

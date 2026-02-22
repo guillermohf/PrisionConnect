@@ -1,0 +1,49 @@
+<!-- src/app/shared/components/sidebar/side-menu/side-menu.component.html -->
+
+<!-- ZONA DE DETECCIÓN DE EDGE SWIPE (solo mobile, cuando el menú está cerrado) -->
+@if (isMobile() && !isMobileOpen()) {
+  <div
+    prisionConnectEdgeSwipe
+    (edgeSwipeRight)="handleEdgeSwipe()"
+    class="fixed top-0 left-0 w-8 h-full z-30 pointer-events-auto"
+  ></div>
+}
+
+<!-- OVERLAY (solo mobile) -->
+@if (isMobileOpen()) {
+  <div
+    class="fixed inset-0 bg-black/50 z-40 lg:hidden"
+    (click)="closeMobile()"
+  ></div>
+}
+
+<!-- SIDEBAR -->
+<aside
+  prisionConnectSwipe
+  (swipe)="handleSwipe($event)"
+  class="bg-[#006666] text-white transition-all duration-300 flex flex-col overflow-hidden shadow-xl"
+  [ngClass]="{
+    'fixed top-0 left-0 z-50 h-screen w-64': isMobile(),
+    'relative z-0 h-full': !isMobile(),
+    'w-64': expanded() || isMobile(),
+    'w-20': !expanded() && !isMobile(),
+    '-translate-x-full': !isMobileOpen() && isMobile(),
+    'translate-x-0': isMobileOpen() || !isMobile()
+  }"
+>
+
+  <!-- HEADER SIDEBAR -->
+  <prisionConnect-side-menu-header
+    [expanded]="expanded()"
+    (toggle)="toggleSidebar()"
+  ></prisionConnect-side-menu-header>
+
+  <!-- OPCIONES -->
+  <div class="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#008080] scrollbar-track-[#1A2626]">
+    <prisionConnect-side-menu-options
+      [expanded]="expanded()"
+      (logout)="closeMobile()"
+    ></prisionConnect-side-menu-options>
+  </div>
+
+</aside>  

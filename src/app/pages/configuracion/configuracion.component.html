@@ -1,0 +1,168 @@
+<!-- src/app/features/configuracion/configuracion.component.html -->
+<div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg p-4 sm:p-6 text-white shadow-lg">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+      <div class="flex-1">
+        <h1 class="text-xl sm:text-2xl font-bold">Configuración del Sistema</h1>
+        <p class="text-teal-100 text-xs sm:text-sm mt-1">
+          Administra los parámetros del sistema
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/20 rounded-lg backdrop-blur-sm">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="text-sm font-medium whitespace-nowrap">Configuración</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-12 sm:py-20">
+      <div class="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-teal-600 border-t-transparent"></div>
+    </div>
+  }
+
+  <!-- Contenido -->
+  @if (!loading() && configuracion()) {
+
+    <!-- Tabs Container -->
+    <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden">
+
+      <!-- Tabs Header - Scrollable en móvil -->
+      <div class="border-b border-gray-200 overflow-x-auto">
+        <nav class="flex min-w-max sm:min-w-0">
+
+          <!-- Tab Horarios -->
+          <button
+            (click)="cambiarTab('horarios')"
+            class="flex-1 min-w-[100px] py-3 px-4 text-center border-b-2 font-medium text-xs sm:text-sm transition-all whitespace-nowrap"
+            [class.border-teal-600]="tabActivo === 'horarios'"
+            [class.text-teal-600]="tabActivo === 'horarios'"
+            [class.bg-teal-50]="tabActivo === 'horarios'"
+            [class.border-transparent]="tabActivo !== 'horarios'"
+            [class.text-gray-500]="tabActivo !== 'horarios'"
+            [class.hover:bg-gray-50]="tabActivo !== 'horarios'">
+            <div class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Horarios</span>
+            </div>
+          </button>
+
+          <!-- Tab Parámetros -->
+          <button
+            (click)="cambiarTab('parametros')"
+            class="flex-1 min-w-[100px] py-3 px-4 text-center border-b-2 font-medium text-xs sm:text-sm transition-all whitespace-nowrap"
+            [class.border-teal-600]="tabActivo === 'parametros'"
+            [class.text-teal-600]="tabActivo === 'parametros'"
+            [class.bg-teal-50]="tabActivo === 'parametros'"
+            [class.border-transparent]="tabActivo !== 'parametros'"
+            [class.text-gray-500]="tabActivo !== 'parametros'"
+            [class.hover:bg-gray-50]="tabActivo !== 'parametros'">
+            <div class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              <span>Parámetros</span>
+            </div>
+          </button>
+
+          <!-- Tab Áreas -->
+          <button
+            (click)="cambiarTab('areas')"
+            class="flex-1 min-w-[100px] py-3 px-4 text-center border-b-2 font-medium text-xs sm:text-sm transition-all whitespace-nowrap"
+            [class.border-teal-600]="tabActivo === 'areas'"
+            [class.text-teal-600]="tabActivo === 'areas'"
+            [class.bg-teal-50]="tabActivo === 'areas'"
+            [class.border-transparent]="tabActivo !== 'areas'"
+            [class.text-gray-500]="tabActivo !== 'areas'"
+            [class.hover:bg-gray-50]="tabActivo !== 'areas'">
+            <div class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span>Áreas</span>
+            </div>
+          </button>
+
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-4 sm:p-6">
+
+        @if (tabActivo === 'horarios') {
+          <prisionConnect-horarios-visita-modal
+            [configuracion]="configuracion()"
+            (cambiosRealizados)="marcarCambios()">
+          </prisionConnect-horarios-visita-modal>
+        }
+
+        @if (tabActivo === 'parametros') {
+          <prisionConnect-parametros-sistema-modal
+            [configuracion]="configuracion()"
+            (cambiosRealizados)="marcarCambios()">
+          </prisionConnect-parametros-sistema-modal>
+        }
+
+        @if (tabActivo === 'areas') {
+          <prisionConnect-areas-visita-modal
+            (cambiosRealizados)="marcarCambios()">
+          </prisionConnect-areas-visita-modal>
+        }
+
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white rounded-lg shadow-lg p-4 sm:p-6 border-2 border-gray-200">
+
+      <!-- Indicador de Cambios -->
+      <div class="w-full sm:w-auto">
+        @if (hayCambios) {
+          <div class="flex items-center gap-2 text-orange-600 bg-orange-50 px-3 py-2 rounded-lg">
+            <svg class="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span class="text-sm font-medium">Hay cambios sin guardar</span>
+          </div>
+        }
+        @if (!hayCambios) {
+          <div class="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-sm font-medium">Cambios guardados</span>
+          </div>
+        }
+      </div>
+
+      <!-- Botón Resetear -->
+      <button
+        (click)="resetearConfiguracion()"
+        class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Resetear a Predeterminado</span>
+      </button>
+
+    </div>
+
+  }
+
+</div>

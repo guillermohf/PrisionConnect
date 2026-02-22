@@ -1,0 +1,352 @@
+<!-- src/app/features/visitas-activas/visitas-activas.component.html -->
+<div class="p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 lg:space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-[#006666] to-[#008080] rounded-lg p-4 sm:p-5 lg:p-6 text-white shadow-lg">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+      <div class="flex-1">
+        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold">Visitas Activas</h1>
+        <p class="text-[#FEEBDD] text-xs sm:text-sm mt-1">
+          Monitoreo en tiempo real de visitas en curso
+        </p>
+      </div>
+      <div class="flex items-center gap-2 px-3 py-2 bg-white/20 rounded-lg backdrop-blur-sm">
+        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        <span class="text-xs sm:text-sm font-bold text-white">Actualización automática</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métricas -->
+  <div class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 lg:gap-4">
+    
+    <!-- Visitas en Curso -->
+    <div class="bg-gradient-to-br from-[#006666] to-[#008080] rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 text-white transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[#FEEBDD] text-xs sm:text-sm font-medium">Visitas en Curso</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-[#FEEBDD]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold">{{ estadisticas().enCurso }}</p>
+    </div>
+
+    <!-- Visitantes Dentro -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 border-2 border-blue-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Visitantes Dentro</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600">{{ estadisticas().visitantesDentro }}</p>
+    </div>
+
+    <!-- En Tránsito -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 border-2 border-purple-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">En Tránsito</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-600">{{ visitasEnTransito() }}</p>
+    </div>
+
+    <!-- Pendiente Salida -->
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 lg:p-6 border-2 border-orange-200 transform transition-all duration-200 hover:scale-105">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-gray-600 text-xs sm:text-sm font-medium">Pendiente Salida</p>
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-orange-600">{{ visitasPendienteSalida() }}</p>
+    </div>
+
+  </div>
+
+  <!-- Filtros Vista -->
+  <div class="bg-white rounded-lg shadow-lg p-3 sm:p-4 border-2 border-gray-200">
+    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      
+      <button
+        (click)="cambiarVista('todas')"
+        class="px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-bold text-sm transition-all"
+        [class.bg-[#006666]]="vistaActual() === 'todas'"
+        [class.text-white]="vistaActual() === 'todas'"
+        [class.bg-gray-100]="vistaActual() !== 'todas'"
+        [class.text-gray-700]="vistaActual() !== 'todas'">
+        Todas ({{ visitasActivas().length }})
+      </button>
+
+      <button
+        (click)="cambiarVista('en-curso')"
+        class="px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-bold text-sm transition-all"
+        [class.bg-green-600]="vistaActual() === 'en-curso'"
+        [class.text-white]="vistaActual() === 'en-curso'"
+        [class.bg-gray-100]="vistaActual() !== 'en-curso'"
+        [class.text-gray-700]="vistaActual() !== 'en-curso'">
+        En Curso ({{ estadisticas().enCurso }})
+      </button>
+
+      <button
+        (click)="cambiarVista('en-transito')"
+        class="px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-bold text-sm transition-all"
+        [class.bg-purple-600]="vistaActual() === 'en-transito'"
+        [class.text-white]="vistaActual() === 'en-transito'"
+        [class.bg-gray-100]="vistaActual() !== 'en-transito'"
+        [class.text-gray-700]="vistaActual() !== 'en-transito'">
+        En Tránsito ({{ visitasEnTransito() }})
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex justify-center items-center py-12 sm:py-16 lg:py-20">
+      <div class="relative">
+        <div class="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-[#006666] border-t-transparent"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <div class="w-4 h-4 sm:w-6 sm:h-6 bg-[#006666] rounded-full animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Sin Visitas -->
+  @if (visitasFiltradas().length === 0 && !loading()) {
+    <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 sm:p-12 text-center">
+      <svg class="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+      </svg>
+      <p class="text-base sm:text-xl font-medium text-gray-600 mb-2">No hay visitas activas</p>
+      <p class="text-sm text-gray-500">No se encontraron visitas en curso en este momento</p>
+    </div>
+  }
+
+  <!-- ========================================= -->
+  <!-- MOBILE: CARDS (< 768px)                  -->
+  <!-- ========================================= -->
+  @if (!loading() && visitasFiltradas().length > 0) {
+    <div class="md:hidden space-y-3">
+      @for (visita of visitasFiltradas(); track visita.id) {
+        <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden transform transition-all duration-200 hover:shadow-xl">
+          
+          <!-- Header con Estado -->
+          <div class="px-3 py-2.5 bg-gradient-to-r from-[#006666] to-[#008080] flex items-center justify-between">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap bg-green-100 text-green-800">
+                {{ visita.estado }}
+              </span>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                {{ calcularTiempoTranscurrido(visita) }}
+              </span>
+            </div>
+            <button
+              (click)="verDetalle(visita)"
+              class="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200">
+              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Contenido -->
+          <div class="p-3.5 space-y-3">
+            
+            <!-- Recluso -->
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-[#006666] flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs text-gray-500 font-medium">Recluso</p>
+                <p class="font-bold text-gray-900 truncate text-sm">{{ visita.reclusoNombre }}</p>
+              </div>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="grid grid-cols-2 gap-2.5">
+              
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Área</p>
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ visita.areaVisita }}</p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Visitantes</p>
+                <p class="text-sm font-semibold text-gray-900">
+                  {{ visita.visitantesPresentes }}/{{ visita.totalVisitantes }}
+                </p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Hora Inicio</p>
+                <p class="text-sm font-semibold text-gray-900">{{ visita.horaInicioProgramada }}</p>
+              </div>
+
+              <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Tipo</p>
+                <p class="text-sm font-semibold text-gray-900">{{ visita.tipo }}</p>
+              </div>
+
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex flex-wrap gap-2 pt-2.5 border-t border-gray-200">
+              
+              @if (puedeHacerCheckIn(visita)) {
+                <button
+                  (click)="abrirCheckIn(visita)"
+                  class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Check-In
+                </button>
+              }
+
+              @if (puedeHacerCheckOut(visita)) {
+                <button
+                  (click)="abrirCheckOut(visita)"
+                  class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Check-Out
+                </button>
+              }
+
+              <button
+                (click)="abrirCambiarEstado(visita)"
+                class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-[#006666] hover:bg-[#008080] text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                Estado
+              </button>
+
+              <button
+                (click)="abrirIncidencia(visita)"
+                class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Incidencia
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ========================================= -->
+  <!-- DESKTOP: TABLA (≥ 768px)                 -->
+  <!-- ========================================= -->
+  @if (!loading() && visitasFiltradas().length > 0) {
+    <div class="hidden md:block bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <prisionConnect-data-table 
+          [data]="visitasFiltradas()" 
+          [columns]="columnas" 
+          [showActions]="true"
+          [showEdit]="false"
+          [showDelete]="false"
+          (detail)="verDetalle($event)">
+
+          <ng-template #customActions let-visita>
+            
+            @if (puedeHacerCheckIn(visita)) {
+              <button
+                (click)="abrirCheckIn(visita)"
+                class="p-1.5 sm:p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200"
+                title="Check-In">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            }
+
+            @if (puedeHacerCheckOut(visita)) {
+              <button
+                (click)="abrirCheckOut(visita)"
+                class="p-1.5 sm:p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
+                title="Check-Out">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            }
+
+            <button
+              (click)="abrirCambiarEstado(visita)"
+              class="p-1.5 sm:p-2 text-[#006666] hover:bg-[#FEEBDD] rounded-lg transition-all duration-200"
+              title="Cambiar Estado">
+              <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+              </svg>
+            </button>
+
+            <button
+              (click)="abrirIncidencia(visita)"
+              class="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+              title="Agregar Incidencia">
+              <svg class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </button>
+
+            <div class="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold">
+              {{ calcularTiempoTranscurrido(visita) }}
+            </div>
+
+          </ng-template>
+
+        </prisionConnect-data-table>
+      </div>
+    </div>
+  }
+
+  <!-- Modales -->
+  <prisionConnect-visita-detalle-modal
+    [(isOpen)]="mostrarModalDetalle"
+    [visita]="visitaSeleccionada">
+  </prisionConnect-visita-detalle-modal>
+
+  <prisionConnect-check-in-modal
+    [(isOpen)]="mostrarModalCheckIn"
+    [visita]="visitaSeleccionada"
+    (checkInRealizado)="onCheckInRealizado()">
+  </prisionConnect-check-in-modal>
+
+  <prisionConnect-check-out-modal
+    [(isOpen)]="mostrarModalCheckOut"
+    [visita]="visitaSeleccionada"
+    (checkOutRealizado)="onCheckOutRealizado()">
+  </prisionConnect-check-out-modal>
+
+  <prisionConnect-cambiar-estado-visita-modal
+    [(isOpen)]="mostrarModalCambiarEstado"
+    [visita]="visitaSeleccionada"
+    (estadoCambiado)="onEstadoCambiado()">
+  </prisionConnect-cambiar-estado-visita-modal>
+
+  <prisionConnect-agregar-incidencia-modal
+    [(isOpen)]="mostrarModalIncidencia"
+    [visita]="visitaSeleccionada"
+    (incidenciaAgregada)="onIncidenciaAgregada()">
+  </prisionConnect-agregar-incidencia-modal>
+
+</div>

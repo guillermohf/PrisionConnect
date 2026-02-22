@@ -1,0 +1,83 @@
+<!-- src/app/shared/components/sidebar/side-menu-options/side-menu-options.component.html -->
+
+<div class="flex flex-col h-full">
+  <!-- NAV LINKS -->
+  <nav class="flex-1 mt-4 space-y-1">
+    @for(option of menuOptions(); track option.route) {
+      <a
+        [routerLink]="option.route"
+        routerLinkActive="bg-[#008080]"
+        class="flex items-center px-4 py-3 hover:bg-[#008080] transition-all group relative"
+        [ngClass]="{ 'justify-center': !expanded(), 'gap-3': expanded() }"
+      >
+        <div class="relative flex-shrink-0">
+          <i class="material-icons text-[#FEEBDD]">{{ option.icon }}</i>
+          
+          @if (option.badge && option.badge > 0) {
+            <span 
+              class="absolute -top-1 -right-1 bg-[#FCD2C9] text-[#1A2626] text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+            >
+              {{ option.badge > 9 ? '9+' : option.badge }}
+            </span>
+          }
+        </div>
+
+        <div
+          class="overflow-hidden whitespace-nowrap transition-all duration-300 flex-1"
+          [ngClass]="{
+            'opacity-100 scale-100 max-w-xs ml-2': expanded(),
+            'opacity-0 scale-95 max-w-0 ml-0': !expanded()
+          }"
+        >
+          <div class="font-bold text-sm">{{ option.label }}</div>
+          @if (option.subLabel && expanded()) {
+            <div class="text-xs text-[#FEEBDD] opacity-90">
+              {{ option.subLabel }}
+            </div>
+          }
+        </div>
+
+        @if (!expanded()) {
+          <div 
+            class="absolute left-full ml-2 px-3 py-2 bg-[#1A2626] text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
+          >
+            <div class="font-bold">{{ option.label }}</div>
+            @if (option.subLabel) {
+              <div class="text-xs text-[#FEEBDD] mt-1">
+                {{ option.subLabel }}
+              </div>
+            }
+          </div>
+        }
+      </a>
+    }
+  </nav>
+
+  <!-- LOGOUT -->
+  <div class="p-4 border-t border-[#008080]">
+    <button
+      (click)="onLogout()"
+      class="w-full flex items-center py-3 px-3 hover:bg-[#008080] rounded-lg transition-all group relative"
+      [ngClass]="{ 'justify-center': !expanded(), 'gap-3': expanded() }"
+    >
+      <i class="material-icons text-[#FCD2C9]">logout</i>
+      <span
+        class="text-sm font-bold overflow-hidden whitespace-nowrap transition-all duration-300"
+        [ngClass]="{
+          'opacity-100 scale-100 max-w-xs ml-2': expanded(),
+          'opacity-0 scale-95 max-w-0 ml-0': !expanded()
+        }"
+      >
+        Cerrar sesión
+      </span>
+
+      @if (!expanded()) {
+        <div 
+          class="absolute left-full ml-2 px-3 py-2 bg-[#1A2626] text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
+        >
+          Cerrar sesión
+        </div>
+      }
+    </button>
+  </div>
+</div>

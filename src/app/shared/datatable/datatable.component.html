@@ -1,0 +1,235 @@
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+  
+  <!-- Header del DataTable -->
+  <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      
+      <!-- Búsqueda -->
+      <div class="relative w-full md:w-96">
+        <input
+          type="text"
+          placeholder="Buscar..."
+          [(ngModel)]="searchTerm"
+          (input)="filtrarDatos()"
+          class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-all"
+        />
+        <svg class="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      <!-- Selector de filas -->
+      <div class="flex items-center gap-3">
+        <label class="text-sm font-medium text-gray-700">Mostrar:</label>
+        <select
+          [(ngModel)]="rowsPerPage"
+          (change)="actualizarPaginacion()"
+          class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+        >
+          @for (size of [5, 10, 20, 50]; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+        <span class="text-sm text-gray-600">registros</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
+        <tr class="bg-gradient-to-r from-teal-600 to-teal-700">
+          @for (column of columns; track column.key) {
+            <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase tracking-wider">
+              {{ column.label }}
+            </th>
+          }
+          <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase tracking-wider">
+            ACCIONES
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-100">
+        
+        <!-- Filas de datos -->
+        @for (row of datosPaginados; track row; let i = $index) {
+          <tr class="hover:bg-teal-50 transition-colors duration-150"
+              [class.bg-gray-50]="i % 2 === 0">
+            
+            @for (column of columns; track column.key) {
+              <!-- Columna especial para horaSalida -->
+              @if (column.key === 'horaSalida') {
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                  @if (row[column.key] && row.estatus === 'Finalizada') {
+                    <div class="flex items-center gap-2">
+                      <span class="text-gray-800 font-medium">{{ row[column.key] }}</span>
+                      <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                        Finalizada
+                      </span>
+                    </div>
+                  } @else {
+                    <div class="flex items-center gap-2">
+                      <input
+                        type="time"
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                        [value]="convertirA24Horas(row[column.key])"
+                        (change)="onHoraSalidaChange(row, $event)"
+                      />
+                      <button
+                        type="button"
+                        class="text-gray-600 hover:text-teal-600 transition-colors"
+                        (click)="focusHoraSalidaInput($event)"
+                        title="Seleccionar hora">
+                        🕐
+                      </button>
+                    </div>
+                  }
+                </td>
+              } @else if (column.key === 'tiempoRestante') {
+                <!-- Columna de tiempo restante -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <span [ngClass]="getEstatusClass(row)">
+                    {{ getTiempoRestante(row) }}
+                  </span>
+                </td>
+              } @else {
+                <!-- Columna con badge (estado/activo) o normal -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  @if (isBadgeColumn(column.key)) {
+                    <span 
+                      class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                      [ngClass]="getBadgeClass(row[column.key])">
+                      {{ getBadgeText(row[column.key]) }}
+                    </span>
+                  } @else {
+                    <span class="text-gray-900 font-medium">{{ row[column.key] || '-' }}</span>
+                  }
+                </td>
+              }
+            }
+            
+            @if (showActions) {
+              <!-- Columna de Acciones -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <div class="flex justify-center gap-1">
+                  
+                  <!-- Acciones personalizadas (ng-content) -->
+                  @if (customActionsTemplate) {
+                    <ng-container *ngTemplateOutlet="customActionsTemplate; context: { $implicit: row }"></ng-container>
+                  }
+                  
+                  <!-- Botón Ver Detalles -->
+                  <button
+                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    (click)="onDetails(row)"
+                    title="Ver detalles">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  
+                  @if (showEdit) {
+                    <!-- Botón Editar -->
+                    <button
+                      class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+                      (click)="onEdit(row)"
+                      title="Editar">
+                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                  }
+                  
+                  @if (showDelete) {
+                    <!-- Botón Eliminar -->
+                    <button
+                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      (click)="onDelete(row)"
+                      title="Eliminar">
+                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </td>
+            }
+          </tr>
+        }
+
+        <!-- Empty state -->
+        @if (datosPaginados.length === 0) {
+          <tr>
+            <td [attr.colspan]="columns.length + 1" class="px-6 py-16 text-center bg-gray-50">
+              <div class="flex flex-col items-center gap-4">
+                <div class="rounded-full bg-gray-100 p-6">
+                  <svg class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-1">No hay registros</h3>
+                  <p class="text-sm text-gray-500">
+                    @if (searchTerm) {
+                      No se encontraron resultados para tu búsqueda
+                    } @else {
+                      No hay datos para mostrar
+                    }
+                  </p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer con Paginación -->
+  <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <!-- Info de registros -->
+      <div class="text-sm text-gray-600">
+        Mostrando
+        <span class="font-semibold text-gray-900">{{ paginaActual * rowsPerPage + 1 }}</span>
+        -
+        <span class="font-semibold text-gray-900">{{
+          (paginaActual + 1) * rowsPerPage > datosFiltrados.length
+            ? datosFiltrados.length
+            : (paginaActual + 1) * rowsPerPage
+        }}</span>
+        de
+        <span class="font-semibold text-gray-900">{{ datosFiltrados.length }}</span>
+        registros
+      </div>
+      
+      <!-- Botones de paginación -->
+      <div class="flex items-center gap-2">
+        <button
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          [disabled]="paginaActual === 0"
+          (click)="cambiarPagina(-1)">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <span class="px-4 py-2 text-sm font-medium text-gray-700">
+          Página {{ paginaActual + 1 }} de {{ Math.ceil(datosFiltrados.length / rowsPerPage) || 1 }}
+        </span>
+        
+        <button
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          [disabled]="(paginaActual + 1) * rowsPerPage >= datosFiltrados.length"
+          (click)="cambiarPagina(1)">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
