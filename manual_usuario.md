@@ -39,9 +39,6 @@ Las visitas en el penal no son instantáneas. Requieren pasar por un control rig
 - **Check-In (Entrada)**: Registra la hora exacta en la que un visitante físicamente cruzó la requisa y entró. El sistema cambiará el estado a `En Curso`.
 - **Check-Out (Salida)**: Registra el fin de la visita. Una vez que el último asociado a esa visita hace su check-out, el sistema pasará el estado total de la visita a `Finalizada`.
 
-> [!TIP]
-> **Modificación de Tiempos**: En **Visitas Activas**, visualizarás colores diferentes por estado (Verde: En Curso, Naranja: Pendiente, etc.) e indicadores como `1/3` visitantes presentes en tiempo real para un control exacto.
-
 ### 3.3 Cancelaciones e Incidencias
 - Si ocurre algún percance (un visitante viene ebrio o hay problemas), puedes usar el botón de **Incidencia** para adjuntar un reporte grave directamente anexado a esa visita.
 
@@ -67,6 +64,4 @@ Diseñado para las auditorías, directores del centro y revisiones legales.
 
 ---
 
-> [!IMPORTANT]
-> **Cierre de Sesión Seguro**
-> PrisionConnect está diseñado bajo requerimientos estrictos de sincronización y memoria. Si debes compartir el dispositivo con otro oficial o secretario, siempre utiliza el botón de **Cerrar Sesión** en el panel lateral. El sistema se encargará de purgar todos los datos de visitantes y abogados de la memoria RAM automáticamente garantizando que la próxima persona inicie con una interfaz limpia y segura.
+Cierre de Sesión Seguro: PrisionConnect está diseñado bajo requerimientos estrictos de sincronización y memoria. Si debes compartir el dispositivo con otro oficial o secretario, siempre utiliza el botón de Cerrar Sesión en el panel lateral. El sistema purgará todos los datos de memoria automáticamente y de forma segura.

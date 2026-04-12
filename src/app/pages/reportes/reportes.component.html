@@ -178,7 +178,36 @@
         <span class="text-sm text-gray-500 ml-2">({{ datosReporte.length }} registros)</span>
       </h2>
 
-      <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <!-- MOBILE VIEW (< 768px) -->
+      <div class="md:hidden space-y-3">
+        @for (dato of datosReporte.slice(0, 10); track $index) {
+          <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden transform transition-all duration-200 hover:shadow-xl">
+            <div class="px-3 py-2.5 bg-gradient-to-r from-[#006666] to-[#008080] flex items-center justify-between">
+              <span class="text-white text-xs font-bold uppercase truncate">
+                Registro #{{ $index + 1 }}
+              </span>
+            </div>
+            <div class="p-3.5">
+              <div class="grid grid-cols-2 gap-2.5">
+                @for (columna of columnasReporte; track columna.key) {
+                  <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
+                    <p class="text-xs text-gray-500 mb-0.5 font-medium">{{ columna.label }}</p>
+                    <p class="text-sm font-semibold text-gray-900 break-words">{{ dato[columna.key] || '---' }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        @if (datosReporte.length > 10) {
+          <p class="text-center text-sm text-gray-500 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
+            Mostrando 10 de {{ datosReporte.length }} registros. Exporta para ver completo.
+          </p>
+        }
+      </div>
+
+      <!-- DESKTOP VIEW (>= 768px) -->
+      <div class="hidden md:block overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -191,7 +220,7 @@
             @for (dato of datosReporte.slice(0, 10); track $index) {
               <tr class="hover:bg-gray-50">
                 @for (columna of columnasReporte; track columna.key) {
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ dato[columna.key] }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ dato[columna.key] || '---' }}</td>
                 }
               </tr>
             }
