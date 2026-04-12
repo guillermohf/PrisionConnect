@@ -78,7 +78,6 @@ visitasFiltradas = computed(() => {
   // COLUMNAS TABLA
   // =========================
   columnasEntrada = [
-    { key: 'id', label: 'ID', hidden: true },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'totalVisitantes', label: 'VISITANTES' },

@@ -74,12 +74,7 @@ export class SideMenuOptionsComponent implements OnInit {
       icon: 'visibility',
       subLabel: 'Monitoreo en tiempo real'
     },
-    {
-      label: 'Historial',
-      route: '/historial',
-      icon: 'history',
-      subLabel: 'Registro de visitas'
-    },
+
     {
       label: 'Reportes',
       route: '/reportes',

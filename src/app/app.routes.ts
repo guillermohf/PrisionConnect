@@ -88,18 +88,6 @@ export const routes: Routes = [
       },
 
       // ============================================
-      // HISTORIAL - Supervisión
-      // ============================================
-      { 
-        path: 'historial',
-        loadComponent: () => import('./pages/historial/historial.component'),
-        canActivate: [roleGuard],
-        data: {
-          roles: [RolUsuario.SUPER_ADMINISTRADOR, RolUsuario.SUPERVISOR]
-        }
-      },
-
-      // ============================================
       // REQUISA - Seguridad especializada
       // ============================================
       { 

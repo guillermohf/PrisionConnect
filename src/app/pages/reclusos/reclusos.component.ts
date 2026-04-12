@@ -40,10 +40,17 @@ export default class ReclusosComponent implements OnInit {
   loading = this.reclusosService.loading;
 
   // Estadísticas (COMPUTED)
-  estadisticas = computed(() => 
-    this.reclusosService.obtenerEstadisticas()
-  );
-
+estadisticas = computed(() => {
+  const lista = this.reclusos();
+  return {
+    total: lista.length,
+    activos: lista.filter(r => r.estado === EstadoRecluso.ACTIVO).length,
+    procesados: lista.filter(r => r.situacionLegal === SituacionLegal.PROCESADO).length,
+    condenados: lista.filter(r => r.situacionLegal === SituacionLegal.CONDENADO).length,
+    hombres: lista.filter(r => r.sexo === 'Masculino').length,
+    mujeres: lista.filter(r => r.sexo === 'Femenino').length
+  };
+});
   // Filtros (SIGNAL)
   filtros = signal<FiltrosReclusos>({
     busqueda: '',

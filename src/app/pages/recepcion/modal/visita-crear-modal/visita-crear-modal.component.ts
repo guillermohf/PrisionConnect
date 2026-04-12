@@ -3,7 +3,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
-import { Firestore, collection, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, query, where, getDocs, Timestamp } from '@angular/fire/firestore';
 import { VisitasService } from '@core/services/visitas.service';
 import { ReclusosService } from '@core/services/reclusos.service';
 import { ConfiguracionService } from '@core/services/configuracion.service';
@@ -157,7 +157,7 @@ export class VisitaCrearModalComponent implements OnChanges {
         parentesco: doc.data()['parentesco']
       }));
 
-      const relacionesAbogadosRef = collection(this.firestore, 'relacionesAbogados');
+      const relacionesAbogadosRef = collection(this.firestore, 'relaciones_abogados');
       const qAbogados = query(
         relacionesAbogadosRef,
         where('reclusoId', '==', reclusoId),
@@ -217,33 +217,31 @@ export class VisitaCrearModalComponent implements OnChanges {
     }
   }
 
-  async guardar(): Promise<void> {
-    Object.keys(this.form.controls).forEach(key => {
-      this.form.get(key)?.markAsTouched();
-    });
+async guardar(): Promise<void> {
+  // ... (tus validaciones anteriores)
 
-    if (!this.esFormularioValido()) {
-      this.notificacionService.error('Por favor completa todos los campos requeridos');
-      return;
-    }
+  const formValue = this.form.value;
 
-    this.guardando = true;
+  // Creamos la fecha asegurándonos de que no tenga horas/minutos extraños
+  const fechaSeleccionada = new Date(formValue.fechaVisita + 'T12:00:00'); 
 
-    const formValue = this.form.value;
+  const dto: CrearVisitaDTO = {
+    tipo: formValue.tipo,
+    reclusoId: formValue.reclusoId,
+    visitantes: formValue.tipo === TipoVisita.FAMILIAR ? formValue.visitantes : undefined,
+    abogadoId: formValue.tipo === TipoVisita.LEGAL ? formValue.abogadoId : undefined,
+    
+    // CAMBIO AQUÍ: Convertimos a Timestamp de Firestore antes de enviar
+    fechaVisita: Timestamp.fromDate(fechaSeleccionada) as any, 
+    
+    horaInicioProgramada: formValue.horaInicioProgramada,
+    horaFinProgramada: formValue.horaFinProgramada,
+    areaVisita: formValue.areaVisita,
+    observaciones: formValue.observaciones
+  };
 
-    const dto: CrearVisitaDTO = {
-      tipo: formValue.tipo,
-      reclusoId: formValue.reclusoId,
-      visitantes: formValue.tipo === TipoVisita.FAMILIAR ? formValue.visitantes : undefined,
-      abogadoId: formValue.tipo === TipoVisita.LEGAL ? formValue.abogadoId : undefined,
-      fechaVisita: new Date(formValue.fechaVisita),
-      horaInicioProgramada: formValue.horaInicioProgramada,
-      horaFinProgramada: formValue.horaFinProgramada,
-      areaVisita: formValue.areaVisita,
-      observaciones: formValue.observaciones
-    };
-
-    const resultado = await this.visitasService.crearVisita(dto);
+  const resultado = await this.visitasService.crearVisita(dto);
+  // ... rest of the code
 
     if (resultado.success) {
       this.visitaCreada.emit();

@@ -14,6 +14,7 @@ import {
   orderBy,
   Timestamp
 } from '@angular/fire/firestore';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Abogado, CrearAbogadoDTO, ActualizarAbogadoDTO } from '@core/models/abogado.interface';
 import { TipoAbogado } from '@core/models/enums.interface';
 import { AuthService } from './auth.service';
@@ -24,6 +25,7 @@ import { Observable } from 'rxjs';
 })
 export class AbogadosService {
   private firestore = inject(Firestore);
+  private auth = inject(Auth);
   private authService = inject(AuthService);
   private abogadosCollection = collection(this.firestore, 'abogados');
 
@@ -33,7 +35,13 @@ export class AbogadosService {
   error = signal<string | null>(null);
 
   constructor() {
-    this.cargarAbogados();
+    onAuthStateChanged(this.auth, (user) => {
+      if (user) {
+        this.cargarAbogados();
+      } else {
+        this.abogados.set([]);
+      }
+    });
   }
 
   /**
@@ -290,19 +298,21 @@ export class AbogadosService {
     });
   }
 
-  obtenerReporte(filtros: any): Observable<any[]> {
+obtenerReporte(filtros: any): Observable<any[]> {
     return new Observable(observer => {
       try {
         let abogadosFiltrados = this.abogados();
 
+        // 1. Filtro por Abogado Específico
         if (filtros.abogadoId) {
           abogadosFiltrados = abogadosFiltrados.filter(a => a.id === filtros.abogadoId);
         }
 
+        // 2. Filtro por Fechas (Corrección de Zona Horaria)
         if (filtros.fechaInicio && filtros.fechaFin) {
-          const inicio = new Date(filtros.fechaInicio);
-          const fin = new Date(filtros.fechaFin);
-          fin.setHours(23, 59, 59, 999);
+          // Agregamos "T00:00:00" y "T23:59:59" para forzar la hora local exacta
+          const inicio = new Date(`${filtros.fechaInicio}T00:00:00`);
+          const fin = new Date(`${filtros.fechaFin}T23:59:59`);
 
           abogadosFiltrados = abogadosFiltrados.filter(a => {
             const fechaRegistro = a.fechaRegistro instanceof Timestamp 
@@ -312,26 +322,31 @@ export class AbogadosService {
           });
         }
 
-        if (filtros.tipoCaso) {
-          abogadosFiltrados = abogadosFiltrados.filter(a => 
-            a.tipo?.toLowerCase().includes(filtros.tipoCaso.toLowerCase())
-          );
+        // 3. Filtro por Colegio/Institución
+        if (filtros.colegioAbogados) {
+          const col = filtros.colegioAbogados.toLowerCase().trim();
+          abogadosFiltrados = abogadosFiltrados.filter(a => a.institucion?.toLowerCase().includes(col));
         }
 
+        // 4. Filtro por Matrícula/Exequatur
+        if (filtros.matricula) {
+          const mat = filtros.matricula.toLowerCase().trim();
+          abogadosFiltrados = abogadosFiltrados.filter(a => a.exequatur?.toLowerCase().includes(mat));
+        }
+
+        // 5. Mapeo de datos para la tabla
         const datos = abogadosFiltrados.map(a => ({
-          abogado: a.nombreCompleto,
-          exequatur: a.exequatur,
-          tipo: a.tipo,
-          recluso: 'N/A',
-          tipoCaso: a.tipo || 'N/A',
-          fechaAsignacion: a.fechaRegistro instanceof Timestamp 
-            ? this.formatearFecha(a.fechaRegistro.toDate()) 
-            : this.formatearFecha(new Date(a.fechaRegistro))
+          nombreCompleto: a.nombreCompleto,
+          cedula: a.cedula || 'N/A',
+          matricula_abogado: a.exequatur || 'N/A',
+          colegio_abogados: a.institucion || 'N/A',
+          telefono: a.telefono || 'N/A'
         }));
 
         observer.next(datos);
         observer.complete();
       } catch (error) {
+        console.error('Error generando reporte de abogados:', error);
         observer.error(error);
       }
     });

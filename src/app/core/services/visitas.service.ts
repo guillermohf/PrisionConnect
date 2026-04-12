@@ -13,7 +13,8 @@ import {
   getDocs,
   getDoc,
   Timestamp,
-  serverTimestamp
+  serverTimestamp,
+  onSnapshot
 } from '@angular/fire/firestore';
 import {
   Visita,
@@ -24,7 +25,7 @@ import {
   FiltrosVisitas
 } from '@core/models/visitas.interface';
 import { EstadoVisita, TipoVisita } from '@core/models/enums.interface';
-import { Auth } from '@angular/fire/auth';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -38,15 +39,42 @@ export class VisitasService {
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
+  constructor() {
+    onAuthStateChanged(this.auth, (user) => {
+      if (!user) {
+        this.limpiar();
+      }
+    });
+  }
+
   estadisticas = computed(() => {
     const todasVisitas = this.visitas();
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
     const visitasHoy = todasVisitas.filter(v => {
-      const fecha = v.fechaVisita instanceof Timestamp ? v.fechaVisita.toDate() : new Date(v.fechaVisita);
-      fecha.setHours(0, 0, 0, 0);
-      return fecha.getTime() === hoy.getTime();
+      let fechaObj: Date;
+      if (v.fechaVisita instanceof Timestamp) {
+        fechaObj = v.fechaVisita.toDate();
+      } else if (typeof (v.fechaVisita as any).toDate === 'function') {
+        fechaObj = (v.fechaVisita as any).toDate();
+      } else if ((v.fechaVisita as any).seconds !== undefined) {
+        fechaObj = new Date((v.fechaVisita as any).seconds * 1000);
+      } else {
+        const strFecha = String(v.fechaVisita);
+        const matchT = strFecha.match(/Timestamp\(seconds=(\d+)/);
+        if (matchT) {
+          fechaObj = new Date(parseInt(matchT[1]) * 1000);
+        } else if (strFecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [y, m, d] = strFecha.split('-');
+          fechaObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        } else {
+          fechaObj = new Date(v.fechaVisita as any);
+        }
+      }
+      
+      fechaObj.setHours(0, 0, 0, 0);
+      return fechaObj.getTime() === hoy.getTime();
     });
 
     return {
@@ -67,26 +95,51 @@ export class VisitasService {
     };
   });
 
+  private listenerUnsubscribe: (() => void) | null = null;
+
   async cargarVisitas(): Promise<void> {
+    if (this.listenerUnsubscribe) return; // Si ya está escuchando en vivo, no hacemos nada
+
     this.loading.set(true);
     try {
       const visitasRef = collection(this.firestore, 'visitas');
+      
+      // Obtener las visitas de los últimos 7 días mínimo para no cargar records muy antiguos y colapsar memoria,
+      // Aunque como dice el código, puedes ordenarlo desc.
+      const hoy = new Date();
+      hoy.setDate(hoy.getDate() - 2); // al menos recuperar un par de días para evitar colapsos.
+      
+      // El viejo request pedia "orderBy", hagamos onSnapshot directamente con la query
       const q = query(visitasRef, orderBy('fechaVisita', 'desc'));
-      const snapshot = await getDocs(q);
       
-      const visitas = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Visita));
+      this.listenerUnsubscribe = onSnapshot(q, (snapshot) => {
+        const data = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        } as Visita));
+        this.visitas.set(data);
+        this.error.set(null);
+        this.loading.set(false);
+      }, (error) => {
+        console.error('Error realtime visitas:', error);
+        this.error.set(error.message);
+        this.loading.set(false);
+      });
       
-      this.visitas.set(visitas);
-      this.error.set(null);
     } catch (error: any) {
-      console.error('Error cargando visitas:', error);
+      console.error('Error inicializando visitas:', error);
       this.error.set(error.message);
-    } finally {
       this.loading.set(false);
     }
+  }
+
+  // Se añade para limpiar memoria
+  limpiar() {
+    if (this.listenerUnsubscribe) {
+      this.listenerUnsubscribe();
+      this.listenerUnsubscribe = null;
+    }
+    this.visitas.set([]);
   }
 
   async crearVisita(dto: CrearVisitaDTO): Promise<{ success: boolean; message: string; visitaId?: string }> {
@@ -403,46 +456,76 @@ export class VisitasService {
     return Math.round(total / visitas.length);
   }
   
-  obtenerReporte(filtros: any): Observable<any[]> {
+ obtenerReporte(filtros: any): Observable<any[]> {
     return new Observable(observer => {
       try {
         let visitasFiltradas = this.visitas();
 
+        // Filtro de Fechas
         if (filtros.fechaInicio && filtros.fechaFin) {
           const inicio = new Date(filtros.fechaInicio);
           const fin = new Date(filtros.fechaFin);
           fin.setHours(23, 59, 59, 999);
 
           visitasFiltradas = visitasFiltradas.filter(v => {
-            const fecha = v.fechaVisita instanceof Timestamp 
-              ? v.fechaVisita.toDate() 
-              : new Date(v.fechaVisita);
+            const fechaObj = (v.fechaVisita as any);
+            const fecha = fechaObj?.toDate 
+              ? fechaObj.toDate() 
+              : new Date(fechaObj);
             return fecha >= inicio && fecha <= fin;
           });
         }
 
+        // Filtro por Tipo de Visita
         if (filtros.tipoVisita) {
           visitasFiltradas = visitasFiltradas.filter(v => v.tipo === filtros.tipoVisita);
         }
 
-        if (filtros.estado) {
-          visitasFiltradas = visitasFiltradas.filter(v => v.estado === filtros.estado);
+        // Filtro por Requisa
+        if (filtros.isRequisa !== undefined && filtros.isRequisa !== '') {
+          const pasoRequisa = filtros.isRequisa === 'true';
+          visitasFiltradas = visitasFiltradas.filter(v => v.requisaEntrada?.realizada === pasoRequisa);
         }
 
-        const datos = visitasFiltradas.map(v => ({
-          fecha: v.fechaVisita instanceof Timestamp 
-            ? this.formatearFecha(v.fechaVisita.toDate()) 
-            : this.formatearFecha(new Date(v.fechaVisita)),
-          visitante: this.obtenerNombresVisitantes(v),
-          recluso: v.reclusoNombre || 'N/A',
-          tipo: v.tipo,
-          estado: v.estado,
-          duracion: v.duracionVisitaReal ? `${v.duracionVisitaReal} min` : '0 min'
-        }));
+        // Mapeo para el formato exacto esperado por la tabla y el PDF
+        const datos = visitasFiltradas.map(v => {
+          
+          // Extraer la hora de entrada y salida del primer visitante que hizo check-in/out
+          let horaEntrada = '---';
+          let horaSalida = '---';
+          const visitanteAtivo = v.visitantes?.find(vis => vis.checkIn) || v.visitantes?.[0];
+
+          if (visitanteAtivo?.checkIn) {
+            const checkInObj = (visitanteAtivo.checkIn as any);
+            const d = checkInObj?.toDate ? checkInObj.toDate() : new Date(checkInObj);
+            horaEntrada = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          }
+
+          if (visitanteAtivo?.checkOut) {
+            const checkOutObj = (visitanteAtivo.checkOut as any);
+            const d = checkOutObj?.toDate ? checkOutObj.toDate() : new Date(checkOutObj);
+            horaSalida = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          }
+
+          const fechaObj = (v.fechaVisita as any);
+
+          return {
+            fecha: fechaObj?.toDate 
+              ? this.formatearFecha(fechaObj.toDate()) 
+              : this.formatearFecha(new Date(fechaObj)),
+            hora_entrada: horaEntrada,
+            hora_salida: horaSalida,
+            visitante: this.obtenerNombresVisitantes(v),
+            recluso: v.reclusoNombre || 'N/A',
+            tipo_visita: v.tipo,
+            isRequisa: v.requisaSalida?.realizada || false // Fallback por si la propiedad no existe
+          };
+        });
 
         observer.next(datos);
         observer.complete();
       } catch (error) {
+        console.error('Error al generar el reporte de visitas:', error);
         observer.error(error);
       }
     });

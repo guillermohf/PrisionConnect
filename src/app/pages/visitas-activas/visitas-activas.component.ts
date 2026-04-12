@@ -29,7 +29,7 @@ import { AgregarIncidenciaModalComponent } from '../recepcion/modal/agregar-inci
   ],
   templateUrl: './visitas-activas.component.html'
 })
-export default class VisitasActivasComponent implements OnInit, OnDestroy {
+export default class VisitasActivasComponent implements OnInit {
   private visitasService = inject(VisitasService);
   private notificacionService = inject(NotificacionService);
 
@@ -88,7 +88,7 @@ export default class VisitasActivasComponent implements OnInit, OnDestroy {
 
   // Columnas para la tabla
   columnas = [
-    { key: 'id', label: 'ID', hidden: true },
+    { key: 'numeroIdentificacion', label: 'ID' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'areaVisita', label: 'ÁREA' },
@@ -98,11 +98,7 @@ export default class VisitasActivasComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    // No se necesita aplicarFiltro() inicial - el computed lo hace automáticamente
-  }
-
-  ngOnDestroy(): void {
-    // Ya no necesitamos intervalo - los signals se actualizan automáticamente
+    this.visitasService.cargarVisitas();  
   }
 
   cambiarVista(vista: 'todas' | 'en-curso' | 'en-transito'): void {

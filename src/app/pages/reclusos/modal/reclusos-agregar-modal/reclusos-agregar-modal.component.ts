@@ -1,7 +1,7 @@
 // FUNCIÓN PARA AGREGAR AL COMPONENT
 // src/app/features/reclusos/components/recluso-agregar-modal/recluso-agregar-modal.component.ts
 
-import { Component, EventEmitter, Input, Output, inject, signal, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal, OnInit, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
@@ -29,7 +29,7 @@ import { ButtonComponent } from "@shared/button/buttton.component";
   ],
   templateUrl: './reclusos-agregar-modal.component.html'
 })
-export class ReclusoAgregarModalComponent implements OnInit {  // ✅ AGREGAR OnInit
+export class ReclusoAgregarModalComponent implements OnChanges  {  // ✅ AGREGAR OnInit
   @Input() showModal = false;
   @Output() showModalChange = new EventEmitter<boolean>();
   @Output() reclusoAgregado = new EventEmitter<void>();
@@ -53,7 +53,7 @@ export class ReclusoAgregarModalComponent implements OnInit {  // ✅ AGREGAR On
       numeroIdentificacion: [{ value: '', disabled: true }, Validators.required],  // ✅ DISABLED
       numeroExpediente: [''],
       cedula: ['', [Validators.required, cedulaDominicanaValidator()]],
-      
+
       // Información Personal
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
@@ -61,98 +61,62 @@ export class ReclusoAgregarModalComponent implements OnInit {  // ✅ AGREGAR On
       sexo: ['', Validators.required],
       nacionalidad: ['', Validators.required],
       estadoCivil: [''],
-      
+
       // Contacto
       direccion: ['', Validators.required],
       telefono: ['', telefonoDominicanoValidator()],
       nombreContactoEmergencia: ['', Validators.required],
       telefonoEmergencia: ['', telefonoDominicanoValidator()],
-      
+
       // Ubicación
       pabellon: ['', Validators.required],
       celda: ['', Validators.required],
-      
+
       // Información Penal
       fechaIngreso: ['', Validators.required],
       situacionLegal: ['', Validators.required],
       estado: ['', Validators.required],
       delito: [''],
       sentencia: [''],
-      
+
       // Otros
       observaciones: ['']
     });
   }
 
-  // ✅ NUEVO: ngOnInit para generar ID al abrir modal
-  ngOnInit(): void {
-    if (this.showModal) {
-      this.generarNumeroIdentificacion();
+  ngOnChanges(changes: SimpleChanges): void {
+    // Se ejecuta cada vez que showModal cambia a true
+    if (changes['showModal']?.currentValue === true) {
+      this.generarIdPenitenciario();
     }
   }
+
 
   // ========================================
   // ✅ NUEVA FUNCIÓN: Generar ID Automático
   // ========================================
-  async generarNumeroIdentificacion(): Promise<void> {
-    this.generandoId = true;
+  async generarIdPenitenciario(): Promise<void> {
+    const anioActual = new Date().getFullYear();
+    const prefijo = `R-${anioActual}-`;
 
-    try {
-      // Obtener el año actual
-      const anioActual = new Date().getFullYear();
+    const idsExistentes = this.reclusosService.reclusos()
+      .map(r => r.numeroIdentificacion)
+      .filter(id => id?.startsWith(prefijo));
 
-      // Obtener todos los reclusos del año actual
-      const reclusosActuales = this.reclusosService.reclusos();
-      
-      // Filtrar reclusos del año actual
-      const reclusosDelAnio = reclusosActuales.filter(r => {
-        if (!r.numeroIdentificacion) return false;
-        return r.numeroIdentificacion.startsWith(`R-${anioActual}`);
-      });
+    const ultimoNumero = idsExistentes.reduce((max, id) => {
+      const partes = id.split('-');
+      const correlativo = parseInt(partes[2], 10);
+      return correlativo > max ? correlativo : max;
+    }, 0);
 
-      // Calcular el siguiente número secuencial
-      let siguienteNumero = 1;
-      
-      if (reclusosDelAnio.length > 0) {
-        // Extraer números existentes y encontrar el máximo
-        const numeros = reclusosDelAnio
-          .map(r => {
-            const match = r.numeroIdentificacion?.match(/R-\d{4}-(\d+)/);
-            return match ? parseInt(match[1], 10) : 0;
-          })
-          .filter(n => !isNaN(n));
+    const nuevoCorrelativo = (ultimoNumero + 1).toString().padStart(5, '0');
+    const numeroIdentificacion = `${prefijo}${nuevoCorrelativo}`;
 
-        siguienteNumero = Math.max(...numeros, 0) + 1;
-      }
-
-      // Formatear con ceros a la izquierda (4 dígitos)
-      const numeroFormateado = siguienteNumero.toString().padStart(4, '0');
-      
-      // Generar el ID final: R-YYYY-NNNN
-      const numeroIdentificacion = `R-${anioActual}-${numeroFormateado}`;
-
-      // Actualizar el formulario
-      this.form.patchValue({ 
-        numeroIdentificacion 
-      });
-
-      console.log('✅ Número de identificación generado:', numeroIdentificacion);
-
-    } catch (error) {
-      console.error('Error generando número de identificación:', error);
-      
-      // Fallback: usar timestamp
-      const timestamp = Date.now().toString().slice(-6);
-      const numeroIdentificacion = `R-${new Date().getFullYear()}-${timestamp}`;
-      
-      this.form.patchValue({ 
-        numeroIdentificacion 
-      });
-      
-      this.notificacionService.warning('ID generado con método alternativo');
-    } finally {
-      this.generandoId = false;
-    }
+    // ✅ Habilitar temporalmente para asegurar que el valor se aplica
+    const control = this.form.get('numeroIdentificacion');
+    control?.enable();
+    control?.setValue(numeroIdentificacion);
+    control?.disable();
   }
 
   // ========================================
@@ -179,7 +143,7 @@ export class ReclusoAgregarModalComponent implements OnInit {  // ✅ AGREGAR On
     }
     this.form.patchValue({ telefono: valor }, { emitEvent: false });
   }
-  
+
   async guardar(): Promise<void> {
     if (!this.form.valid) {
       this.notificacionService.error('Por favor completa todos los campos requeridos');
@@ -191,7 +155,7 @@ export class ReclusoAgregarModalComponent implements OnInit {  // ✅ AGREGAR On
     try {
       // ✅ IMPORTANTE: Obtener el valor incluso si está disabled
       const formValue = this.form.getRawValue();  // getRawValue() incluye campos disabled
-      
+
       const recluso = {
         ...formValue,
         fechaNacimiento: Timestamp.fromDate(new Date(formValue.fechaNacimiento)),
@@ -203,11 +167,9 @@ export class ReclusoAgregarModalComponent implements OnInit {  // ✅ AGREGAR On
 
       if (resultado.success) {
         this.notificacionService.success(resultado.message);
-        this.form.reset();
+        // ✅ No hacer form.reset() aquí, cerrar() ya lo hace
         this.reclusoAgregado.emit();
         this.cerrar();
-      } else {
-        this.notificacionService.error(resultado.message);
       }
     } catch (error) {
       this.notificacionService.error('Error inesperado al guardar');

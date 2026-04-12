@@ -19,6 +19,7 @@ import {
   CollectionReference,
   DocumentData
 } from '@angular/fire/firestore';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { 
   Visitante, 
   CrearVisitanteDTO, 
@@ -36,6 +37,7 @@ import { Observable, from, map, catchError, of } from 'rxjs';
 
 export class VisitantesService {
   private firestore = inject(Firestore);
+  private auth = inject(Auth);
   private collectionName = 'visitantes';
   
   // Señal reactiva con todos los visitantes
@@ -45,7 +47,13 @@ export class VisitantesService {
   loading = signal<boolean>(false);
 
   constructor() {
-    this.cargarTodos();
+    onAuthStateChanged(this.auth, (user) => {
+      if (user) {
+        this.cargarTodos();
+      } else {
+        this.limpiarCache();
+      }
+    });
   }
   
 
@@ -144,9 +152,51 @@ export class VisitantesService {
     }
   }
 
+
+  obtenerReporte(filtros: any): Observable<any[]> {
+    return from(
+      getDocs(collection(this.firestore, this.collectionName)).then(snapshot => {
+        let datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+
+        // Filtro por Cédula (ignorando guiones)
+        if (filtros.cedula) {
+          const cedulaBuscar = filtros.cedula.replace(/-/g, '').toLowerCase();
+          datos = datos.filter(v => v.cedula && v.cedula.replace(/-/g, '').toLowerCase().includes(cedulaBuscar));
+        }
+
+        // Filtro por Nacionalidad
+        if (filtros.nacionalidad) {
+          const nacBuscar = filtros.nacionalidad.toLowerCase().trim();
+          datos = datos.filter(v => v.nacionalidad && v.nacionalidad.toLowerCase().includes(nacBuscar));
+        }
+
+        // Filtro por Género
+        if (filtros.genero) {
+          datos = datos.filter(v => v.genero === filtros.genero);
+        }
+
+        // Ordenar alfabéticamente por nombre
+        datos.sort((a, b) => (a.nombreCompleto || '').localeCompare(b.nombreCompleto || ''));
+
+        // Formatear datos para la tabla y PDF del reporte
+        return datos.map(v => ({
+          ...v,
+          estadoTexto: v.activo ? 'Activo' : 'Inactivo',
+          nombreCompleto: v.nombreCompleto || `${v.nombre} ${v.apellido}`,
+          totalVisitas: v.totalVisitas || 0,
+          parentescoConRecluso: v.parentescoConRecluso || 'No especificado',
+          nacionalidad: v.nacionalidad || 'N/A',
+          genero: v.genero === 'M' ? 'Masculino' : (v.genero === 'F' ? 'Femenino' : 'N/A')
+        }));
+      })
+    );
+  }
+  
   /**
    * Obtener visitante por cédula
    */
+
+
   async obtenerPorCedula(cedula: string): Promise<Visitante | null> {
     try {
       const cedulaFormateada = formatearCedula(cedula);

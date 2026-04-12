@@ -11,7 +11,7 @@ import {
   onSnapshot
 } from '@angular/fire/firestore';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth'; // ✅ IMPORTANTE: Importar Auth de Firebase
-import { Recluso, FiltrosReclusos } from '@core/models/recluso.interface';
+import { Recluso, FiltrosReclusos, CrearReclusoDTO, ActualizarReclusoDTO } from '@core/models/recluso.interface';
 import { AuthService } from './auth.service';
 import { calcularEdad, getNombreCompleto } from '@core/models/utils';
 import { Observable, of } from 'rxjs';
@@ -110,7 +110,7 @@ export class ReclusosService {
   /**
    * AGREGAR RECLUSO
    */
-  async agregarRecluso(datos: any): Promise<{ success: boolean; message: string; id?: string }> {
+  async agregarRecluso(datos: CrearReclusoDTO): Promise<{ success: boolean; message: string; id?: string }> {
     try {
       this.loading.set(true);
       const edad = calcularEdad(datos.fechaNacimiento);
@@ -140,22 +140,27 @@ export class ReclusosService {
   /**
    * ACTUALIZAR RECLUSO
    */
-  async actualizarRecluso(id: string, datos: any): Promise<{ success: boolean; message: string }> {
+  async actualizarRecluso(id: string, datos: ActualizarReclusoDTO): Promise<{ success: boolean; message: string }> {
     try {
       this.loading.set(true);
       const reclusoRef = doc(this.firestore, `reclusos/${id}`);
       const actual = this.reclusos().find(r => r.id === id);
 
-      if (datos.fechaNacimiento) datos.edad = calcularEdad(datos.fechaNacimiento);
-      if (datos.nombre || datos.apellido) {
-        datos.nombreCompleto = getNombreCompleto(datos.nombre || actual?.nombre, datos.apellido || actual?.apellido);
-      }
-
-      const updateBody = {
+      // Construir el body de actualización dinamicamente
+      const updateBody: any = {
         ...datos,
         modificadoPor: this.authService.userId() || 'sistema',
         fechaActualizacion: Timestamp.now()
       };
+
+      if (datos.fechaNacimiento) updateBody.edad = calcularEdad(datos.fechaNacimiento);
+      
+      const payloadNombre = (datos as any).nombre;
+      const payloadApellido = (datos as any).apellido;
+      
+      if (payloadNombre || payloadApellido) {
+        updateBody.nombreCompleto = getNombreCompleto(payloadNombre || actual?.nombre, payloadApellido || actual?.apellido);
+      }
 
       await updateDoc(reclusoRef, updateBody);
       return { success: true, message: 'Actualizado correctamente' };
@@ -229,12 +234,30 @@ export class ReclusosService {
   obtenerReporte(filtros: any): Observable<any[]> {
     let filtrados = this.reclusos();
     
+    if (filtros.fechaInicio && filtros.fechaFin) {
+      const inicio = new Date(`${filtros.fechaInicio}T00:00:00`);
+      const fin = new Date(`${filtros.fechaFin}T23:59:59`);
+      filtrados = filtrados.filter(r => {
+        const fecha = r.fechaIngreso instanceof Timestamp ? r.fechaIngreso.toDate() : new Date(r.fechaIngreso);
+        return fecha >= inicio && fecha <= fin;
+      });
+    }
+
+    if (filtros.tipoDelito) {
+      const td = filtros.tipoDelito.toLowerCase().trim();
+      filtrados = filtrados.filter(r => r.delito?.toLowerCase().includes(td));
+    }
+
+    if (filtros.estadoRecluso) {
+      filtrados = filtrados.filter(r => r.estado === filtros.estadoRecluso);
+    }
+    
     const datos = filtrados.map(r => ({
+      numeroInterno: r.numeroIdentificacion || r.numeroExpediente || 'N/A',
       nombreCompleto: r.nombreCompleto,
-      cedula: r.cedula || 'N/A',
       delito: r.delito || 'N/A',
-      situacionLegal: r.situacionLegal,
-      pabellon: r.pabellon
+      tiempoCondena: r.sentencia ? `${r.sentencia} años` : 'N/A',
+      estado: r.estado || 'N/A'
     }));
     return of(datos);
   }

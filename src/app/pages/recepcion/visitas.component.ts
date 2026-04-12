@@ -1,5 +1,3 @@
-// src/app/features/visitas/visitas.component.ts
-
 import { Component, inject, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,15 +17,10 @@ import { AgregarIncidenciaModalComponent } from './modal/agregar-incidencia-moda
   selector: 'prisionConnect-visitas',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    DataTableComponent,
-    VisitaCrearModalComponent,
-    VisitaDetalleModalComponent,
-    CheckInModalComponent,
-    CheckOutModalComponent,
-    CambiarEstadoVisitaModalComponent,
-    AgregarIncidenciaModalComponent
+    CommonModule, FormsModule, DataTableComponent,
+    VisitaCrearModalComponent, VisitaDetalleModalComponent,
+    CheckInModalComponent, CheckOutModalComponent,
+    CambiarEstadoVisitaModalComponent, AgregarIncidenciaModalComponent
   ],
   templateUrl: './visitas.component.html'
 })
@@ -38,24 +31,57 @@ export default class VisitasComponent implements OnInit {
   EstadoVisita = EstadoVisita;
   TipoVisita = TipoVisita;
 
-  // =========================
-  // SIGNALS
-  // =========================
   loading = this.visitasService.loading;
   estadisticas = this.visitasService.estadisticas;
-  
   filtros = signal<FiltrosVisitas>({});
 
-  // =========================
-  // COMPUTED
-  // =========================
   visitasFiltradas = computed(() => {
-    return this.visitasService.obtenerVisitasFiltradas(this.filtros());
-  });
+    const todas = this.visitasService.obtenerVisitasFiltradas(this.filtros());
+    const hoyTimestamp = new Date().setHours(0, 0, 0, 0);
 
-  // =========================
-  // MODALES
-  // =========================
+    return todas.filter(visita => {
+      // 1. Si la visita está activa, se muestra SIEMPRE (incluso si la fecha está mal guardada o si pasó de medianoche)
+      const estadosActivos = [
+        EstadoVisita.REGISTRADA,
+        EstadoVisita.EN_REQUISA_ENTRADA,
+        EstadoVisita.EN_TRANSITO,
+        EstadoVisita.EN_CURSO,
+        EstadoVisita.PENDIENTE_REQUISA_SALIDA
+      ];
+
+      if (estadosActivos.includes(visita.estado)) {
+        return true;
+      }
+
+      // 2. Si no es activa, solo la mostramos si es de HOY
+      if (!visita.fechaVisita) return false;
+
+      let fechaProcesada: Date;
+
+      if (visita.fechaVisita instanceof Date) {
+        fechaProcesada = new Date(visita.fechaVisita);
+      } else if (typeof (visita.fechaVisita as any).toDate === 'function') {
+        fechaProcesada = (visita.fechaVisita as any).toDate();
+      } else if ((visita.fechaVisita as any).seconds !== undefined) {
+        fechaProcesada = new Date((visita.fechaVisita as any).seconds * 1000);
+      } else {
+        const strFecha = String(visita.fechaVisita);
+        const matchT = strFecha.match(/Timestamp\(seconds=(\d+)/);
+        
+        if (matchT) {
+          fechaProcesada = new Date(parseInt(matchT[1]) * 1000);
+        } else if (strFecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [y, m, d] = strFecha.split('-');
+          fechaProcesada = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        } else {
+          fechaProcesada = new Date(visita.fechaVisita as any);
+        }
+      }
+
+      return fechaProcesada.setHours(0, 0, 0, 0) === hoyTimestamp;
+    });
+  });
+  // Control de Modales
   mostrarModalCrear = false;
   mostrarModalDetalle = false;
   mostrarModalCheckIn = false;
@@ -65,58 +91,99 @@ export default class VisitasComponent implements OnInit {
 
   visitaSeleccionada: Visita | null = null;
 
-  // =========================
-  // COLUMNAS TABLA
-  // =========================
   columnas = [
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
+    { key: 'totalVisitantes', label: 'CANT. VISITANTES' },
     { key: 'fechaVisita', label: 'FECHA' },
     { key: 'horaInicioProgramada', label: 'HORA' },
     { key: 'estado', label: 'ESTADO' },
     { key: 'areaVisita', label: 'ÁREA' }
   ];
 
-  // =========================
-  // INIT
-  // =========================
   ngOnInit(): void {
     this.visitasService.cargarVisitas();
   }
 
-  // =========================
-  // FILTROS
-  // =========================
-  actualizarFiltro(campo: keyof FiltrosVisitas, valor: any): void {
-    this.filtros.update(f => ({ ...f, [campo]: valor }));
+  formatearFecha(fecha: any): string {
+    if (!fecha) return '---';
+
+    try {
+      let fechaObj: Date;
+
+      // 1. Si ya es un objeto Date
+      if (fecha instanceof Date) {
+        fechaObj = fecha;
+      }
+      // 2. Si es un Timestamp de Firebase (tiene el método toDate)
+      else if (typeof fecha.toDate === 'function') {
+        fechaObj = fecha.toDate();
+      }
+      // 3. Si es un objeto con segundos (Firestore plano)
+      else if (fecha.seconds !== undefined) {
+        fechaObj = new Date(fecha.seconds * 1000);
+      }
+      // 4. Si es un String como "YYYY-MM-DD" o de otro tipo
+      else {
+        const strFecha = String(fecha);
+        const matchT = strFecha.match(/Timestamp\(seconds=(\d+)/);
+        
+        if (matchT) {
+          fechaObj = new Date(parseInt(matchT[1]) * 1000);
+        }
+        // Si el formato es exactamente YYYY-MM-DD evitamos el offset UTC
+        else if (strFecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [y, m, d] = strFecha.split('-');
+          fechaObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        } else {
+          fechaObj = new Date(fecha);
+        }
+      }
+
+      // Validar si la conversión fue exitosa
+      if (isNaN(fechaObj.getTime())) {
+        return fecha.toString();
+      }
+
+      const d = String(fechaObj.getDate()).padStart(2, '0');
+      const m = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const y = fechaObj.getFullYear();
+      
+      return `${d}/${m}/${y}`;
+    } catch (error) {
+      return 'Error de fecha';
+    }
   }
 
-  limpiarFiltros(): void {
-    this.filtros.set({});
+  /**
+   * Lógica para mostrar acciones (Se añadió 'En Tránsito' para coincidir con tu captura)
+   */
+  puedeHacerCheckIn(visita: Visita): boolean {
+    if (!visita.estado) return false;
+
+    // Convertimos a minúsculas para evitar errores de "Registrada" vs "REGISTRADA"
+    const estadoActual = visita.estado.toString().toLowerCase();
+
+    const estadosValidos = [
+      EstadoVisita.REGISTRADA.toLowerCase(),
+      EstadoVisita.EN_REQUISA_ENTRADA.toLowerCase(),
+      'en tránsito',
+      'registrada'
+    ];
+
+    return estadosValidos.includes(estadoActual);
   }
 
-  // Métodos auxiliares para fechas
-  obtenerFechaInputInicio(): string {
-    const fecha = this.filtros().fechaInicio;
-    return fecha ? this.formatearFechaInput(fecha) : '';
+  puedeHacerCheckOut(visitante: any): boolean {
+    // Solo muestra si tiene entrada (checkIn) y no tiene salida (!checkOut)
+    return visitante.checkIn && !visitante.checkOut;
   }
 
-  obtenerFechaInputFin(): string {
-    const fecha = this.filtros().fechaFin;
-    return fecha ? this.formatearFechaInput(fecha) : '';
+  puedeCancelar(visita: Visita): boolean {
+    return [EstadoVisita.REGISTRADA, EstadoVisita.EN_REQUISA_ENTRADA].includes(visita.estado as any);
   }
 
-  actualizarFechaInicio(valor: string): void {
-    this.actualizarFiltro('fechaInicio', valor ? new Date(valor) : undefined);
-  }
-
-  actualizarFechaFin(valor: string): void {
-    this.actualizarFiltro('fechaFin', valor ? new Date(valor) : undefined);
-  }
-
-  // =========================
-  // ACCIONES DE VISITA
-  // =========================
+  // Métodos de acción
   verDetalle(visita: Visita): void {
     this.visitaSeleccionada = visita;
     this.mostrarModalDetalle = true;
@@ -143,118 +210,42 @@ export default class VisitasComponent implements OnInit {
   }
 
   async cancelarVisita(visita: Visita): Promise<void> {
-    const confirmar = await this.notificacionService.confirmar(
-      'Cancelar visita',
-      `¿Estás seguro de que deseas cancelar esta visita?\n\n` +
-      `Recluso: ${visita.reclusoNombre}\n` +
-      `Fecha: ${this.formatearFecha(visita.fechaVisita)}`,
-      'Sí, cancelar',
-      'No'
-    );
-
+    const confirmar = await this.notificacionService.confirmar('Cancelar Visita', '¿Desea cancelar esta visita?', 'Sí', 'No');
     if (!confirmar) return;
 
-    const motivo = await this.notificacionService.textarea(
-      'Motivo de cancelación',
-      'Escribe el motivo de la cancelación...'
-    );
+    const motivo = await this.notificacionService.textarea('Motivo de Cancelación', 'Escriba por qué se cancela...');
+    if (!motivo) return;
 
-    if (!motivo || !motivo.trim()) {
-      await this.notificacionService.warning(
-        'Debes ingresar un motivo para cancelar la visita',
-        'Motivo requerido'
-      );
-      return;
-    }
-
-    this.notificacionService.loading('Cancelando visita...');
-
-    const resultado = await this.visitasService.cancelarVisita(
-      visita.id!,
-      motivo
-    );
-
+    this.notificacionService.loading('Cancelando...');
+    const res = await this.visitasService.cancelarVisita(visita.id!, motivo);
     this.notificacionService.cerrarLoading();
 
-    if (resultado.success) {
-      this.notificacionService.toast('Visita cancelada exitosamente', 'success');
-    } else {
-      await this.notificacionService.error(resultado.message);
-    }
+    if (res.success) this.notificacionService.toast('Visita cancelada', 'success');
   }
 
-  // =========================
-  // CALLBACKS DE MODALES
-  // =========================
-  onVisitaCreada(): void {
-    this.notificacionService.toast('Visita creada exitosamente', 'success');
+  // Ayudantes de UI
+  actualizarFiltro(campo: keyof FiltrosVisitas, valor: any): void {
+    this.filtros.update(f => ({ ...f, [campo]: valor }));
   }
 
+  limpiarFiltros(): void { this.filtros.set({}); }
+
+  obtenerColorEstado(estado: any) { return this.visitasService.obtenerColorEstado(estado); }
+
+  trackById(index: number, v: Visita) { return v.id ?? index; }
+
+
+  // Callbacks de modales
+  onVisitaCreada() { this.mostrarModalCrear = false; }
+  onCheckInRealizado() { this.mostrarModalCheckIn = false; }
+  onCheckOutRealizado() { this.mostrarModalCheckOut = false; }
   onEstadoCambiado(): void {
-    this.notificacionService.toast('Estado actualizado', 'success');
-  }
-
-  onCheckInRealizado(): void {
-    this.notificacionService.toast('Check-in realizado', 'success');
-  }
-
-  onCheckOutRealizado(): void {
-    this.notificacionService.toast('Check-out realizado', 'success');
+    this.mostrarModalCambiarEstado = false;
+    this.notificacionService.toast('Estado actualizado correctamente', 'success');
   }
 
   onIncidenciaAgregada(): void {
-    this.notificacionService.toast('Incidencia registrada', 'success');
-  }
-
-  // =========================
-  // UTILIDADES
-  // =========================
-  formatearFecha(fecha: any): string {
-    if (!fecha) return 'N/A';
-    try {
-      const fechaObj = fecha instanceof Date ? fecha : fecha.toDate();
-      return fechaObj.toLocaleDateString('es-DO', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
-    } catch (error) {
-      return 'N/A';
-    }
-  }
-
-  formatearFechaInput(fecha: Date): string {
-    if (!fecha) return '';
-    try {
-      const fechaObj = fecha instanceof Date ? fecha : (fecha as any).toDate();
-      const year = fechaObj.getFullYear();
-      const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
-      const day = String(fechaObj.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    } catch (error) {
-      return '';
-    }
-  }
-
-  obtenerColorEstado(estado: EstadoVisita): string {
-    return this.visitasService.obtenerColorEstado(estado);
-  }
-
-  puedeHacerCheckIn(visita: Visita): boolean {
-    return visita.estado === EstadoVisita.EN_CURSO;
-  }
-
-  puedeHacerCheckOut(visita: Visita): boolean {
-    return visita.estado === EstadoVisita.EN_CURSO &&
-      (visita.visitantesPresentes > 0);
-  }
-
-  puedeCancelar(visita: Visita): boolean {
-    return visita.estado === EstadoVisita.REGISTRADA ||
-      visita.estado === EstadoVisita.EN_REQUISA_ENTRADA;
-  }
-
-  trackById(index: number, visita: Visita): string | number {
-    return visita.id ?? index;
+    this.mostrarModalIncidencia = false;
+    this.notificacionService.toast('Incidencia registrada en el sistema', 'info');
   }
 }

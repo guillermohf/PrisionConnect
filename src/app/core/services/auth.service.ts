@@ -32,6 +32,8 @@ export class AuthService {
   usuario = signal<Usuario | null>(null); 
   loading = signal(true); 
 
+  private userListenerUnsubscribe: (() => void) | null = null;
+
   // ✅ Getters reactivos (Adaptados para leer de Firestore)
   isAuthenticated = computed(() => !!this.currentUser());
   
@@ -105,7 +107,7 @@ export class AuthService {
     
     // ⭐ El "corazón" de la seguridad para tu tesis:
     // Mantiene el rol y estado activo sincronizados en tiempo real sin Cloud Functions
-    onSnapshot(userRef, (snap) => {
+    this.userListenerUnsubscribe = onSnapshot(userRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data() as Usuario;
         this.usuario.set({ id: snap.id, ...data });
@@ -121,6 +123,10 @@ export class AuthService {
   }
 
   private limpiarEstado() {
+    if (this.userListenerUnsubscribe) {
+      this.userListenerUnsubscribe();
+      this.userListenerUnsubscribe = null;
+    }
     this.usuario.set(null);
     this.currentUser.set(null);
   }

@@ -91,16 +91,6 @@ export class MenuService {
       subLabel: 'Monitoreo en tiempo real'
     },
     {
-      label: 'Historial',
-      icon: 'history',
-      route: '/historial',
-      roles: [
-        RolUsuario.SUPER_ADMINISTRADOR,
-        RolUsuario.SUPERVISOR
-      ],
-      subLabel: 'Registro de visitas'
-    },
-    {
       label: 'Reportes',
       icon: 'assessment',
       route: '/reportes',

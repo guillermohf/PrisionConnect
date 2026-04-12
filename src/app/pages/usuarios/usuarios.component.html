@@ -24,7 +24,7 @@
         <input type="text" [(ngModel)]="filtros.busqueda" (keyup)="aplicarFiltros()" placeholder="Nombre o correo..."
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none">
       </div>
-      </div>
+    </div>
   </div>
 
   <div class="relative">
@@ -34,30 +34,66 @@
       </div>
     }
 
-    <prisionConnect-data-table
-      [columns]="columnas"
-      [data]="usuariosFiltrados"
-      [showEdit]="false" 
-      [showDelete]="true"
-      (detail)="onVerDetalle($event)"
-      (delete)="onCambiarEstado($event)">
-      
-      <ng-template #customActions let-user>
-        <button (click)="usuarioSeleccionado = user; mostrarModalCambiarRol = true" 
-          class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-          title="Cambiar Rol">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-        </button>
-      </ng-template>
+    <div class="hidden md:block bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
+      <prisionConnect-data-table
+        [columns]="columnas"
+        [data]="usuariosFiltrados"
+        [showEdit]="false" 
+        [showDelete]="true"
+        (detail)="onVerDetalle($event)"
+        (delete)="onCambiarEstado($event)">
+        
+        <ng-template #customActions let-user>
+          <button (click)="usuarioSeleccionado = user; mostrarModalCambiarRol = true" 
+            class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+            title="Cambiar Rol">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </button>
+        </ng-template>
+      </prisionConnect-data-table>
+    </div>
 
-    </prisionConnect-data-table>
-  </div>
+    <div class="md:hidden space-y-4">
+      @for (user of usuariosFiltrados; track user.id) {
+        <div class="bg-white p-4 rounded-xl shadow border border-gray-100">
+          <div class="flex justify-between items-center mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-teal-50 text-[#006666] border border-teal-100">
+              {{ user.rol || 'SIN ROL' }}
+            </span>
+          </div>
+          
+          <h3 class="font-black text-gray-800">{{ user.nombre }}</h3>
+          <p class="text-sm text-gray-500">{{ user.email }}</p>
 
-  </div>
+          <div class="grid grid-cols-2 gap-2 mt-3 text-[11px] text-gray-500 font-bold uppercase">
+            <div>IDENTIFICACIÓN: <span class="text-gray-900 block">{{ user.cedula }}</span></div>
+            <div>DEPARTAMENTO: <span class="text-gray-900 block">{{ user.departamento }}</span></div>
+          </div>
 
-  @if (mostrarModalDetalle && usuarioSeleccionado) {
+          <div class="mt-4 flex gap-2">
+            <button (click)="onVerDetalle(user)" class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs font-black uppercase hover:bg-gray-200 transition-colors">
+              Detalle
+            </button>
+            <button (click)="usuarioSeleccionado = user; mostrarModalCambiarRol = true" class="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-black uppercase hover:bg-purple-700 transition-colors">
+              Rol
+            </button>
+            <button (click)="onCambiarEstado(user)" class="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors" title="Cambiar Estado">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+          <p class="text-gray-500 text-sm font-medium">No se encontraron usuarios</p>
+        </div>
+      }
+    </div>
+
+  </div> </div>
+
+@if (mostrarModalDetalle && usuarioSeleccionado) {
   <prisionConnect-usuarios-detalle-modal 
     [usuario]="usuarioSeleccionado" 
     (cerrar)="mostrarModalDetalle = false">

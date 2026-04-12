@@ -12,6 +12,8 @@ export interface Usuario {
   nombre: string;
   apellido: string;
   nombreCompleto?: string;
+  cedula: string;
+  departamento: string;
   rol: RolUsuario;
   activo: boolean;
   fechaCreacion: Timestamp | Date;

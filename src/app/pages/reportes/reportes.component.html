@@ -1,106 +1,104 @@
 <div class="p-6 space-y-6">
 
-  <!-- Header -->
   <div class="bg-gradient-to-r from-teal-600 to-teal-700 rounded-lg p-6 text-white mb-6">
     <h1 class="text-2xl font-bold">Generación de Reportes</h1>
-    <p class="text-teal-100 text-sm mt-1">Genera reportes personalizados en PDF y Excel</p>
+    <p class="text-teal-100 text-sm mt-1">Sistema de Gestión Najayo (Hombres y Mujeres)</p>
   </div>
 
-  <!-- Selector de Tipo -->
   <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-200">
     <h2 class="text-base font-semibold text-teal-700 mb-4">Tipo de Reporte</h2>
     
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <button
-        (click)="seleccionarTipoReporte('visitas')"
-        class="p-6 border-2 rounded-lg transition-all text-left"
-        [class.border-teal-600]="tipoReporteSeleccionado() === 'visitas'"
-        [class.bg-teal-50]="tipoReporteSeleccionado() === 'visitas'"
-        [class.border-gray-300]="tipoReporteSeleccionado() !== 'visitas'">
-        <div class="flex items-center gap-3 mb-3">
-          <svg class="w-8 h-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-          </svg>
-          <h3 class="text-lg font-bold text-teal-700">Visitas</h3>
+      <button (click)="seleccionarTipoReporte('visitas')" class="p-5 border-2 rounded-lg transition-all text-left"
+        [class.border-teal-600]="tipoReporteSeleccionado() === 'visitas'" [class.bg-teal-50]="tipoReporteSeleccionado() === 'visitas'" [class.border-gray-300]="tipoReporteSeleccionado() !== 'visitas'">
+        <div class="flex items-center gap-3 mb-2">
+          <svg class="w-7 h-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+          <h3 class="text-base font-bold text-teal-700">Check-in / Out</h3>
         </div>
-        <p class="text-sm text-gray-600">Estadísticas y análisis de visitas por periodo</p>
+        <p class="text-xs text-gray-600">Historial de entradas y salidas</p>
       </button>
 
-      <button
-        (click)="seleccionarTipoReporte('abogados')"
-        class="p-6 border-2 rounded-lg transition-all text-left"
-        [class.border-teal-600]="tipoReporteSeleccionado() === 'abogados'"
-        [class.bg-teal-50]="tipoReporteSeleccionado() === 'abogados'"
-        [class.border-gray-300]="tipoReporteSeleccionado() !== 'abogados'">
-        <div class="flex items-center gap-3 mb-3">
-          <svg class="w-8 h-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          <h3 class="text-lg font-bold text-teal-700">Abogados</h3>
+      <button (click)="seleccionarTipoReporte('visitantes')" class="p-5 border-2 rounded-lg transition-all text-left"
+        [class.border-teal-600]="tipoReporteSeleccionado() === 'visitantes'" [class.bg-teal-50]="tipoReporteSeleccionado() === 'visitantes'" [class.border-gray-300]="tipoReporteSeleccionado() !== 'visitantes'">
+        <div class="flex items-center gap-3 mb-2">
+          <svg class="w-7 h-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          <h3 class="text-base font-bold text-teal-700">Visitantes</h3>
         </div>
-        <p class="text-sm text-gray-600">Filtrado por abogado, interno, tipo de caso o fechas</p>
+        <p class="text-xs text-gray-600">Padrón de familiares y terceros</p>
       </button>
 
-      <button
-        (click)="seleccionarTipoReporte('reclusos')"
-        class="p-6 border-2 rounded-lg transition-all text-left"
-        [class.border-teal-600]="tipoReporteSeleccionado() === 'reclusos'"
-        [class.bg-teal-50]="tipoReporteSeleccionado() === 'reclusos'"
-        [class.border-gray-300]="tipoReporteSeleccionado() !== 'reclusos'">
-        <div class="flex items-center gap-3 mb-3">
-          <svg class="w-8 h-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <h3 class="text-lg font-bold text-teal-700">Reclusos</h3>
+      <button (click)="seleccionarTipoReporte('abogados')" class="p-5 border-2 rounded-lg transition-all text-left"
+        [class.border-teal-600]="tipoReporteSeleccionado() === 'abogados'" [class.bg-teal-50]="tipoReporteSeleccionado() === 'abogados'" [class.border-gray-300]="tipoReporteSeleccionado() !== 'abogados'">
+        <div class="flex items-center gap-3 mb-2">
+          <svg class="w-7 h-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          <h3 class="text-base font-bold text-teal-700">Abogados</h3>
         </div>
-        <p class="text-sm text-gray-600">Filtrado por recluso, tipo de delito o fechas</p>
+        <p class="text-xs text-gray-600">Representantes y colegiaturas</p>
+      </button>
+
+      <button (click)="seleccionarTipoReporte('reclusos')" class="p-5 border-2 rounded-lg transition-all text-left"
+        [class.border-teal-600]="tipoReporteSeleccionado() === 'reclusos'" [class.bg-teal-50]="tipoReporteSeleccionado() === 'reclusos'" [class.border-gray-300]="tipoReporteSeleccionado() !== 'reclusos'">
+        <div class="flex items-center gap-3 mb-2">
+          <svg class="w-7 h-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          <h3 class="text-base font-bold text-teal-700">Reclusos</h3>
+        </div>
+        <p class="text-xs text-gray-600">Población, delitos y estados</p>
       </button>
 
     </div>
   </div>
 
-  <!-- Filtros -->
   @if (tipoReporteSeleccionado()) {
     <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-200">
       <h2 class="text-base font-semibold text-teal-700 mb-4">Filtros del Reporte</h2>
 
       @if (tipoReporteSeleccionado() === 'visitas') {
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Fecha Inicio</label>
-            <input
-              type="date"
-              [(ngModel)]="filtros.fechaInicio"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Fecha (Desde)</label>
+            <input type="date" [(ngModel)]="filtros.fechaInicio" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Fecha Fin</label>
-            <input
-              type="date"
-              [(ngModel)]="filtros.fechaFin"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Fecha (Hasta)</label>
+            <input type="date" [(ngModel)]="filtros.fechaFin" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Tipo de Visita</label>
-            <select
-              [(ngModel)]="filtros.tipoVisita"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Tipo de Visita</label>
+            <select [(ngModel)]="filtros.tipoVisita" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 bg-white">
               <option value="">Todas</option>
               <option value="Familiar">Familiar</option>
               <option value="Legal">Legal</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Estado</label>
-            <select
-              [(ngModel)]="filtros.estado"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Pasó Requisa</label>
+            <select [(ngModel)]="filtros.isRequisa" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 bg-white">
               <option value="">Todos</option>
-              <option value="Finalizada">Finalizadas</option>
-              <option value="Cancelada">Canceladas</option>
-              <option value="En Curso">En Curso</option>
+              <option value="true">Sí (Requisado)</option>
+              <option value="false">No</option>
             </select>
+          </div>
+        </div>
+      }
+
+      @if (tipoReporteSeleccionado() === 'visitantes') {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-600 mb-1">Nacionalidad</label>
+            <input type="text" [(ngModel)]="filtros.nacionalidad" placeholder="Ej: Dominicana..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-600 mb-1">Género</label>
+            <select [(ngModel)]="filtros.genero" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 bg-white">
+              <option value="">Todos</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-600 mb-1">Cédula / Pasaporte</label>
+            <input type="text" [(ngModel)]="filtros.cedula" placeholder="Buscar por documento..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
         </div>
       }
@@ -108,24 +106,8 @@
       @if (tipoReporteSeleccionado() === 'abogados') {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Fecha Inicio</label>
-            <input
-              type="date"
-              [(ngModel)]="filtros.fechaInicio"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-          </div>
-          <div>
-            <label class="block text-xs text-gray-600 mb-1">Fecha Fin</label>
-            <input
-              type="date"
-              [(ngModel)]="filtros.fechaFin"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-          </div>
-          <div>
-            <label class="block text-xs text-gray-600 mb-1">Abogado</label>
-            <select
-              [(ngModel)]="filtros.abogadoId"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Abogado (Búsqueda)</label>
+            <select [(ngModel)]="filtros.abogadoId" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 bg-white">
               <option value="">Todos</option>
               @for (abogado of abogados; track abogado.id) {
                 <option [value]="abogado.id">{{ abogado.nombreCompleto }}</option>
@@ -133,115 +115,62 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Recluso</label>
-            <select
-              [(ngModel)]="filtros.reclusoId"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-              <option value="">Todos</option>
-              @for (recluso of reclusos; track recluso.id) {
-                <option [value]="recluso.id">{{ recluso.nombreCompleto }}</option>
-              }
-            </select>
+            <label class="block text-xs font-bold text-gray-600 mb-1">Colegio de Abogados</label>
+            <input type="text" [(ngModel)]="filtros.colegioAbogados" placeholder="Ej: CARD..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Tipo de Caso</label>
-            <input
-              type="text"
-              [(ngModel)]="filtros.tipoCaso"
-              placeholder="Ej: Penal, Civil..."
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Matrícula</label>
+            <input type="text" [(ngModel)]="filtros.matricula" placeholder="Número de registro..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
         </div>
       }
 
       @if (tipoReporteSeleccionado() === 'reclusos') {
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Fecha Inicio</label>
-            <input
-              type="date"
-              [(ngModel)]="filtros.fechaInicio"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Fecha Ingreso (Desde)</label>
+            <input type="date" [(ngModel)]="filtros.fechaInicio" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Fecha Fin</label>
-            <input
-              type="date"
-              [(ngModel)]="filtros.fechaFin"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Fecha Ingreso (Hasta)</label>
+            <input type="date" [(ngModel)]="filtros.fechaFin" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
           <div>
-            <label class="block text-xs text-gray-600 mb-1">Recluso</label>
-            <select
-              [(ngModel)]="filtros.reclusoId"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <label class="block text-xs font-bold text-gray-600 mb-1">Tipo de Delito</label>
+            <input type="text" [(ngModel)]="filtros.tipoDelito" placeholder="Ej: Robo, Fraude..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-600 mb-1">Estado Actual</label>
+            <select [(ngModel)]="filtros.estadoRecluso" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 bg-white">
               <option value="">Todos</option>
-              @for (recluso of reclusos; track recluso.id) {
-                <option [value]="recluso.id">{{ recluso.nombreCompleto }}</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs text-gray-600 mb-1">Tipo de Delito</label>
-            <input
-              type="text"
-              [(ngModel)]="filtros.tipoDelito"
-              placeholder="Ej: Robo, Homicidio..."
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-          </div>
-          <div>
-            <label class="block text-xs text-gray-600 mb-1">Situación Legal</label>
-            <select
-              [(ngModel)]="filtros.situacionLegal"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-              <option value="">Todas</option>
-              <option value="Condenado">Condenado</option>
-              <option value="Procesado">Procesado</option>
-              <option value="Prisión Preventiva">Prisión Preventiva</option>
+              <option value="Activo">Activo</option>
+              <option value="Trasladado">Trasladado</option>
+              <option value="Libre">Libre</option>
+              <option value="Suspendido">Suspendido</option>
             </select>
           </div>
         </div>
       }
 
       <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-300">
-        <button
-          (click)="limpiarFiltros()"
-          class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+        <button (click)="limpiarFiltros()" class="px-6 py-2 bg-gray-100 font-bold text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
           Limpiar Filtros
         </button>
-        <button
-          (click)="generarReporte('excel')"
-          [disabled]="generando()"
-          class="px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2">
-          @if (generando() && formatoGenerando() === 'excel') {
-            <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-          }
-          @if (!generando() || formatoGenerando() !== 'excel') {
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          }
+        <button (click)="cargarDatosReporte()" class="px-6 py-2 text-white font-bold bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+          Aplicar Filtros
+        </button>
+        <button (click)="generarReporte('excel')" [disabled]="generando()" class="px-6 py-2 text-white font-bold bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+          @if (generando() && formatoGenerando() === 'excel') { <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> }
           Exportar Excel
         </button>
-        <button
-          (click)="generarReporte('pdf')"
-          [disabled]="generando()"
-          class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-2">
-          @if (generando() && formatoGenerando() === 'pdf') {
-            <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-          }
-          @if (!generando() || formatoGenerando() !== 'pdf') {
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          }
+        <button (click)="generarReporte('pdf')" [disabled]="generando()" class="px-6 py-2 font-bold bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+          @if (generando() && formatoGenerando() === 'pdf') { <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> }
           Exportar PDF
         </button>
       </div>
     </div>
   }
 
-  <!-- Vista Previa -->
   @if (tipoReporteSeleccionado() && datosReporte.length > 0) {
     <div class="bg-white rounded-lg shadow-lg p-6 border-2 border-gray-200">
       <h2 class="text-base font-semibold text-teal-700 mb-4">
@@ -249,14 +178,12 @@
         <span class="text-sm text-gray-500 ml-2">({{ datosReporte.length }} registros)</span>
       </h2>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               @for (columna of columnasReporte; track columna.key) {
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {{ columna.label }}
-                </th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{{ columna.label }}</th>
               }
             </tr>
           </thead>
@@ -264,31 +191,18 @@
             @for (dato of datosReporte.slice(0, 10); track $index) {
               <tr class="hover:bg-gray-50">
                 @for (columna of columnasReporte; track columna.key) {
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ dato[columna.key] }}
-                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ dato[columna.key] }}</td>
                 }
               </tr>
             }
           </tbody>
         </table>
         @if (datosReporte.length > 10) {
-          <p class="text-center text-sm text-gray-500 mt-4">
-            Mostrando 10 de {{ datosReporte.length }} registros. Exporta para ver todos.
+          <p class="text-center text-sm text-gray-500 py-3 bg-gray-50 border-t border-gray-200">
+            Mostrando 10 de {{ datosReporte.length }} registros. Exporta para ver la lista completa.
           </p>
         }
       </div>
     </div>
   }
-
-  <!-- Sin Selección -->
-  @if (!tipoReporteSeleccionado()) {
-    <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-      <p class="text-gray-500 mt-2">Selecciona un tipo de reporte para comenzar</p>
-    </div>
-  }
-
 </div>

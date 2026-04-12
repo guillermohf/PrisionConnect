@@ -25,9 +25,9 @@ import { DataTableComponent } from "@shared/datatable/datatable.component";
     // ✅ Usamos tu componente compartido
     DataTableComponent,
     UsuarioDetalleModalComponent,
-    CambiarRolModalComponent,
+    UsuariosAgregarModalComponent,
     CambiarEstadoModalComponent,
-    UsuariosAgregarModalComponent
+    CambiarRolModalComponent
 ],
   templateUrl: './usuarios.component.html'
 })
