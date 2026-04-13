@@ -10,6 +10,7 @@ import { VisitasService } from '../../core/services/visitas.service';
 import { AbogadosService } from '../../core/services/abogados.service';
 import { ReclusosService } from '../../core/services/reclusos.service';
 import { VisitantesService } from '../../core/services/visitantes.service';
+import { NotificacionService } from '../../core/services/notificacion.service';
 
 interface FiltrosReporte {
   fechaInicio: string;
@@ -43,6 +44,7 @@ export default class ReportesComponent implements OnInit, OnDestroy {
   private abogadosService = inject(AbogadosService);
   private reclusosService = inject(ReclusosService);
   private visitantesService = inject(VisitantesService);
+  private notificacionService = inject(NotificacionService);
 
   tipoReporteSeleccionado = signal<string>('');
   generando = signal<boolean>(false);
@@ -195,8 +197,8 @@ export default class ReportesComponent implements OnInit, OnDestroy {
   }
 
   async generarReporte(formato: 'pdf' | 'excel'): Promise<void> {
-    if (!this.tipoReporteSeleccionado()) { alert('Selecciona un tipo de reporte'); return; }
-    if (this.datosReporte.length === 0)  { alert('No hay datos para exportar');     return; }
+    if (!this.tipoReporteSeleccionado()) { this.notificacionService.toast('Selecciona un tipo de reporte', 'warning'); return; }
+    if (this.datosReporte.length === 0)  { this.notificacionService.toast('No hay datos para exportar', 'warning');     return; }
     
     this.generando.set(true);
     this.formatoGenerando.set(formato);
@@ -205,7 +207,7 @@ export default class ReportesComponent implements OnInit, OnDestroy {
       formato === 'pdf' ? await this.generarPDF() : await this.generarExcel();
     } catch (e) {
       console.error(e);
-      alert('Error al generar el reporte. Intenta nuevamente.');
+      this.notificacionService.error('Error al generar el reporte. Intenta nuevamente.');
     } finally {
       this.generando.set(false);
       this.formatoGenerando.set('');

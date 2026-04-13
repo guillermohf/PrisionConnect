@@ -31,8 +31,11 @@ export class CambiarEstadoModalComponent {
     if (!this.usuario?.id) return;
 
     const accion = nuevoEstado ? 'activar' : 'desactivar';
-    const confirmar = confirm(
-      `¿Estás seguro de que deseas ${accion} a ${this.usuario.nombreCompleto}?`
+    const confirmar = await this.notificacionService.confirmar(
+      'Modificar Estado',
+      `¿Deseas ${accion} la cuenta de ${this.usuario.nombreCompleto}?`,
+      `Sí, ${accion}`,
+      'Cancelar'
     );
 
     if (!confirmar) return;

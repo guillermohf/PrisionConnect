@@ -70,8 +70,11 @@ export class ReclusosAsignadosComponent implements OnChanges {
   }
 
   async desasignar(relacion: RelacionAbogado): Promise<void> {
-    const confirmar = confirm(
-      `¿Estás seguro de que deseas desasignar a ${relacion.reclusoNombre}?`
+    const confirmar = await this.notificacionService.confirmar(
+      'Desasignar Abogado',
+      `¿Estás seguro de que deseas desasignar el recluso ${relacion.reclusoNombre}?`,
+      'Sí, desasignar',
+      'Cancelar'
     );
 
     if (!confirmar || !relacion.id) return;

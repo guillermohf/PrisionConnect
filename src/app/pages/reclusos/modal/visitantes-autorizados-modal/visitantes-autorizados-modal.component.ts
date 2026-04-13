@@ -73,8 +73,11 @@ export class VisitantesAutorizadosComponent implements OnInit, OnChanges {
   }
 
   async desautorizar(relacion: RelacionVisitante): Promise<void> {
-    const confirmar = confirm(
-      `¿Estás seguro de desautorizar a ${relacion.visitanteNombre}?`
+    const confirmar = await this.notificacionService.confirmar(
+      'Remover Visitante',
+      `¿Estás seguro de desautorizar a ${relacion.visitanteNombre}?`,
+      'Sí, remover',
+      'Cancelar'
     );
 
     if (confirmar && relacion.id) {
