@@ -102,6 +102,60 @@ export class DataTableComponent implements OnInit, OnChanges {
     return key === 'activo' || key === 'estado' || key === 'estatus';
   }
 
+  // ⭐ NUEVO - Determinar si una columna es de tipo fecha
+  isDateColumn(key: string): boolean {
+    const dateKeys = [
+      'fecha',
+      'fechavisita',
+      'fechanacimiento',
+      'fechaingreso',
+      'fecharegistro',
+      'fechaasignacion',
+      'fechacreacion',
+      'fechaactualizacion',
+      'ultimoacceso',
+      'checkin',
+      'checkout',
+      'checkinprincipal',
+      'checkoutfinal'
+    ];
+    return dateKeys.includes(key.toLowerCase());
+  }
+
+  // ⭐ NUEVO - Formatear fecha para celdas de la tabla
+  formatearFechaTabla(value: any): string {
+    if (!value) return '-';
+    try {
+      let dateObj: Date;
+      if (value instanceof Date) {
+        dateObj = value;
+      } else if (typeof value.toDate === 'function') {
+        dateObj = value.toDate();
+      } else if (value.seconds !== undefined) {
+        dateObj = new Date(value.seconds * 1000);
+      } else {
+        const strVal = String(value);
+        const matchT = strVal.match(/Timestamp\(seconds=(\d+)/);
+        if (matchT) {
+          dateObj = new Date(parseInt(matchT[1]) * 1000);
+        } else {
+          dateObj = new Date(value);
+        }
+      }
+      
+      if (isNaN(dateObj.getTime())) {
+        return String(value);
+      }
+      
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const y = dateObj.getFullYear();
+      return `${d}/${m}/${y}`;
+    } catch {
+      return String(value);
+    }
+  }
+
   // ⭐ NUEVO - Obtener clase para badge de estado
   getBadgeClass(value: any): string {
     if (typeof value === 'boolean') {

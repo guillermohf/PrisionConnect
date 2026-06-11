@@ -88,7 +88,7 @@ export default class VisitasActivasComponent implements OnInit {
 
   // Columnas para la tabla
   columnas = [
-    { key: 'numeroIdentificacion', label: 'ID' },
+    { key: 'id', label: 'ID' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'areaVisita', label: 'ÁREA' },
