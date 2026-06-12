@@ -40,8 +40,8 @@ export default class VisitasActivasComponent implements OnInit {
   estadisticas = this.visitasService.estadisticas;
 
   // Visitas activas (en curso y en tránsito)
-  visitasActivas = computed(() => 
-    this.visitasService.visitas().filter(v => 
+  visitasActivas = computed(() =>
+    this.visitasService.visitas().filter(v =>
       v.estado === EstadoVisita.EN_CURSO ||
       v.estado === EstadoVisita.EN_TRANSITO ||
       v.estado === EstadoVisita.EN_REQUISA_ENTRADA ||
@@ -50,11 +50,11 @@ export default class VisitasActivasComponent implements OnInit {
   );
 
   // Contadores por estado
-  visitasEnTransito = computed(() => 
+  visitasEnTransito = computed(() =>
     this.visitasActivas().filter(v => v.estado === EstadoVisita.EN_TRANSITO).length
   );
 
-  visitasPendienteSalida = computed(() => 
+  visitasPendienteSalida = computed(() =>
     this.visitasActivas().filter(v => v.estado === EstadoVisita.PENDIENTE_REQUISA_SALIDA).length
   );
 
@@ -64,13 +64,13 @@ export default class VisitasActivasComponent implements OnInit {
   // Visitas filtradas (COMPUTED - se actualiza automáticamente)
   visitasFiltradas = computed(() => {
     const visitas = this.visitasActivas();
-    
+
     switch (this.vistaActual()) {
       case 'en-curso':
         return visitas.filter(v => v.estado === EstadoVisita.EN_CURSO);
       case 'en-transito':
-        return visitas.filter(v => 
-          v.estado === EstadoVisita.EN_TRANSITO || 
+        return visitas.filter(v =>
+          v.estado === EstadoVisita.EN_TRANSITO ||
           v.estado === EstadoVisita.EN_REQUISA_ENTRADA
         );
       default:
@@ -88,9 +88,8 @@ export default class VisitasActivasComponent implements OnInit {
 
   // Columnas para la tabla
   columnas = [
-    { key: 'id', label: 'ID' },
-    { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'tipo', label: 'TIPO' },
+    { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'areaVisita', label: 'ÁREA' },
     { key: 'horaInicioProgramada', label: 'HORA INICIO' },
     { key: 'estado', label: 'ESTADO' },
@@ -98,7 +97,7 @@ export default class VisitasActivasComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.visitasService.cargarVisitas();  
+    this.visitasService.cargarVisitas();
   }
 
   cambiarVista(vista: 'todas' | 'en-curso' | 'en-transito'): void {
@@ -152,13 +151,13 @@ export default class VisitasActivasComponent implements OnInit {
 
   // Utilidades
   puedeHacerCheckIn(visita: Visita): boolean {
-    return visita.estado === EstadoVisita.REGISTRADA || 
-           visita.estado === EstadoVisita.EN_REQUISA_ENTRADA;
+    return visita.estado === EstadoVisita.REGISTRADA ||
+      visita.estado === EstadoVisita.EN_REQUISA_ENTRADA;
   }
 
   puedeHacerCheckOut(visita: Visita): boolean {
-    return visita.estado === EstadoVisita.EN_CURSO && 
-           visita.visitantesPresentes > 0;
+    return visita.estado === EstadoVisita.EN_CURSO &&
+      visita.visitantesPresentes > 0;
   }
 
   obtenerColorEstado(estado: EstadoVisita): string {
@@ -171,17 +170,17 @@ export default class VisitasActivasComponent implements OnInit {
 
   calcularTiempoTranscurrido(visita: Visita): string {
     if (!visita.horaInicioProgramada) return 'N/A';
-    
+
     const ahora = new Date();
     const [horas, minutos] = visita.horaInicioProgramada.split(':').map(Number);
     const horaInicio = new Date();
     horaInicio.setHours(horas, minutos, 0);
-    
+
     const diff = Math.floor((ahora.getTime() - horaInicio.getTime()) / 60000);
-    
+
     if (diff < 0) return 'Aún no inicia';
     if (diff < 60) return `${diff} min`;
-    
+
     const hh = Math.floor(diff / 60);
     const mm = diff % 60;
     return `${hh}h ${mm}min`;

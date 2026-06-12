@@ -12,12 +12,13 @@
       >
         <div class="relative flex-shrink-0">
           <i class="material-icons text-[#FEEBDD]">{{ option.icon }}</i>
-          
-          @if (option.badge && option.badge > 0) {
-            <span 
-              class="absolute -top-1 -right-1 bg-[#FCD2C9] text-[#1A2626] text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+
+          <!-- Badge dinámico en tiempo real -->
+          @if (getBadge(option.route) > 0) {
+            <span
+              class="absolute -top-1 -right-1 bg-[#FCD2C9] text-[#1A2626] text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse"
             >
-              {{ option.badge > 9 ? '9+' : option.badge }}
+              {{ getBadge(option.route) > 9 ? '9+' : getBadge(option.route) }}
             </span>
           }
         </div>
@@ -29,7 +30,15 @@
             'opacity-0 scale-95 max-w-0 ml-0': !expanded()
           }"
         >
-          <div class="font-bold text-sm">{{ option.label }}</div>
+          <div class="font-bold text-sm flex items-center gap-2">
+            {{ option.label }}
+            <!-- Badge inline cuando el menú está expandido -->
+            @if (expanded() && getBadge(option.route) > 0) {
+              <span class="bg-[#FCD2C9] text-[#1A2626] text-xs rounded-full px-1.5 py-0.5 font-bold leading-none">
+                {{ getBadge(option.route) > 9 ? '9+' : getBadge(option.route) }}
+              </span>
+            }
+          </div>
           @if (option.subLabel && expanded()) {
             <div class="text-xs text-[#FEEBDD] opacity-90">
               {{ option.subLabel }}
@@ -38,10 +47,17 @@
         </div>
 
         @if (!expanded()) {
-          <div 
+          <div
             class="absolute left-full ml-2 px-3 py-2 bg-[#1A2626] text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
           >
-            <div class="font-bold">{{ option.label }}</div>
+            <div class="font-bold flex items-center gap-2">
+              {{ option.label }}
+              @if (getBadge(option.route) > 0) {
+                <span class="bg-[#FCD2C9] text-[#1A2626] text-xs rounded-full px-1.5 py-0.5 font-bold leading-none">
+                  {{ getBadge(option.route) > 9 ? '9+' : getBadge(option.route) }}
+                </span>
+              }
+            </div>
             @if (option.subLabel) {
               <div class="text-xs text-[#FEEBDD] mt-1">
                 {{ option.subLabel }}
@@ -72,7 +88,7 @@
       </span>
 
       @if (!expanded()) {
-        <div 
+        <div
           class="absolute left-full ml-2 px-3 py-2 bg-[#1A2626] text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50"
         >
           Cerrar sesión

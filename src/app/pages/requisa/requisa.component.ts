@@ -99,6 +99,7 @@ visitasFiltradas = computed(() => {
   // INIT
   // =========================
   ngOnInit(): void {
+    this.visitasService.cargarVisitas();
     this.cambiarTipoRequisa('entrada');
   }
 

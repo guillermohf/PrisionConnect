@@ -1,9 +1,11 @@
 // src/app/shared/components/sidebar/side-menu-options/side-menu-options.component.ts
 
-import { Component, input, output, signal, inject, OnInit } from '@angular/core';
+import { Component, input, output, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { MenuService } from '@core/services/menu.service';
+import { VisitasService } from '@core/services/visitas.service';
 
 export interface MenuOption {
   label: string;
@@ -21,8 +23,10 @@ export interface MenuOption {
   styleUrls: ['./side-menu-options.component.scss']
 })
 export class SideMenuOptionsComponent implements OnInit {
-  
+
   private authService = inject(AuthService);
+  private menuService = inject(MenuService);
+  private visitasService = inject(VisitasService);
 
   // Inputs
   expanded = input.required<boolean>();
@@ -30,94 +34,24 @@ export class SideMenuOptionsComponent implements OnInit {
   // Outputs
   logout = output<void>();
 
-  // Opciones del menú
-  menuOptions = signal<MenuOption[]>([
-    {
-      label: 'Dashboard',
-      route: '/dashboard',
-      icon: 'dashboard',
-      subLabel: 'Panel principal'
-    },
-    {
-      label: 'Recepción',
-      route: '/visitas',
-      icon: 'how_to_reg',
-      subLabel: 'Gestión de Visitas'
-    },
-    {
-      label: 'Requisa',
-      route: '/requisa',
-      icon: 'search',
-      subLabel: 'Control de acceso'
-    },
-    {
-      label: 'Visitantes',
-      route: '/visitantes',
-      icon: 'people',
-      subLabel: 'Gestión de visitantes'
-    },
-    {
-      label: 'Reclusos',
-      route: '/reclusos',
-      icon: 'person',
-      subLabel: 'Gestión de reclusos'
-    },
-    {
-      label: 'Abogados',
-      route: '/abogados',
-      icon: 'gavel',
-      subLabel: 'Gestión de abogados'
-    },
-    {
-      label: 'Visitas Activas',
-      route: '/visitas-activas',
-      icon: 'visibility',
-      subLabel: 'Monitoreo en tiempo real'
-    },
-
-    {
-      label: 'Reportes',
-      route: '/reportes',
-      icon: 'assessment',
-      subLabel: 'Análisis y estadísticas'
-    },
-    {
-      label: 'Configuración',
-      route: '/configuracion',
-      icon: 'settings',
-      subLabel: 'Ajustes del sistema'
-    },
-    {
-      label: 'Usuarios',
-      route: '/usuarios',
-      icon: 'group',
-      subLabel: 'Gestión de accesos'
-    },
-    {
-      label: 'Perfil',
-      route: '/perfil',
-      icon: 'account_circle',
-      subLabel: 'Mi cuenta'
-    }
-  ]);
+  /**
+   * Opciones del menú filtradas por rol del usuario actual.
+   * Se recalculan automáticamente cuando cambia el rol o las visitas.
+   */
+  menuOptions = computed(() => this.menuService.menuOptions());
 
   ngOnInit(): void {
-    // Aquí podrías cargar badges dinámicos desde un servicio
-    // Por ejemplo, cantidad de visitas pendientes, alertas, etc.
-    this.loadBadges();
+    // Iniciar la carga de visitas en tiempo real para que los badges
+    // se alimenten del onSnapshot de Firestore desde el primer render.
+    this.visitasService.cargarVisitas();
   }
 
-  private loadBadges(): void {
-
-    this.menuOptions.update(options => 
-      options.map(opt => {
-        if (opt.route === '/visitas-activas') {
-          return { ...opt, badge: 5 }; // 5 visitas activas
-        }
-        return opt;
-      })
-    );
-    
+  /**
+   * Obtiene el badge dinámico de una ruta desde el MenuService.
+   * Al ser llamado dentro de un template con signals, se recalcula automáticamente.
+   */
+  getBadge(ruta: string): number {
+    return this.menuService.getBadgePorRuta(ruta);
   }
 
   onLogout(): void {
