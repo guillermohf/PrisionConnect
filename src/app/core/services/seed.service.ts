@@ -264,6 +264,7 @@ export class SeedService {
           data: {
             id: docRef.id,
             ...r,
+            estado: (r as any).estado || 'Activo',
             fechaNacimiento: Timestamp.fromDate(new Date(`${r.fechaNacimiento}T00:00:00`)),
             fechaIngreso: Timestamp.fromDate(new Date(`${r.fechaIngreso}T00:00:00`)),
             fechaCreacion: Timestamp.now(),

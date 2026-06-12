@@ -154,10 +154,10 @@ export class ReclusosService {
       };
 
       if (datos.fechaNacimiento) updateBody.edad = calcularEdad(datos.fechaNacimiento);
-      
+
       const payloadNombre = (datos as any).nombre;
       const payloadApellido = (datos as any).apellido;
-      
+
       if (payloadNombre || payloadApellido) {
         updateBody.nombreCompleto = getNombreCompleto(payloadNombre || actual?.nombre, payloadApellido || actual?.apellido);
       }
@@ -177,10 +177,10 @@ export class ReclusosService {
   async eliminarRecluso(id: string): Promise<{ success: boolean; message: string }> {
     try {
       const reclusoRef = doc(this.firestore, `reclusos/${id}`);
-      await updateDoc(reclusoRef, { 
-        activo: false, 
+      await updateDoc(reclusoRef, {
+        activo: false,
         modificadoPor: this.authService.userId() || 'sistema',
-        fechaActualizacion: Timestamp.now() 
+        fechaActualizacion: Timestamp.now()
       });
       return { success: true, message: 'Eliminado correctamente' };
     } catch (error: any) {
@@ -233,7 +233,7 @@ export class ReclusosService {
    */
   obtenerReporte(filtros: any): Observable<any[]> {
     let filtrados = this.reclusos();
-    
+
     if (filtros.fechaInicio && filtros.fechaFin) {
       const inicio = new Date(`${filtros.fechaInicio}T00:00:00`);
       const fin = new Date(`${filtros.fechaFin}T23:59:59`);
@@ -251,7 +251,7 @@ export class ReclusosService {
     if (filtros.estadoRecluso) {
       filtrados = filtrados.filter(r => r.estado === filtros.estadoRecluso);
     }
-    
+
     const datos = filtrados.map(r => ({
       numeroInterno: r.numeroIdentificacion || r.numeroExpediente || 'N/A',
       nombreCompleto: r.nombreCompleto,
