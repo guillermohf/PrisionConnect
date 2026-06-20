@@ -87,13 +87,21 @@ export default class VisitasActivasComponent implements OnInit {
   visitaSeleccionada: Visita | null = null;
 
   // Columnas para la tabla
-  columnas = [
+  columnas: ColumnaConfig[] = [
+    {
+      key: 'cedula',
+      label: 'CEDULA',
+      getValue: (row: any) => row.tipo === TipoVisita.LEGAL
+        ? row.abogado?.cedula
+        : row.visitantes?.[0]?.cedula
+    },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
-    { key: 'areaVisita', label: 'ÁREA' },
-    { key: 'horaInicioProgramada', label: 'HORA INICIO' },
+    { key: 'totalVisitantes', label: 'CANT. VISITANTES' },
+    { key: 'fechaVisita', label: 'FECHA' },
+    { key: 'horaInicioProgramada', label: 'HORA' },
     { key: 'estado', label: 'ESTADO' },
-    { key: 'visitantesPresentes', label: 'VISITANTES' }
+    { key: 'areaVisita', label: 'ÁREA' }
   ];
 
   ngOnInit(): void {
