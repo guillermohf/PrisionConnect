@@ -244,6 +244,36 @@ async guardar(): Promise<void> {
   // ... rest of the code
 
     if (resultado.success) {
+      // Intentar obtener el nombre del recluso para el ticket
+      const reclusoSeleccionado = this.reclusos().find(r => r.id === formValue.reclusoId);
+      const nombreRecluso = reclusoSeleccionado ? reclusoSeleccionado.nombreCompleto : 'Recluso';
+      const areaDestino = formValue.areaVisita;
+      const hora = formValue.horaInicioProgramada;
+
+      // Generar tarjeta HTML tipo Ticket
+      const html = `
+        <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-top: 10px; border: 1px dashed #94a3b8; text-align: center;">
+          <div style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Ticket de Entrada</div>
+          <div style="font-size: 24px; font-weight: bold; color: #0f172a; margin-bottom: 12px;">${nombreRecluso}</div>
+          
+          <div style="display: flex; justify-content: space-between; border-top: 1px dashed #cbd5e1; padding-top: 12px; margin-top: 12px; text-align: left;">
+            <div>
+              <div style="color: #64748b; font-size: 12px;">Área</div>
+              <div style="color: #0f766e; font-weight: bold; font-size: 14px;">${areaDestino}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="color: #64748b; font-size: 12px;">Hora Inicio</div>
+              <div style="color: #0f172a; font-weight: bold; font-size: 14px;">${hora}</div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 12px; font-size: 13px; color: #64748b; font-weight: 500;">
+            Tipo: ${formValue.tipo}
+          </div>
+        </div>
+      `;
+
+      this.notificacionService.successCard('Visita Registrada', html);
       this.visitaCreada.emit();
       this.cerrar();
     } else {

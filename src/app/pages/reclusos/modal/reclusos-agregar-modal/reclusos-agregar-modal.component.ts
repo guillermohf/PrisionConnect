@@ -167,7 +167,6 @@ export class ReclusoAgregarModalComponent implements OnChanges  {  // ✅ AGREGA
 
       if (resultado.success) {
         this.notificacionService.success(resultado.message);
-        // ✅ No hacer form.reset() aquí, cerrar() ya lo hace
         this.reclusoAgregado.emit();
         this.cerrar();
       }

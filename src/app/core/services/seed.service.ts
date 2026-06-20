@@ -1,14 +1,14 @@
 // src/app/core/services/seed.service.ts
 
 import { Injectable, inject } from '@angular/core';
-import { 
-  Firestore, 
-  collection, 
-  getDocs, 
-  doc, 
-  deleteDoc, 
-  setDoc, 
-  Timestamp 
+import {
+  Firestore,
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  setDoc,
+  Timestamp
 } from '@angular/fire/firestore';
 
 @Injectable({
@@ -222,7 +222,7 @@ export class SeedService {
     try {
       const colRef = collection(this.firestore, name);
       const snap = await getDocs(colRef);
-      const promises = snap.docs.map(docSnap => 
+      const promises = snap.docs.map(docSnap =>
         deleteDoc(doc(this.firestore, `${name}/${docSnap.id}`))
       );
       await Promise.all(promises);
@@ -250,7 +250,7 @@ export class SeedService {
         'incidencias',
         'auditLogs'
       ];
-      
+
       for (const col of coleccionesABorrar) {
         await this.deleteCollection(col);
       }
@@ -410,6 +410,7 @@ export class SeedService {
         {
           abogadoId: abogadosData[0].data.id,
           abogadoNombre: abogadosData[0].data.nombreCompleto,
+          abogadoCedula: abogadosData[0].data.cedula,
           abogadoExequatur: abogadosData[0].data.exequatur,
           abogadoTipo: abogadosData[0].data.tipo,
           reclusoId: reclusosData[0].data.id,
@@ -570,6 +571,7 @@ export class SeedService {
           abogado: {
             abogadoId: abogadosData[1].data.id,
             nombre: abogadosData[1].data.nombreCompleto,
+            cedula: abogadosData[1].data.cedula,
             exequatur: abogadosData[1].data.exequatur,
             institucion: abogadosData[1].data.institucion,
             checkIn: null,

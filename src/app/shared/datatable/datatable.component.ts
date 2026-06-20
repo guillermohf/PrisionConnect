@@ -69,6 +69,13 @@ export class DataTableComponent implements OnInit, OnChanges {
     this.actualizarPaginacion();
   }
 
+obtenerValor(obj: any, key: string): any {
+  return key.split('.').reduce((valor, parte) => valor?.[parte], obj);
+}
+
+obtenerValorColumna(row: any, column: ColumnaConfig): any {
+  return column.getValue ? column.getValue(row) : this.obtenerValor(row, column.key);
+}
   actualizarPaginacion() {
     const start = this.paginaActual * this.rowsPerPage;
     const end = start + this.rowsPerPage;

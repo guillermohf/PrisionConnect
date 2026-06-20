@@ -40,6 +40,26 @@ export class NotificacionService {
   }
 
   /**
+   * Muestra un "recibo" o tarjeta de confirmación de éxito con detalles HTML.
+   * Usar para validación visual de registros complejos creados.
+   */
+  successCard(titulo: string, htmlContent: string): void {
+    Swal.fire({
+      title: titulo,
+      html: htmlContent,
+      icon: 'success',
+      confirmButtonText: 'Cerrar y Continuar',
+      confirmButtonColor: '#0f766e', // teal-700
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl p-6',
+        title: 'text-2xl font-bold text-gray-800 mt-2',
+        htmlContainer: 'text-left mt-4 !m-0',
+        confirmButton: 'rounded-lg px-6 py-2.5 font-semibold w-full'
+      }
+    });
+  }
+
+  /**
    * Toast de error — esquina superior derecha, más duración para que se lea.
    * Usar para errores de operaciones que NO requieren acción del usuario.
    * Para errores que SÍ requieren acción, usar confirmar().

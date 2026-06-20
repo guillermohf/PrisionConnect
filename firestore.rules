@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función para verificar si el usuario está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Función para obtener el rol del usuario desde la colección de usuarios
+    function getUserRole() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol;
+    }
+    
+    // Función para verificar si el usuario es Super Administrador
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserRole() == 'SuperAdministrador';
+    }
+    
+    // Función para verificar si el usuario es Supervisor
+    function isSupervisor() {
+      return isAuthenticated() && getUserRole() == 'Supervisor';
+    }
+
+    // Colección de Usuarios
+    match /usuarios/{userId} {
+      // Todos pueden leer su propio documento para obtener su rol
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // Solo el SuperAdmin puede leer todos los usuarios y modificarlos
+      allow read, write: if isSuperAdmin();
+    }
+    
+    // Colecciones Core: Reclusos, Visitantes, Abogados y Relaciones
+    match /{document=**} {
+      // El SuperAdmin puede hacer todo
+      allow read, write: if isSuperAdmin();
+      // El Supervisor puede leer todo (para reportes y auditoria)
+      allow read: if isSupervisor();
+    }
+    
+    match /reclusos/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Data Entry';
+    }
+    
+    match /visitantes/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Data Entry' || getUserRole() == 'Seguridad de Recepción';
+    }
+    
+    match /abogados/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Data Entry';
+    }
+    
+    match /visitas/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Seguridad de Recepción' || getUserRole() == 'Seguridad de Requisa';
+    }
+    
+    match /incidencias/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Seguridad de Recepción' || getUserRole() == 'Seguridad de Requisa';
+    }
+    
+    match /relaciones_visitantes/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Data Entry';
+    }
+    
+    match /relaciones_abogados/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isSupervisor() || getUserRole() == 'Data Entry';
+    }
+    
+    match /configuracion/{document=**} {
+      // Todos leen configuración (parámetros del sistema)
+      allow read: if true;
+      // Solo SuperAdmin edita configuración
+      allow write: if isSuperAdmin();
+    }
+    
+    match /auditLogs/{document=**} {
+      // Cualquiera puede ESCRIBIR logs de auditoría si está logueado (el sistema loguea sus acciones)
+      allow write: if isAuthenticated();
+      // Solo Admin y Supervisor pueden LEER auditoría
+      allow read: if isSuperAdmin() || isSupervisor();
+    }
+    
+  }
+}

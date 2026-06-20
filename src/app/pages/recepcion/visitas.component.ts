@@ -67,7 +67,7 @@ export default class VisitasComponent implements OnInit {
       } else {
         const strFecha = String(visita.fechaVisita);
         const matchT = strFecha.match(/Timestamp\(seconds=(\d+)/);
-        
+
         if (matchT) {
           fechaProcesada = new Date(parseInt(matchT[1]) * 1000);
         } else if (strFecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -91,7 +91,14 @@ export default class VisitasComponent implements OnInit {
 
   visitaSeleccionada: Visita | null = null;
 
-  columnas = [
+  columnas: ColumnaConfig[] = [
+    {
+      key: 'cedula',
+      label: 'CEDULA',
+      getValue: (row: any) => row.tipo === TipoVisita.LEGAL
+        ? row.abogado?.cedula
+        : row.visitantes?.[0]?.cedula
+    },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'totalVisitantes', label: 'CANT. VISITANTES' },
@@ -127,7 +134,7 @@ export default class VisitasComponent implements OnInit {
       else {
         const strFecha = String(fecha);
         const matchT = strFecha.match(/Timestamp\(seconds=(\d+)/);
-        
+
         if (matchT) {
           fechaObj = new Date(parseInt(matchT[1]) * 1000);
         }
@@ -148,7 +155,7 @@ export default class VisitasComponent implements OnInit {
       const d = String(fechaObj.getDate()).padStart(2, '0');
       const m = String(fechaObj.getMonth() + 1).padStart(2, '0');
       const y = fechaObj.getFullYear();
-      
+
       return `${d}/${m}/${y}`;
     } catch (error) {
       return 'Error de fecha';

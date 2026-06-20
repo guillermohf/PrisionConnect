@@ -61,9 +61,9 @@
               <!-- Columna especial para horaSalida -->
               @if (column.key === 'horaSalida') {
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
-                  @if (row[column.key] && row.estatus === 'Finalizada') {
+                  @if (obtenerValorColumna(row, column) && row.estatus === 'Finalizada') {
                     <div class="flex items-center gap-2">
-                      <span class="text-gray-800 font-medium">{{ row[column.key] }}</span>
+                      <span class="text-gray-800 font-medium">{{ obtenerValorColumna(row, column) }}</span>
                       <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
                         Finalizada
                       </span>
@@ -73,7 +73,7 @@
                       <input
                         type="time"
                         class="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                        [value]="convertirA24Horas(row[column.key])"
+                        [value]="convertirA24Horas(obtenerValorColumna(row, column))"
                         (change)="onHoraSalidaChange(row, $event)"
                       />
                       <button
@@ -99,13 +99,13 @@
                   @if (isBadgeColumn(column.key)) {
                     <span 
                       class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-                      [ngClass]="getBadgeClass(row[column.key])">
-                      {{ getBadgeText(row[column.key]) }}
+                      [ngClass]="getBadgeClass(obtenerValorColumna(row, column))">
+                      {{ getBadgeText(obtenerValorColumna(row, column)) }}
                     </span>
                   } @else if (isDateColumn(column.key)) {
-                    <span class="text-gray-900 font-medium">{{ formatearFechaTabla(row[column.key]) }}</span>
+                    <span class="text-gray-900 font-medium">{{ formatearFechaTabla(obtenerValorColumna(row, column)) }}</span>
                   } @else {
-                    <span class="text-gray-900 font-medium">{{ row[column.key] || '-' }}</span>
+                    <span class="text-gray-900 font-medium">{{ obtenerValorColumna(row, column) || '-' }}</span>
                   }
                 </td>
               }

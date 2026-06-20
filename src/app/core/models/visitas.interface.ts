@@ -91,6 +91,7 @@ export interface AbogadoEnVisita {
   abogadoId: string;
   nombre: string;
   exequatur: string;
+  cedula: string;
   institucion: string;
   checkIn?: Timestamp | Date | null;
   checkOut?: Timestamp | Date | null;

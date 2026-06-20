@@ -180,10 +180,7 @@ export class VisitanteAgregarModalComponent {
     this.guardando.set(false);
 
     if (resultado.exito) {
-      await this.notificacion.success(
-        'Visitante creado exitosamente',
-        '¡Éxito!'
-      );
+      this.notificacion.success(resultado.mensaje || 'Visitante creado exitosamente');
       this.guardado.emit(resultado.data!);
       this.closeModal();
     } else {
