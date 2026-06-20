@@ -135,6 +135,14 @@ export const routes: Routes = [
         }
       },
       {
+        path: 'auditoria',
+        loadComponent: () => import('./pages/auditoria/auditoria.component'),
+        canActivate: [roleGuard],
+        data: {
+          roles: [RolUsuario.SUPER_ADMINISTRADOR, RolUsuario.SUPERVISOR]
+        }
+      },
+      {
         path: 'usuarios',
         loadComponent: () => import('./pages/usuarios/usuarios.component'), // Asegúrate que el archivo tenga "export default"
         canActivate: [roleGuard],
