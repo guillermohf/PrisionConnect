@@ -1,6 +1,6 @@
 // src/app/shared/components/sidebar/side-menu/side-menu.component.ts
 
-import { Component, signal, inject, OnInit, HostListener, effect } from '@angular/core';
+import { Component, signal, inject, OnInit, HostListener, effect, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
 import { SideMenuHeaderComponent } from './side-menu-header/side-menu-header.component';
@@ -24,6 +24,7 @@ import { EdgeSwipeDirective } from '@shared/directives/edge-swipe.directive';
 export class SideMenuComponent implements OnInit {
   
   private authService = inject(AuthService);
+  private eRef = inject(ElementRef);
 
   // Estado del sidebar
   expanded = signal(true);
@@ -51,6 +52,15 @@ export class SideMenuComponent implements OnInit {
   @HostListener('window:resize')
   onResize(): void {
     this.checkMobile();
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: Event): void {
+    // Si estamos en desktop, el menú está expandido, y el clic fue fuera del sidebar
+    if (!this.isMobile() && this.expanded() && !this.eRef.nativeElement.contains(event.target)) {
+      // Colapsamos el menú
+      this.expanded.set(false);
+    }
   }
 
   private checkMobile(): void {
