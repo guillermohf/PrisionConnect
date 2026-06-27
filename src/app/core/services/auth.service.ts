@@ -14,7 +14,10 @@ import {
   Firestore,
   doc,
   onSnapshot,
-  getDoc
+  getDoc,
+  collection,
+  addDoc,
+  Timestamp
 } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { Usuario, RolUsuario } from '@core/models';
@@ -69,10 +72,12 @@ export class AuthService {
     try {
       this.loading.set(true);
       await signInWithEmailAndPassword(this.auth, email, pass);
-      // La redirección se maneja usualmente en el componente de login tras éxito
+      // El log de acceso exitoso se registra en escucharDatosFirestore una vez que el usuario carga
       return { success: true };
     } catch (error: any) {
       this.loading.set(false);
+      // Registrar intento fallido directamente en Firestore (sin AuditService para evitar ciclo)
+      this.registrarLogDirecto('Sistema', 'LOGIN_FALLIDO', `Intento de acceso fallido para: ${email}`, 'WARNING').catch(() => {});
       return { success: false, message: this.mapError(error.code) };
     }
   }
@@ -92,6 +97,14 @@ export class AuthService {
 
   async logout() {
     this.loading.set(true);
+    // Registrar el cierre de sesión antes de limpiar el estado
+    const fbUser = this.currentUser();
+    const dbUser = this.usuario();
+    await this.registrarLogDirecto(
+      'Sistema', 'LOGOUT',
+      `Cierre de sesión: ${dbUser?.nombreCompleto || fbUser?.email || 'Usuario'}`,
+      'INFO'
+    ).catch(() => {});
     await signOut(this.auth);
     this.limpiarEstado();
     this.router.navigate(['/login']);
@@ -110,7 +123,16 @@ export class AuthService {
     this.userListenerUnsubscribe = onSnapshot(userRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data() as Usuario;
+        const esNuevaSession = !this.usuario();
         this.usuario.set({ id: snap.id, ...data });
+        // Registrar el login exitoso la primera vez que carga el usuario
+        if (esNuevaSession) {
+          this.registrarLogDirecto(
+            'Sistema', 'LOGIN_EXITOSO',
+            `Inicio de sesión: ${data.nombreCompleto || data.email} (Rol: ${data.rol || 'N/A'})`,
+            'INFO'
+          ).catch(() => {});
+        }
       } else {
         console.warn('El usuario no tiene un perfil creado en Firestore');
         this.usuario.set(null);
@@ -160,4 +182,29 @@ export class AuthService {
   puedeGestionarVisitantes = computed(() =>
     this.esAdminLogica() || this.userRole() === RolUsuario.DATA_ENTRY || this.userRole() === RolUsuario.SEGURIDAD_RECEPCION
   );
+
+  /**
+   * Escribe un log de auditoría directamente en Firestore.
+   * Se usa en AuthService para evitar dependencia circular con AuditService.
+   */
+  private async registrarLogDirecto(
+    modulo: string,
+    accion: string,
+    detalles: string,
+    nivel: 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL'
+  ): Promise<void> {
+    const fbUser = this.currentUser();
+    const dbUser = this.usuario();
+    const logData = {
+      modulo,
+      accion,
+      detalles,
+      nivel,
+      usuarioId: fbUser?.uid || 'SISTEMA',
+      usuarioNombre: dbUser?.nombreCompleto || fbUser?.displayName || 'Usuario del Sistema',
+      rolUsuario: dbUser?.rol || 'N/A',
+      fecha: Timestamp.now()
+    };
+    await addDoc(collection(this.firestore, 'auditLogs'), logData);
+  }
 }

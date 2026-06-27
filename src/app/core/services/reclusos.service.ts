@@ -13,6 +13,7 @@ import {
 import { Auth, onAuthStateChanged } from '@angular/fire/auth'; // ✅ IMPORTANTE: Importar Auth de Firebase
 import { Recluso, FiltrosReclusos, CrearReclusoDTO, ActualizarReclusoDTO } from '@core/models/recluso.interface';
 import { AuthService } from './auth.service';
+import { AuditService } from './audit.service';
 import { calcularEdad, getNombreCompleto } from '@core/models/utils';
 import { Observable, of } from 'rxjs';
 
@@ -22,6 +23,7 @@ import { Observable, of } from 'rxjs';
 export class ReclusosService {
   private firestore = inject(Firestore);
   private authService = inject(AuthService);
+  private auditService = inject(AuditService);
   private auth = inject(Auth); // ✅ Inyectamos Auth
   private reclusosCollection = collection(this.firestore, 'reclusos');
 
@@ -129,8 +131,14 @@ export class ReclusosService {
       };
 
       const docRef = await addDoc(this.reclusosCollection, nuevo);
+      await this.auditService.registrarAccion(
+        'Reclusos', 'CREAR_RECLUSO',
+        `Recluso registrado: ${nuevo.nombreCompleto} (Exp: ${datos.numeroExpediente || 'N/A'})`,
+        'INFO'
+      );
       return { success: true, message: 'Recluso registrado', id: docRef.id };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Reclusos', 'ERROR_CREAR_RECLUSO', `Error: ${error.message}`, 'ERROR');
       return { success: false, message: error.message };
     } finally {
       this.loading.set(false);
@@ -163,8 +171,14 @@ export class ReclusosService {
       }
 
       await updateDoc(reclusoRef, updateBody);
+      await this.auditService.registrarAccion(
+        'Reclusos', 'ACTUALIZAR_RECLUSO',
+        `Recluso actualizado: ${actual?.nombreCompleto || id}`,
+        'INFO'
+      );
       return { success: true, message: 'Actualizado correctamente' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Reclusos', 'ERROR_ACTUALIZAR_RECLUSO', `Error al actualizar recluso ${id}: ${error.message}`, 'ERROR');
       return { success: false, message: error.message };
     } finally {
       this.loading.set(false);
@@ -177,13 +191,20 @@ export class ReclusosService {
   async eliminarRecluso(id: string): Promise<{ success: boolean; message: string }> {
     try {
       const reclusoRef = doc(this.firestore, `reclusos/${id}`);
+      const actual = this.reclusos().find(r => r.id === id);
       await updateDoc(reclusoRef, {
         activo: false,
         modificadoPor: this.authService.userId() || 'sistema',
         fechaActualizacion: Timestamp.now()
       });
+      await this.auditService.registrarAccion(
+        'Reclusos', 'DESACTIVAR_RECLUSO',
+        `Recluso desactivado: ${actual?.nombreCompleto || id}`,
+        'WARNING'
+      );
       return { success: true, message: 'Eliminado correctamente' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Reclusos', 'ERROR_DESACTIVAR_RECLUSO', `Error al desactivar recluso ${id}: ${error.message}`, 'ERROR');
       return { success: false, message: error.message };
     }
   }

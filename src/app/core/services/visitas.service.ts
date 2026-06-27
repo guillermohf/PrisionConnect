@@ -26,6 +26,7 @@ import {
 } from '@core/models/visitas.interface';
 import { EstadoVisita, TipoVisita } from '@core/models/enums.interface';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { AuditService } from './audit.service';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -34,6 +35,7 @@ import { Observable } from 'rxjs';
 export class VisitasService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private auditService = inject(AuditService);
 
   visitas = signal<Visita[]>([]);
   loading = signal<boolean>(false);
@@ -203,7 +205,9 @@ export class VisitasService {
         totalVisitantes: visitantes.length,
         visitantesPresentes: 0,
         abogado: dto.tipo === TipoVisita.LEGAL ? abogado : null,
-        fechaVisita: Timestamp.fromDate(dto.fechaVisita),
+        fechaVisita: dto.fechaVisita instanceof Timestamp
+          ? dto.fechaVisita
+          : Timestamp.fromDate(dto.fechaVisita as Date),
         horaInicioProgramada: dto.horaInicioProgramada,
         horaFinProgramada: dto.horaFinProgramada,
         checkInPrincipal: null,
@@ -236,10 +240,15 @@ export class VisitasService {
 
       const docRef = await addDoc(collection(this.firestore, 'visitas'), nuevaVisita);
       await this.cargarVisitas();
-
+      await this.auditService.registrarAccion(
+        'Recepción', 'CREAR_VISITA',
+        `Visita ${dto.tipo} creada para: ${reclusoData['nombreCompleto']} (Visitantes: ${visitantes.length})`,
+        'INFO'
+      );
       return { success: true, message: 'Visita creada exitosamente', visitaId: docRef.id };
     } catch (error: any) {
       console.error('Error creando visita:', error);
+      await this.auditService.registrarAccion('Recepción', 'ERROR_CREAR_VISITA', `Error: ${error.message}`, 'ERROR');
       return { success: false, message: error.message || 'Error al crear la visita' };
     }
   }
@@ -345,8 +354,14 @@ export class VisitasService {
 
       await updateDoc(visitaRef, updates);
       await this.cargarVisitas();
+      await this.auditService.registrarAccion(
+        'Recepción', 'CAMBIAR_ESTADO_VISITA',
+        `Visita ${visitaId} cambió a estado: ${nuevoEstado}`,
+        'INFO'
+      );
       return { success: true, message: 'Estado actualizado exitosamente' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Recepción', 'ERROR_CAMBIAR_ESTADO_VISITA', `Error al cambiar estado de visita ${visitaId}: ${error.message}`, 'ERROR');
       return { success: false, message: error.message };
     }
   }
@@ -382,8 +397,14 @@ export class VisitasService {
       });
 
       await this.cargarVisitas();
+      await this.auditService.registrarAccion(
+        'Recepción', 'AGREGAR_INCIDENCIA',
+        `Incidencia [${dto.tipo} - ${dto.gravedad}] en visita ${dto.visitaId}: ${dto.descripcion}`,
+        'WARNING'
+      );
       return { success: true, message: 'Incidencia agregada exitosamente' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Recepción', 'ERROR_AGREGAR_INCIDENCIA', `Error en visita ${dto.visitaId}: ${error.message}`, 'ERROR');
       return { success: false, message: error.message };
     }
   }
@@ -398,8 +419,14 @@ export class VisitasService {
       });
 
       await this.cargarVisitas();
+      await this.auditService.registrarAccion(
+        'Recepción', 'CANCELAR_VISITA',
+        `Visita ${visitaId} cancelada. Motivo: ${motivo}`,
+        'WARNING'
+      );
       return { success: true, message: 'Visita cancelada exitosamente' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Recepción', 'ERROR_CANCELAR_VISITA', `Error al cancelar visita ${visitaId}: ${error.message}`, 'ERROR');
       return { success: false, message: error.message };
     }
   }

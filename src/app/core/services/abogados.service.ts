@@ -18,6 +18,7 @@ import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Abogado, CrearAbogadoDTO, ActualizarAbogadoDTO } from '@core/models/abogado.interface';
 import { TipoAbogado } from '@core/models/enums.interface';
 import { AuthService } from './auth.service';
+import { AuditService } from './audit.service';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -27,6 +28,7 @@ export class AbogadosService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
   private authService = inject(AuthService);
+  private auditService = inject(AuditService);
   private abogadosCollection = collection(this.firestore, 'abogados');
 
   // Signals reactivos
@@ -122,7 +124,11 @@ export class AbogadosService {
       await this.cargarAbogados();
       
       console.log('✅ Abogado creado:', docRef.id);
-
+      await this.auditService.registrarAccion(
+        'Abogados', 'CREAR_ABOGADO',
+        `Abogado registrado: ${nombreCompleto} (Exequatur: ${datos.exequatur})`,
+        'INFO'
+      );
       return {
         success: true,
         message: 'Abogado registrado exitosamente',
@@ -130,6 +136,7 @@ export class AbogadosService {
       };
     } catch (error: any) {
       console.error('❌ Error creando abogado:', error);
+      await this.auditService.registrarAccion('Abogados', 'ERROR_CREAR_ABOGADO', `Error: ${error.message}`, 'ERROR');
       return {
         success: false,
         message: 'Error al registrar abogado: ' + error.message
@@ -155,13 +162,18 @@ export class AbogadosService {
       await this.cargarAbogados();
       
       console.log('✅ Abogado actualizado:', id);
-
+      await this.auditService.registrarAccion(
+        'Abogados', 'ACTUALIZAR_ABOGADO',
+        `Abogado actualizado: ID ${id}`,
+        'INFO'
+      );
       return {
         success: true,
         message: 'Abogado actualizado exitosamente'
       };
     } catch (error: any) {
       console.error('❌ Error actualizando abogado:', error);
+      await this.auditService.registrarAccion('Abogados', 'ERROR_ACTUALIZAR_ABOGADO', `Error al actualizar abogado ${id}: ${error.message}`, 'ERROR');
       return {
         success: false,
         message: 'Error al actualizar abogado: ' + error.message
@@ -184,13 +196,18 @@ export class AbogadosService {
       await this.cargarAbogados();
       
       console.log('✅ Abogado eliminado:', id);
-
+      await this.auditService.registrarAccion(
+        'Abogados', 'DESACTIVAR_ABOGADO',
+        `Abogado desactivado: ID ${id}`,
+        'WARNING'
+      );
       return {
         success: true,
         message: 'Abogado eliminado exitosamente'
       };
     } catch (error: any) {
       console.error('❌ Error eliminando abogado:', error);
+      await this.auditService.registrarAccion('Abogados', 'ERROR_DESACTIVAR_ABOGADO', `Error al desactivar abogado ${id}: ${error.message}`, 'ERROR');
       return {
         success: false,
         message: 'Error al eliminar abogado: ' + error.message

@@ -14,12 +14,14 @@
     HorarioDia,
     DiaSemana
   } from '@core/models/configuracion.interface';
+  import { AuditService } from './audit.service';
 
   @Injectable({
     providedIn: 'root'
   })
   export class ConfiguracionService {
     private firestore = inject(Firestore);
+    private auditService = inject(AuditService);
     private readonly CONFIGURACION_DOC_ID = 'sistema';
     private configuracionDocRef = doc(this.firestore, `configuracion/${this.CONFIGURACION_DOC_ID}`);
 
@@ -123,13 +125,18 @@
         await this.cargarConfiguracion();
 
         console.log('✅ Configuración actualizada');
-
+        await this.auditService.registrarAccion(
+          'Configuración', 'ACTUALIZAR_CONFIGURACION',
+          'Configuración del sistema actualizada',
+          'WARNING'
+        );
         return {
           success: true,
           message: 'Configuración actualizada exitosamente'
         };
       } catch (error: any) {
         console.error('❌ Error actualizando configuración:', error);
+        await this.auditService.registrarAccion('Configuración', 'ERROR_ACTUALIZAR_CONFIGURACION', `Error: ${error.message}`, 'ERROR');
         return {
           success: false,
           message: 'Error al actualizar configuración: ' + error.message
@@ -176,13 +183,18 @@
         await this.cargarConfiguracion();
 
         console.log(`✅ Horario de ${dia} actualizado`);
-
+        await this.auditService.registrarAccion(
+          'Configuración', 'ACTUALIZAR_HORARIO',
+          `Horario del día "${dia}" actualizado`,
+          'WARNING'
+        );
         return {
           success: true,
           message: `Horario de ${dia} actualizado exitosamente`
         };
       } catch (error: any) {
         console.error('❌ Error actualizando horario:', error);
+        await this.auditService.registrarAccion('Configuración', 'ERROR_ACTUALIZAR_HORARIO', `Error al actualizar horario de ${dia}: ${error.message}`, 'ERROR');
         return {
           success: false,
           message: 'Error al actualizar horario: ' + error.message
@@ -236,13 +248,18 @@
         await this.cargarConfiguracion();
 
         console.log('✅ Área agregada:', areaLimpia);
-
+        await this.auditService.registrarAccion(
+          'Configuración', 'AGREGAR_AREA_VISITA',
+          `Área de visita agregada: "${areaLimpia}"`,
+          'WARNING'
+        );
         return {
           success: true,
           message: 'Área agregada exitosamente'
         };
       } catch (error: any) {
         console.error('❌ Error agregando área:', error);
+        await this.auditService.registrarAccion('Configuración', 'ERROR_AGREGAR_AREA', `Error: ${error.message}`, 'ERROR');
         return {
           success: false,
           message: 'Error al agregar área: ' + error.message

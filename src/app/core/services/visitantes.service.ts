@@ -29,6 +29,7 @@ import {
   formatearCedula,
   RespuestaOperacion
 } from '@core/models';
+import { AuditService } from './audit.service';
 import { Observable, from, map, catchError, of } from 'rxjs';
 
 @Injectable({
@@ -38,6 +39,7 @@ import { Observable, from, map, catchError, of } from 'rxjs';
 export class VisitantesService {
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private auditService = inject(AuditService);
   private collectionName = 'visitantes';
   
   // Señal reactiva con todos los visitantes
@@ -113,6 +115,11 @@ export class VisitantesService {
       // Actualizar señal
       this.visitantes.update(lista => [...lista, visitanteCreado]);
 
+      await this.auditService.registrarAccion(
+        'Visitantes', 'CREAR_VISITANTE',
+        `Visitante creado: ${visitanteCreado.nombreCompleto} (Céd: ${visitanteCreado.cedula})`,
+        'INFO'
+      );
       return {
         exito: true,
         mensaje: 'Visitante creado exitosamente',
@@ -121,6 +128,7 @@ export class VisitantesService {
 
     } catch (error: any) {
       console.error('Error al crear visitante:', error);
+      await this.auditService.registrarAccion('Visitantes', 'ERROR_CREAR_VISITANTE', `Error: ${error.message}`, 'ERROR');
       return {
         exito: false,
         mensaje: 'Error al crear visitante',
@@ -267,6 +275,11 @@ export class VisitantesService {
         );
       }
 
+      await this.auditService.registrarAccion(
+        'Visitantes', 'ACTUALIZAR_VISITANTE',
+        `Visitante actualizado: ${visitanteActualizado?.nombreCompleto || id}`,
+        'INFO'
+      );
       return {
         exito: true,
         mensaje: 'Visitante actualizado exitosamente',
@@ -275,6 +288,7 @@ export class VisitantesService {
 
     } catch (error: any) {
       console.error('Error al actualizar visitante:', error);
+      await this.auditService.registrarAccion('Visitantes', 'ERROR_ACTUALIZAR_VISITANTE', `Error al actualizar visitante ${id}: ${error.message}`, 'ERROR');
       return {
         exito: false,
         mensaje: 'Error al actualizar visitante',
@@ -289,6 +303,7 @@ export class VisitantesService {
   async eliminar(id: string): Promise<RespuestaOperacion> {
     try {
       const docRef = doc(this.firestore, this.collectionName, id);
+      const visitante = this.visitantes().find(v => v.id === id);
       
       // Marcar como inactivo en lugar de eliminar
       await updateDoc(docRef, { activo: false });
@@ -298,6 +313,11 @@ export class VisitantesService {
         lista.map(v => v.id === id ? { ...v, activo: false } : v)
       );
 
+      await this.auditService.registrarAccion(
+        'Visitantes', 'DESACTIVAR_VISITANTE',
+        `Visitante desactivado: ${visitante?.nombreCompleto || id}`,
+        'WARNING'
+      );
       return {
         exito: true,
         mensaje: 'Visitante desactivado exitosamente'
@@ -305,6 +325,7 @@ export class VisitantesService {
 
     } catch (error: any) {
       console.error('Error al eliminar visitante:', error);
+      await this.auditService.registrarAccion('Visitantes', 'ERROR_DESACTIVAR_VISITANTE', `Error al desactivar visitante ${id}: ${error.message}`, 'ERROR');
       return {
         exito: false,
         mensaje: 'Error al eliminar visitante',
@@ -319,11 +340,17 @@ export class VisitantesService {
   async eliminarPermanente(id: string): Promise<RespuestaOperacion> {
     try {
       const docRef = doc(this.firestore, this.collectionName, id);
+      const visitante = this.visitantes().find(v => v.id === id);
       await deleteDoc(docRef);
 
       // Actualizar señal
       this.visitantes.update(lista => lista.filter(v => v.id !== id));
 
+      await this.auditService.registrarAccion(
+        'Visitantes', 'ELIMINAR_VISITANTE_PERMANENTE',
+        `Visitante eliminado permanentemente: ${visitante?.nombreCompleto || id}`,
+        'WARNING'
+      );
       return {
         exito: true,
         mensaje: 'Visitante eliminado permanentemente'
@@ -331,6 +358,7 @@ export class VisitantesService {
 
     } catch (error: any) {
       console.error('Error al eliminar visitante permanentemente:', error);
+      await this.auditService.registrarAccion('Visitantes', 'ERROR_ELIMINAR_VISITANTE', `Error al eliminar permanente visitante ${id}: ${error.message}`, 'ERROR');
       return {
         exito: false,
         mensaje: 'Error al eliminar visitante',

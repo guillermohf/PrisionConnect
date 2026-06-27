@@ -4,10 +4,12 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Firestore, collection, getDocs, query, orderBy, doc, updateDoc, Timestamp, setDoc } from '@angular/fire/firestore';
 import { Usuario, ActualizarRolDTO, CambiarEstadoUsuarioDTO } from '@core/models/usuario.interface';
 import { RolUsuario } from '@core/models/enums.interface';
+import { AuditService } from './audit.service';
 
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
   private firestore = inject(Firestore);
+  private auditService = inject(AuditService);
   private usuariosCollection = collection(this.firestore, 'usuarios');
 
   // Signals Reactivos
@@ -81,8 +83,14 @@ export class UsuariosService {
         fechaActualizacion: Timestamp.now() 
       });
       await this.cargarUsuarios();
+      await this.auditService.registrarAccion(
+        'Usuarios', 'ACTUALIZAR_PERFIL',
+        `Perfil actualizado para usuario: ${userId}`,
+        'INFO'
+      );
       return { success: true, message: 'Perfil actualizado exitosamente' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Usuarios', 'ERROR_ACTUALIZAR_PERFIL', `Error al actualizar perfil de ${userId}: ${error.message}`, 'ERROR');
       return { success: false, message: 'Error al actualizar perfil' };
     } finally {
       this.loading.set(false);
@@ -112,8 +120,14 @@ export class UsuariosService {
 
       await setDoc(userRef, nuevoUsuario);
       await this.cargarUsuarios(); 
+      await this.auditService.registrarAccion(
+        'Usuarios', 'CREAR_USUARIO',
+        `Nuevo usuario creado: ${nuevoUsuario.nombreCompleto} (${nuevoUsuario.email}) - Rol: ${nuevoUsuario.rol}`,
+        'INFO'
+      );
       return { success: true, message: 'Usuario registrado en Firestore' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Usuarios', 'ERROR_CREAR_USUARIO', `Error al crear usuario ${datos.email}: ${error.message}`, 'ERROR');
       return { success: false, message: 'Error de escritura' };
     } finally {
       this.loading.set(false);
@@ -126,8 +140,14 @@ export class UsuariosService {
       const userRef = doc(this.firestore, `usuarios/${datos.usuarioId}`);
       await updateDoc(userRef, { rol: datos.nuevoRol });
       await this.cargarUsuarios();
+      await this.auditService.registrarAccion(
+        'Usuarios', 'CAMBIAR_ROL',
+        `Rol cambiado a "${datos.nuevoRol}" para usuario: ${datos.usuarioId}`,
+        'WARNING'
+      );
       return { success: true, message: 'Rol actualizado directamente en Firestore' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Usuarios', 'ERROR_CAMBIAR_ROL', `Error al cambiar rol de ${datos.usuarioId}: ${error.message}`, 'ERROR');
       return { success: false, message: 'Error al cambiar rol' };
     } finally {
       this.loading.set(false);
@@ -140,8 +160,14 @@ export class UsuariosService {
       const userRef = doc(this.firestore, `usuarios/${datos.usuarioId}`);
       await updateDoc(userRef, { activo: datos.activo });
       await this.cargarUsuarios();
+      await this.auditService.registrarAccion(
+        'Usuarios', datos.activo ? 'ACTIVAR_USUARIO' : 'DESACTIVAR_USUARIO',
+        `Usuario ${datos.activo ? 'activado' : 'desactivado'}: ${datos.usuarioId}`,
+        'WARNING'
+      );
       return { success: true, message: datos.activo ? 'Usuario activado' : 'Usuario desactivado' };
     } catch (error: any) {
+      await this.auditService.registrarAccion('Usuarios', 'ERROR_CAMBIAR_ESTADO_USUARIO', `Error al cambiar estado de ${datos.usuarioId}: ${error.message}`, 'ERROR');
       return { success: false, message: 'Error al actualizar estado' };
     } finally {
       this.loading.set(false);
