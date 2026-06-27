@@ -218,7 +218,8 @@ export class VisitaCrearModalComponent implements OnChanges {
   }
 
 async guardar(): Promise<void> {
-  // ... (tus validaciones anteriores)
+  if (this.guardando) return; // Prevenir doble submit
+  this.guardando = true;
 
   const formValue = this.form.value;
 

@@ -163,7 +163,7 @@ export class VisitasService {
       if (dto.tipo === TipoVisita.FAMILIAR && dto.visitantes) {
         for (const visitanteId of dto.visitantes) {
           const relDoc = await getDoc(
-            doc(this.firestore, 'relacionesVisitantes', `${dto.reclusoId}_${visitanteId}`)
+            doc(this.firestore, 'relaciones_visitantes', `${dto.reclusoId}_${visitanteId}`)
           );
           if (relDoc.exists()) {
             const rel = relDoc.data();
@@ -183,7 +183,7 @@ export class VisitasService {
 
       if (dto.tipo === TipoVisita.LEGAL && dto.abogadoId) {
         const relDoc = await getDoc(
-          doc(this.firestore, 'relacionesAbogados', `${dto.reclusoId}_${dto.abogadoId}`)
+          doc(this.firestore, 'relaciones_abogados', `${dto.reclusoId}_${dto.abogadoId}`)
         );
         if (relDoc.exists()) {
           const rel = relDoc.data();
