@@ -219,108 +219,252 @@ export default class ReportesComponent implements OnInit, OnDestroy {
     const pageW = doc.internal.pageSize.getWidth();
     const pageH = doc.internal.pageSize.getHeight();
 
-    const teal      : [number,number,number] = [13, 148, 136];
-    const tealDark  : [number,number,number] = [15, 118, 110];
-    const white     : [number,number,number] = [255,255,255];
-    const grayLight : [number,number,number] = [248,250,252];
-    const grayText  : [number,number,number] = [71, 85, 105];
-    const grayBorder: [number,number,number] = [226,232,240];
+    // ── Paleta institucional ──────────────────────────────────────────
+    const tealDark   : [number,number,number] = [0,  77,  77];
+    const tealMid    : [number,number,number] = [0, 102, 102];
+    const tealLight  : [number,number,number] = [0, 128, 128];
+    const white      : [number,number,number] = [255,255,255];
+    const grayLight  : [number,number,number] = [248,250,252];
+    const grayText   : [number,number,number] = [71,  85, 105];
+    const grayBorder : [number,number,number] = [203,213,225];
+    const gold       : [number,number,number] = [180,140,  50];
+    const green      : [number,number,number] = [22, 163,  74];
+    const red        : [number,number,number] = [220,  38,  38];
+    const amber      : [number,number,number] = [217,119,   6];
+    const blue       : [number,number,number] = [37,  99, 235];
+    const pink       : [number,number,number] = [219, 39, 119];
+
+    // ── Metadatos del reporte ─────────────────────────────────────────
+    const reportCode  = `RPT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const generatedAt = new Date();
+    const stats       = this.calcularEstadisticas();
 
     let logo: string | null = null;
     try { logo = await this.loadImageAsBase64(this.LOGO_PATH); } catch { }
 
-    const drawHeaderFooter = (pageNum: number, totalPages: number) => {
-      doc.setFillColor(...teal);
-      doc.rect(0, 0, pageW, 28, 'F');
-
-      if (logo) doc.addImage(logo, 'PNG', 6, 3, 24, 22);
-
-      const textX = logo ? 34 : 10;
-      doc.setTextColor(...white);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(13);
-      doc.text(this.INSTITUCION, textX, 13);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.text(this.SUBTITULO, textX, 20);
-
-      const now = new Date();
-      doc.setFontSize(7);
-      doc.text(`Generado: ${now.toLocaleDateString('es-DO')} ${now.toLocaleTimeString('es-DO')}`, pageW - 8, 13, { align: 'right' });
-      doc.text(`Página ${pageNum} de ${totalPages}`, pageW - 8, 20, { align: 'right' });
-
+    // ── ENCABEZADO (se re-dibuja en cada página) ──────────────────────
+    const drawHeader = (pageNum: number, totalPages: number) => {
+      // Banda principal oscura
       doc.setFillColor(...tealDark);
-      doc.rect(0, 28, pageW, 10, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(...white);
-      doc.text(this.tituloReporte.toUpperCase(), pageW / 2, 35, { align: 'center' });
+      doc.rect(0, 0, pageW, 32, 'F');
+      // Acento dorado
+      doc.setFillColor(...gold);
+      doc.rect(0, 32, pageW, 1.5, 'F');
 
-      doc.setFillColor(...grayBorder);
-      doc.rect(0, pageH - 9, pageW, 9, 'F');
-      doc.setFont('helvetica', 'italic');
-      doc.setFontSize(7);
-      doc.setTextColor(...grayText);
-      doc.text(`${this.INSTITUCION} · Documento oficial de control y auditoría`, pageW / 2, pageH - 3, { align: 'center' });
+      if (logo) doc.addImage(logo, 'PNG', 5, 3, 26, 26);
+
+      const tx = logo ? 35 : 10;
+      doc.setTextColor(...white);
+      doc.setFont('helvetica', 'bold');   doc.setFontSize(13);
+      doc.text('MINISTERIO DE JUSTICIA Y PAZ', tx, 11);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.text(this.SUBTITULO, tx, 17);
+      doc.setFontSize(7.5); doc.setTextColor(190, 220, 220);
+      doc.text('Dirección General de Prisiones · Sistema de Control de Visitas', tx, 23);
+
+      // Derecha: código + fecha + página
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(...white);
+      doc.text(`Código: ${reportCode}`, pageW - 8, 10, { align: 'right' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+      doc.text(`Generado: ${generatedAt.toLocaleDateString('es-DO')}`, pageW - 8, 16, { align: 'right' });
+      doc.text(generatedAt.toLocaleTimeString('es-DO'), pageW - 8, 21, { align: 'right' });
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Pág. ${pageNum} / ${totalPages}`, pageW - 8, 27, { align: 'right' });
+
+      // Sub-banda con título
+      doc.setFillColor(...tealLight);
+      doc.rect(0, 33.5, pageW, 11, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(...white);
+      doc.text(`▌ ${this.tituloReporte.toUpperCase()}`, pageW / 2, 41, { align: 'center' });
     };
 
-    const fY = 42;
-    doc.setFillColor(...grayLight);
-    doc.roundedRect(6, fY, pageW - 12, 13, 2, 2, 'F');
-    doc.setDrawColor(...grayBorder);
-    doc.roundedRect(6, fY, pageW - 12, 13, 2, 2, 'S');
+    // ── PIE DE PÁGINA ────────────────────────────────────────────────
+    const drawFooter = () => {
+      doc.setFillColor(...tealDark);
+      doc.rect(0, pageH - 10, pageW, 10, 'F');
+      doc.setFillColor(...gold);
+      doc.rect(0, pageH - 10, pageW, 0.8, 'F');
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(6.5);
+      doc.setTextColor(180, 220, 220);
+      doc.text('DOCUMENTO OFICIAL — USO EXCLUSIVO DEL PERSONAL AUTORIZADO — INFORMACIÓN CONFIDENCIAL', pageW / 2, pageH - 5.5, { align: 'center' });
+      doc.text(`Código de verificación: ${reportCode}  ·  ${this.INSTITUCION}  ·  PrisionConnect v1.0`, pageW / 2, pageH - 2, { align: 'center' });
+    };
 
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...tealDark);
-    doc.text('FILTROS APLICADOS:', 10, fY + 5);
+    // ── Dibuja encabezado en página 1 ────────────────────────────────
+    drawHeader(1, 1);
+    let currentY = 47;
 
-    doc.setFont('helvetica','normal'); doc.setTextColor(...grayText);
-    
-    // Concatenación dinámica de filtros
-    const parts = [];
-    if (this.filtros.fechaInicio && this.filtros.fechaFin) {
+    // ── CAJA DE FILTROS ──────────────────────────────────────────────
+    const parts: string[] = [];
+    if (this.filtros.fechaInicio && this.filtros.fechaFin)
       parts.push(`Período: ${this.toReadableDate(this.filtros.fechaInicio)} — ${this.toReadableDate(this.filtros.fechaFin)}`);
-    }
-    if (this.filtros.tipoVisita)      parts.push(`Visita: ${this.filtros.tipoVisita}`);
+    if (this.filtros.tipoVisita)      parts.push(`Tipo: ${this.filtros.tipoVisita}`);
     if (this.filtros.isRequisa)       parts.push(`Requisa: ${this.filtros.isRequisa === 'true' ? 'Sí' : 'No'}`);
-    if (this.filtros.estadoRecluso)   parts.push(`Estado Recluso: ${this.filtros.estadoRecluso}`);
+    if (this.filtros.estadoRecluso)   parts.push(`Estado: ${this.filtros.estadoRecluso}`);
     if (this.filtros.tipoDelito)      parts.push(`Delito: ${this.filtros.tipoDelito}`);
-    if (this.filtros.nacionalidad)    parts.push(`Nacionalidad: ${this.filtros.nacionalidad}`);
+    if (this.filtros.nacionalidad)    parts.push(`Nac.: ${this.filtros.nacionalidad}`);
     if (this.filtros.colegioAbogados) parts.push(`Colegio: ${this.filtros.colegioAbogados}`);
-    
-    doc.text(parts.length > 0 ? parts.join('   |   ') : 'Todos los registros', 45, fY + 5);
-    doc.setFont('helvetica','bold');
-    doc.text(`Total de registros obtenidos: ${this.datosReporte.length}`, 10, fY + 10);
 
+    doc.setFillColor(...grayLight);
+    doc.roundedRect(6, currentY, pageW - 12, 13, 2, 2, 'F');
+    doc.setDrawColor(...grayBorder);
+    doc.roundedRect(6, currentY, pageW - 12, 13, 2, 2, 'S');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...tealDark);
+    doc.text('FILTROS APLICADOS:', 10, currentY + 5);
+    doc.setFont('helvetica','normal'); doc.setTextColor(...grayText);
+    doc.text(parts.length > 0 ? parts.join('   ·   ') : 'Sin filtros adicionales — Todos los registros', 53, currentY + 5);
+    doc.setFont('helvetica','bold'); doc.setTextColor(...tealMid);
+    doc.text(`Total de registros: ${this.datosReporte.length}`, 10, currentY + 10);
+    currentY += 16;
+
+    // ── TARJETAS ESTADÍSTICAS ─────────────────────────────────────────
+    if (stats.length > 0) {
+      const cardW = (pageW - 12 - (stats.length - 1) * 3) / stats.length;
+      stats.forEach((stat, i) => {
+        const x = 6 + i * (cardW + 3);
+        const [r, g, b] = stat.color as [number,number,number];
+        doc.setFillColor(...white);
+        doc.setDrawColor(...grayBorder);
+        doc.roundedRect(x, currentY, cardW, 18, 2, 2, 'FD');
+        // barra lateral coloreada
+        doc.setFillColor(r, g, b);
+        doc.roundedRect(x, currentY, 3.5, 18, 1, 1, 'F');
+        // valor numérico grande
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+        doc.setTextColor(r, g, b);
+        doc.text(String(stat.value), x + cardW / 2 + 1.5, currentY + 11, { align: 'center' });
+        // etiqueta
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(5.8);
+        doc.setTextColor(...grayText);
+        doc.text(stat.label.toUpperCase(), x + cardW / 2 + 1.5, currentY + 16, { align: 'center' });
+      });
+      currentY += 21;
+    }
+
+    // ── TABLA PRINCIPAL ───────────────────────────────────────────────
     autoTable(doc, {
-      head:   [this.columnasReporte.map(c => c.label)],
-      body:   this.datosReporte.map(row => this.columnasReporte.map(c => row[c.key] ?? 'N/A')),
-      startY: fY + 17,
-      margin: { left: 6, right: 6, bottom: 13 },
+      head: [this.columnasReporte.map(c => c.label)],
+      body: this.datosReporte.map(row =>
+        this.columnasReporte.map(c => row[c.key] ?? 'N/A')
+      ),
+      startY: currentY,
+      margin: { left: 6, right: 6, bottom: 14 },
       styles: {
-        fontSize: 8,
-        cellPadding: { top: 3, bottom: 3, left: 4, right: 4 },
+        fontSize: 7.5,
+        cellPadding: { top: 2.8, bottom: 2.8, left: 4, right: 4 },
         overflow: 'linebreak',
         valign: 'middle',
         lineColor: grayBorder,
-        lineWidth: 0.2
+        lineWidth: 0.2,
+        textColor: [30, 41, 59]
       },
       headStyles: {
-        fillColor: teal,
+        fillColor: tealDark,
         textColor: white,
         fontStyle: 'bold',
-        halign: 'center'
+        halign: 'center',
+        fontSize: 7.5
       },
       alternateRowStyles: { fillColor: [240, 253, 250] },
-      didDrawPage: () => { }
+      didParseCell: (data: any) => {
+        if (data.section !== 'body') return;
+        const val = String(data.cell.raw ?? '');
+        if (['Activo', 'Aprobada', 'Sí', 'Finalizada'].includes(val)) {
+          data.cell.styles.textColor = green;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (['Trasladado', 'Fugado', 'Rechazada', 'Cancelada', 'Fallecido'].includes(val)) {
+          data.cell.styles.textColor = red;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (['En Curso', 'Registrada', 'En Tránsito', 'Procesado', 'Legal'].includes(val)) {
+          data.cell.styles.textColor = blue;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (['Prisión Preventiva', 'En Requisa Entrada', 'Pendiente Requisa Salida'].includes(val)) {
+          data.cell.styles.textColor = amber;
+          data.cell.styles.fontStyle = 'bold';
+        } else if (['Libertad Condicional', 'Liberado'].includes(val)) {
+          data.cell.styles.textColor = pink;
+          data.cell.styles.fontStyle = 'bold';
+        }
+      },
+      didDrawPage: () => {}
     });
 
+    // ── SECCIÓN DE FIRMAS (última página) ────────────────────────────
+    const lastY: number = (doc as any).lastAutoTable?.finalY ?? currentY + 10;
+    const sigSectionY = lastY + 6;
+
+    if (sigSectionY < pageH - 38) {
+      // Línea divisoria
+      doc.setDrawColor(...grayBorder); doc.setLineWidth(0.3);
+      doc.line(6, sigSectionY, pageW - 6, sigSectionY);
+      // Etiqueta sección
+      doc.setFillColor(...grayLight);
+      doc.roundedRect(6, sigSectionY + 2, pageW - 12, 6, 1, 1, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+      doc.setTextColor(...grayText);
+      doc.text('▌ AUTORIZACIÓN Y FIRMA DEL REPORTE', pageW / 2, sigSectionY + 6, { align: 'center' });
+
+      const sigY = sigSectionY + 12;
+      const numSigs = 3;
+      const sigW = (pageW - 30) / numSigs;
+      const sigs = [
+        { label: 'Director del Centro Penitenciario', role: 'Firma y Sello Oficial' },
+        { label: 'Supervisor de Turno',               role: 'Supervisión Operativa' },
+        { label: 'Responsable del Sistema',            role: 'Verificación de Datos' }
+      ];
+      sigs.forEach((sig, i) => {
+        const x = 10 + i * (sigW + 5);
+        const mid = x + (sigW - 5) / 2;
+        doc.setDrawColor(...tealMid); doc.setLineWidth(0.5);
+        doc.line(x, sigY + 12, x + sigW - 5, sigY + 12);
+        doc.setFont('helvetica', 'bold');   doc.setFontSize(7);   doc.setTextColor(...tealDark);
+        doc.text(sig.label, mid, sigY + 16, { align: 'center' });
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...grayText);
+        doc.text(sig.role,  mid, sigY + 20, { align: 'center' });
+        doc.setDrawColor(...grayBorder); doc.setLineWidth(0.2);
+        doc.line(x, sigY + 25, x + sigW - 5, sigY + 25);
+        doc.setFontSize(6);
+        doc.text('Fecha: _________________________', x, sigY + 29);
+      });
+    }
+
+    // ── Aplicar encabezado y pie a TODAS las páginas ─────────────────
     const total = (doc as any).internal.getNumberOfPages();
     for (let p = 1; p <= total; p++) {
       doc.setPage(p);
-      drawHeaderFooter(p, total);
+      drawHeader(p, total);
+      drawFooter();
     }
 
-    doc.save(`${this.tipoReporteSeleccionado()}_${this.formatearFechaArchivo()}.pdf`);
+    doc.save(`${reportCode}_${this.tipoReporteSeleccionado()}_${this.formatearFechaArchivo()}.pdf`);
+  }
+
+  /** Calcula estadísticas de resumen según el tipo de reporte activo */
+  private calcularEstadisticas(): Array<{label: string; value: number; color: number[]}> {
+    const tipo  = this.tipoReporteSeleccionado();
+    const datos = this.datosReporte;
+    const stats: Array<{label: string; value: number; color: number[]}> = [];
+
+    stats.push({ label: 'Total Registros', value: datos.length, color: [0, 102, 102] });
+
+    if (tipo === 'visitas') {
+      stats.push({ label: 'Visitas Familiares', value: datos.filter((d: any) => d.tipo_visita === 'Familiar').length, color: [22, 163, 74] });
+      stats.push({ label: 'Visitas Legales',    value: datos.filter((d: any) => d.tipo_visita === 'Legal').length,    color: [37,  99, 235] });
+      stats.push({ label: 'Con Requisa',        value: datos.filter((d: any) => d.requisaTexto === 'Sí').length,      color: [217,119,   6] });
+    } else if (tipo === 'reclusos') {
+      const activos     = datos.filter((d: any) => d.estado === 'Activo').length;
+      const trasladados = datos.filter((d: any) => d.estado === 'Trasladado').length;
+      stats.push({ label: 'Activos',     value: activos,                            color: [22, 163, 74] });
+      stats.push({ label: 'Trasladados', value: trasladados,                         color: [220, 38,  38] });
+      stats.push({ label: 'Otros',       value: datos.length - activos - trasladados, color: [217,119,   6] });
+    } else if (tipo === 'visitantes') {
+      stats.push({ label: 'Masculinos', value: datos.filter((d: any) => ['M','Masculino'].includes(d.genero)).length, color: [37, 99, 235] });
+      stats.push({ label: 'Femeninos',  value: datos.filter((d: any) => ['F','Femenino' ].includes(d.genero)).length, color: [219,39, 119] });
+    } else if (tipo === 'abogados') {
+      stats.push({ label: 'Públicos',  value: datos.filter((d: any) => d.tipo === 'Público' ).length, color: [22,163, 74] });
+      stats.push({ label: 'Privados', value: datos.filter((d: any) => d.tipo === 'Privado').length, color: [37, 99,235] });
+    }
+    return stats;
   }
 
   private loadImageAsBase64(src: string): Promise<string> {
@@ -346,29 +490,48 @@ export default class ReportesComponent implements OnInit, OnDestroy {
 
   async generarExcel(): Promise<void> {
     await this.delay(300);
-    const ws = XLSX.utils.json_to_sheet(this.datosReporte);
+    const reportCode = `RPT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 
+    // ── Hoja 1: Datos ────────────────────────────────────────────────
+    const ws = XLSX.utils.json_to_sheet(this.datosReporte);
     this.columnasReporte.forEach((col, i) => {
       const cell = XLSX.utils.encode_cell({ c: i, r: 0 });
       if (ws[cell]) ws[cell].v = col.label;
     });
-    ws['!cols'] = this.columnasReporte.map(c => ({ wch: Math.max(c.label.length + 4, 18) }));
+    ws['!cols'] = this.columnasReporte.map(c => ({ wch: Math.max(c.label.length + 4, 20) }));
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, this.tituloReporte.substring(0, 31));
 
-    const meta: any[][] = [
-      ['Reporte',          this.tituloReporte],
-      ['Centro',           this.SUBTITULO],
-      ['Generado',         new Date().toLocaleString('es-DO')],
-      ['Total registros',  this.datosReporte.length]
+    // ── Hoja 2: Resumen estadístico ───────────────────────────────────
+    const stats = this.calcularEstadisticas();
+    const resumenData: any[][] = [
+      ['MINISTERIO DE JUSTICIA Y PAZ'],
+      [this.SUBTITULO],
+      [''],
+      ['REPORTE:', this.tituloReporte],
+      ['CÓDIGO:', reportCode],
+      ['GENERADO:', new Date().toLocaleString('es-DO')],
+      ['TOTAL REGISTROS:', this.datosReporte.length],
+      [''],
+      ['── FILTROS APLICADOS ──'],
     ];
-    
-    const wsInfo = XLSX.utils.aoa_to_sheet(meta);
-    wsInfo['!cols'] = [{ wch: 20 }, { wch: 40 }];
-    XLSX.utils.book_append_sheet(wb, wsInfo, 'Filtros y Metadatos');
+    if (this.filtros.fechaInicio) resumenData.push(['Desde:', this.toReadableDate(this.filtros.fechaInicio)]);
+    if (this.filtros.fechaFin)    resumenData.push(['Hasta:', this.toReadableDate(this.filtros.fechaFin)]);
+    if (this.filtros.tipoVisita)      resumenData.push(['Tipo de visita:', this.filtros.tipoVisita]);
+    if (this.filtros.estadoRecluso)   resumenData.push(['Estado recluso:', this.filtros.estadoRecluso]);
+    if (this.filtros.tipoDelito)      resumenData.push(['Tipo de delito:', this.filtros.tipoDelito]);
+    if (this.filtros.nacionalidad)    resumenData.push(['Nacionalidad:', this.filtros.nacionalidad]);
+    if (this.filtros.colegioAbogados) resumenData.push(['Colegio:', this.filtros.colegioAbogados]);
+    resumenData.push([''], ['── ESTADÍSTICAS ──']);
+    stats.forEach(s => resumenData.push([s.label + ':', s.value]));
+    resumenData.push([''], ['── FIRMAS ──'], ['Director del Centro:', '___________________________'], ['Supervisor de Turno:', '___________________________'], ['Fecha:', '___________________________']);
 
-    XLSX.writeFile(wb, `${this.tipoReporteSeleccionado()}_${this.formatearFechaArchivo()}.xlsx`);
+    const wsRes = XLSX.utils.aoa_to_sheet(resumenData);
+    wsRes['!cols'] = [{ wch: 26 }, { wch: 42 }];
+    XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen y Metadatos');
+
+    XLSX.writeFile(wb, `${reportCode}_${this.tipoReporteSeleccionado()}_${this.formatearFechaArchivo()}.xlsx`);
   }
 
   formatearFechaArchivo(): string {
