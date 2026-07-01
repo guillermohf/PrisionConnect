@@ -208,7 +208,7 @@ export class VisitaCrearModalComponent implements OnChanges {
       return false;
     }
 
-    if (tipo === TipoVisita.FAMILIAR) {
+    if (tipo === TipoVisita.FAMILIAR || tipo === TipoVisita.AMISTADES) {
       const visitantes = this.form.get('visitantes')?.value || [];
       return visitantes.length > 0;
     } else {
@@ -229,7 +229,7 @@ async guardar(): Promise<void> {
   const dto: CrearVisitaDTO = {
     tipo: formValue.tipo,
     reclusoId: formValue.reclusoId,
-    visitantes: formValue.tipo === TipoVisita.FAMILIAR ? formValue.visitantes : undefined,
+    visitantes: (formValue.tipo === TipoVisita.FAMILIAR || formValue.tipo === TipoVisita.AMISTADES) ? formValue.visitantes : undefined,
     abogadoId: formValue.tipo === TipoVisita.LEGAL ? formValue.abogadoId : undefined,
     
     // CAMBIO AQUÍ: Convertimos a Timestamp de Firestore antes de enviar
