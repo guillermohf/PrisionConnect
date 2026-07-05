@@ -1,7 +1,7 @@
 // src/app/core/services/ubicacion-rd.service.ts
 
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 export interface Provincia {
@@ -30,7 +30,7 @@ export interface Barrio {
 @Injectable({ providedIn: 'root' })
 export class UbicacionRDService {
   private http = inject(HttpClient);
-  private readonly BASE = 'assets/data';
+  private readonly BASE = '/assets/data';
 
   // Estado interno
   private _provincias = signal<Provincia[]>([]);
@@ -85,6 +85,23 @@ export class UbicacionRDService {
       .slice(0, 10);
   }
 
+  // Buscar barrios pertenecientes a cualquier sector del municipio
+  buscarBarriosPorMunicipio(municipioNombre: string, provinciaId: number, texto: string): Barrio[] {
+    if (!texto || texto.length < 2) return [];
+    const lower = texto.toLowerCase();
+    const sectores = this.sectorenDeMunicipio(municipioNombre, provinciaId);
+    const sectoresIds = sectores.map(s => s.id);
+    if (sectoresIds.length === 0) return [];
+    return this._barrios()
+      .filter(b => sectoresIds.includes(b.seccionId) && b.nombre.toLowerCase().includes(lower))
+      .slice(0, 10);
+  }
+
+  // Obtener sector por ID
+  obtenerSectorPorId(id: number): Sector | undefined {
+    return this._sectores().find(s => s.id === id);
+  }
+
   // Carga única de los 4 JSONs
   async cargarTodo(): Promise<void> {
     if (this._cargado()) return;
@@ -108,26 +125,23 @@ export class UbicacionRDService {
     }
   }
 
-  // Carga de nacionalidades desde countries.dev
+  // Carga de nacionalidades desde JSON local
   async cargarNacionalidades(): Promise<void> {
     if (this._nacionalidades().length > 0) return;
     this.cargandoNacionalidades.set(true);
     try {
-      const data = await firstValueFrom(
-        this.http.get<any[]>('https://countries.dev/api/countries')
+      const lista = await firstValueFrom(
+        this.http.get<string[]>(`${this.BASE}/nacionalidades.json`)
       );
-      const lista: string[] = data
-        .map(p => p.demonyms?.spa?.f ?? p.translations?.spa?.common ?? p.name)
-        .filter(Boolean)
-        .sort((a: string, b: string) => a.localeCompare(b, 'es'));
 
-      const prioritarias = ['Dominicana', 'Haitiana'];
+      const prioritarias = ['República Dominicana', 'Haití'];
       const resto = lista.filter((n: string) => !prioritarias.includes(n));
       this._nacionalidades.set([...prioritarias, ...resto]);
-    } catch {
+    } catch (error) {
+      console.error('Error cargando nacionalidades:', error);
       // Fallback
       this._nacionalidades.set([
-        'Dominicana', 'Haitiana', 'Estadounidense', 'Española', 'Venezolana', 'Colombiana'
+        'República Dominicana', 'Haití', 'Estados Unidos', 'España', 'Venezuela', 'Colombia'
       ]);
     } finally {
       this.cargandoNacionalidades.set(false);

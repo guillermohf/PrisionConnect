@@ -189,16 +189,21 @@ export class ReclusoEditarModalComponent implements OnChanges {
     this.form.patchValue({ _barrioNombre: '' });
   }
 
+  cerrarSugerenciasSector(): void {
+    setTimeout(() => this.mostrarSugerenciasSector.set(false), 200);
+  }
+
+  cerrarSugerenciasBarrio(): void {
+    setTimeout(() => this.mostrarSugerenciasBarrio.set(false), 200);
+  }
+
   onBarrioInput(texto: string): void {
     this.barrioTexto.set(texto);
     this.form.patchValue({ _barrioNombre: texto });
-    const sectorNombre = this.sectorTexto();
     const municipioNombre = this.form.get('_municipioNombre')?.value;
     const provinciaId = Number(this.form.get('_provinciaId')?.value);
-    const sectores = this.ubicacionService.sectorenDeMunicipio(municipioNombre, provinciaId);
-    const sector = sectores.find(s => s.nombre === sectorNombre);
-    if (sector) {
-      const resultados = this.ubicacionService.buscarBarrios(sector.id, texto);
+    if (municipioNombre) {
+      const resultados = this.ubicacionService.buscarBarriosPorMunicipio(municipioNombre, provinciaId, texto);
       this.barriosAutocomplete.set(resultados);
       this.mostrarSugerenciasBarrio.set(resultados.length > 0);
     }
@@ -207,6 +212,14 @@ export class ReclusoEditarModalComponent implements OnChanges {
   seleccionarBarrio(barrio: Barrio): void {
     this.barrioTexto.set(barrio.nombre);
     this.form.patchValue({ _barrioNombre: barrio.nombre });
+    
+    // Auto-completar el sector asociado a este barrio
+    const sec = this.ubicacionService.obtenerSectorPorId(barrio.seccionId);
+    if (sec) {
+      this.sectorTexto.set(sec.nombre);
+      this.form.patchValue({ _sectorNombre: sec.nombre });
+    }
+    
     this.mostrarSugerenciasBarrio.set(false);
     this.barriosAutocomplete.set([]);
   }

@@ -156,7 +156,7 @@
           <div class="relative">
             <label class="block text-xs text-gray-600 mb-1">Sector</label>
             <input type="text" [value]="sectorTexto()" (input)="onSectorInput($any($event.target).value)"
-              (blur)="mostrarSugerenciasSector.set(false)" [disabled]="!form.get('_municipioNombre')?.value"
+              (blur)="cerrarSugerenciasSector()" [disabled]="!form.get('_municipioNombre')?.value"
               placeholder="Escribe para buscar sector..." autocomplete="off"
               class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
             @if (mostrarSugerenciasSector() && sectoresAutocomplete().length > 0) {
@@ -177,7 +177,7 @@
           <div class="relative">
             <label class="block text-xs text-gray-600 mb-1">Barrio</label>
             <input type="text" [value]="barrioTexto()" (input)="onBarrioInput($any($event.target).value)"
-              (blur)="mostrarSugerenciasBarrio.set(false)" [disabled]="!sectorTexto()"
+              (blur)="cerrarSugerenciasBarrio()" [disabled]="!form.get('_municipioNombre')?.value"
               placeholder="Escribe para buscar barrio..." autocomplete="off"
               class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
             @if (mostrarSugerenciasBarrio() && barriosAutocomplete().length > 0) {
