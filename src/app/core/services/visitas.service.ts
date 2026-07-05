@@ -490,8 +490,12 @@ export class VisitasService {
 
         // Filtro de Fechas
         if (filtros.fechaInicio && filtros.fechaFin) {
-          const inicio = new Date(filtros.fechaInicio);
-          const fin = new Date(filtros.fechaFin);
+          const [yI, mI, dI] = filtros.fechaInicio.split('-');
+          const inicio = new Date(parseInt(yI), parseInt(mI) - 1, parseInt(dI));
+          inicio.setHours(0, 0, 0, 0);
+          
+          const [yF, mF, dF] = filtros.fechaFin.split('-');
+          const fin = new Date(parseInt(yF), parseInt(mF) - 1, parseInt(dF));
           fin.setHours(23, 59, 59, 999);
 
           visitasFiltradas = visitasFiltradas.filter(v => {
@@ -578,5 +582,28 @@ export class VisitasService {
     }
     
     return 'N/A';
+  }
+
+  // ── C5: Flujo automático de estados ──────────────────────────
+
+  /** Aprueba la requisa de entrada: pasa la visita a EN_CURSO */
+  async aprobarRequisaEntrada(visitaId: string, usuarioId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      await updateDoc(doc(this.firestore, 'visitas', visitaId), {
+        estado: EstadoVisita.EN_CURSO,
+        horaCheckInReal: Timestamp.now(),
+        requisaAprobadaPor: usuarioId,
+        requisaAprobadaEn: Timestamp.now()
+      });
+      await this.auditService.registrarAccion(
+        'visitas',
+        'aprobar_requisa_entrada',
+        `Visita ${visitaId} aprobada en requisa de entrada → EN_CURSO`
+      );
+      return { success: true, message: 'Requisa aprobada. Visita en curso.' };
+    } catch (error) {
+      console.error('Error aprobando requisa:', error);
+      return { success: false, message: 'Error al aprobar requisa.' };
+    }
   }
 }

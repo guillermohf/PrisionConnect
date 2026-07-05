@@ -66,7 +66,35 @@
 
   </div>
 
+  <!-- C6: Alerta visitas vencidas -->
+  @if (pendientesSalidaVencidas().length > 0) {
+    <div class="bg-orange-50 border-2 border-orange-400 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div class="flex items-start gap-3">
+        <div class="w-3 h-3 mt-1 bg-orange-500 rounded-full animate-ping flex-shrink-0"></div>
+        <div>
+          <p class="text-orange-800 font-bold text-sm">
+            ⚠️ {{ pendientesSalidaVencidas().length }} visita(s) con tiempo vencido
+          </p>
+          <ul class="mt-1 space-y-1">
+            @for (v of pendientesSalidaVencidas(); track v.id) {
+              <li class="text-xs text-orange-700">
+                {{ v.reclusoNombre }} — Debía salir: {{ v.horaFinProgramada }}
+                <span class="font-semibold">({{ tiempoVencido(v.horaFinProgramada!) }})</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+      <button
+        (click)="generarReportePendientes()"
+        class="px-4 py-2 bg-orange-500 text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0">
+        Ver Reporte
+      </button>
+    </div>
+  }
+
   <!-- Filtros Vista -->
+
   <div class="bg-white rounded-lg shadow-lg p-3 sm:p-4 border-2 border-gray-200">
     <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
       
@@ -271,6 +299,10 @@
               <span class="text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded">
                 {{ visita.tipo === 'Legal' ? '1/1' : (visita.visitantesPresentes + '/' + visita.totalVisitantes) }}
               </span>
+            } @else if (column.key === 'visitanteNombre') {
+              <span class="text-gray-800 font-medium">{{ visita.tipo === 'Legal' ? visita.abogado?.nombre : (visita.visitantes?.length ? visita.visitantes[0].nombre : 'N/A') }}</span>
+            } @else if (column.key === 'cedula') {
+              <span class="text-gray-600">{{ visita.tipo === 'Legal' ? visita.abogado?.cedula : (visita.visitantes?.length ? visita.visitantes[0].cedula : 'N/A') }}</span>
             } @else {
               <span class="text-gray-600">{{ visita[column.key] || 'N/A' }}</span>
             }

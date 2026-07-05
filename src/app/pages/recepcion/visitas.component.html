@@ -76,6 +76,10 @@
             <span class="text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded">
               {{ visita.tipo === 'Legal' ? 1 : (visita.totalVisitantes || 0) }}
             </span>
+          } @else if (column.key === 'visitanteNombre') {
+            <span class="text-gray-800 font-medium">{{ visita.tipo === 'Legal' ? visita.abogado?.nombre : (visita.visitantes?.length ? visita.visitantes[0].nombre : 'N/A') }}</span>
+          } @else if (column.key === 'cedula') {
+            <span class="text-gray-600">{{ visita.tipo === 'Legal' ? visita.abogado?.cedula : (visita.visitantes?.length ? visita.visitantes[0].cedula : 'N/A') }}</span>
           } @else {
             <span class="text-gray-600">{{ visita[column.key] }}</span>
           }

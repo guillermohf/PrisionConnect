@@ -1,18 +1,20 @@
-// src/app/features/reclusos/components/recluso-editar-modal/recluso-editar-modal.component.ts
+// src/app/pages/reclusos/modal/reclusos-editar-modal/reclusos-editar-modal.component.ts
 
-import { Component, EventEmitter, Input, Output, inject, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component, EventEmitter, Input, Output,
+  inject, signal, OnChanges, SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Timestamp } from '@angular/fire/firestore';
 import { ReclusosService } from '@core/services/reclusos.service';
 import { NotificacionService } from '@core/services/notificacion.service';
+import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { Recluso } from '@core/models/recluso.interface';
 import { SituacionLegal, EstadoCivil, EstadoRecluso } from '@core/models/enums.interface';
-import { InputComponent } from '@shared/input/input.component';
 import { ModalComponent } from '@shared/modal/modal.component';
-import { ButtonComponent } from '@shared/button/buttton.component';
-import { TelefonoMaskDirective } from "@shared/directives/telefono.mask.directive";
-import { telefonoDominicanoValidator } from '@shared/validators/custom.validators';
+import { TelefonoMaskDirective } from '@shared/directives/telefono.mask.directive';
+import { telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
 
 @Component({
   selector: 'prisionConnect-recluso-editar-modal',
@@ -22,7 +24,7 @@ import { telefonoDominicanoValidator } from '@shared/validators/custom.validator
     ReactiveFormsModule,
     ModalComponent,
     TelefonoMaskDirective
-],
+  ],
   templateUrl: './reclusos-editar-modal.component.html'
 })
 export class ReclusoEditarModalComponent implements OnChanges {
@@ -34,53 +36,79 @@ export class ReclusoEditarModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private reclusosService = inject(ReclusosService);
   private notificacionService = inject(NotificacionService);
+  private ubicacionService = inject(UbicacionRDService);
 
   form: FormGroup;
   guardando = false;
 
-  // Enums para el template
   SituacionLegal = SituacionLegal;
   EstadoRecluso = EstadoRecluso;
   EstadoCivil = EstadoCivil;
 
+  // Ubicación
+  provincias = this.ubicacionService.provincias;
+  cargandoUbicacion = this.ubicacionService.cargando;
+  municipiosFiltrados = signal<Municipio[]>([]);
+  sectoresAutocomplete = signal<Sector[]>([]);
+  barriosAutocomplete = signal<Barrio[]>([]);
+  sectorTexto = signal('');
+  barrioTexto = signal('');
+  mostrarSugerenciasSector = signal(false);
+  mostrarSugerenciasBarrio = signal(false);
+
+  // Nacionalidades
+  nacionalidades = this.ubicacionService.nacionalidades;
+  cargandoNacionalidades = this.ubicacionService.cargandoNacionalidades;
+
+  get fechaMaxNacimiento(): string {
+    const f = new Date();
+    f.setFullYear(f.getFullYear() - 18);
+    return f.toISOString().split('T')[0];
+  }
+
   constructor() {
     this.form = this.fb.group({
-      // Identificación
       numeroIdentificacion: ['', Validators.required],
       numeroExpediente: [''],
       cedula: ['', Validators.required],
-      
-      // Información Personal
+
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      fechaNacimiento: ['', Validators.required],
+      fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator()]],
       sexo: ['', Validators.required],
       nacionalidad: ['', Validators.required],
       estadoCivil: [''],
-      
-      // Contacto
-      direccion: ['', Validators.required],
-      telefono: ['', [ telefonoDominicanoValidator()]],
+
+      // Dirección en cascada
+      _provinciaId: [''],
+      _provinciaNombre: [''],
+      _municipioNombre: [''],
+      _sectorNombre: [''],
+      _barrioNombre: [''],
+      _calle: ['', Validators.required],
+
+      telefono: ['', [telefonoDominicanoValidator()]],
       nombreContactoEmergencia: ['', Validators.required],
       telefonoEmergencia: ['', [Validators.required, telefonoDominicanoValidator()]],
-      
-      // Ubicación
+
       pabellon: ['', Validators.required],
       celda: ['', Validators.required],
-      
-      // Información Penal
+
       fechaIngreso: ['', Validators.required],
       situacionLegal: ['', Validators.required],
       estado: ['', Validators.required],
       delito: [''],
       sentencia: [''],
-      
-      // Otros
+
       observaciones: ['']
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['showModal']?.currentValue === true) {
+      this.ubicacionService.cargarTodo();
+      this.ubicacionService.cargarNacionalidades();
+    }
     if (changes['recluso'] && this.recluso) {
       this.cargarDatos();
     }
@@ -88,7 +116,7 @@ export class ReclusoEditarModalComponent implements OnChanges {
 
   private cargarDatos(): void {
     if (!this.recluso) return;
-
+    // La dirección existente (string) se carga en _calle para no perder datos
     this.form.patchValue({
       numeroIdentificacion: this.recluso.numeroIdentificacion,
       numeroExpediente: this.recluso.numeroExpediente || '',
@@ -99,7 +127,7 @@ export class ReclusoEditarModalComponent implements OnChanges {
       sexo: this.recluso.sexo || '',
       nacionalidad: this.recluso.nacionalidad || '',
       estadoCivil: this.recluso.estadoCivil || '',
-      direccion: this.recluso.direccion || '',
+      _calle: this.recluso.direccion || '',
       telefono: this.recluso.telefono || '',
       nombreContactoEmergencia: this.recluso.nombreContactoEmergencia || '',
       telefonoEmergencia: this.recluso.telefonoEmergencia || '',
@@ -120,29 +148,105 @@ export class ReclusoEditarModalComponent implements OnChanges {
     return date.toISOString().split('T')[0];
   }
 
+  // ── Dirección en cascada ──────────────────────────────────────
+  onProvinciaChange(provinciaId: string): void {
+    const id = Number(provinciaId);
+    const prov = this.provincias().find(p => p.id === id);
+    this.municipiosFiltrados.set(this.ubicacionService.municipiosDeProvincia(id));
+    this.form.patchValue({ _provinciaNombre: prov?.nombre ?? '', _municipioNombre: '', _sectorNombre: '', _barrioNombre: '' });
+    this.sectorTexto.set('');
+    this.barrioTexto.set('');
+    this.sectoresAutocomplete.set([]);
+    this.barriosAutocomplete.set([]);
+  }
+
+  onMunicipioChange(municipioNombre: string): void {
+    this.form.patchValue({ _municipioNombre: municipioNombre, _sectorNombre: '', _barrioNombre: '' });
+    this.sectorTexto.set('');
+    this.barrioTexto.set('');
+    this.sectoresAutocomplete.set([]);
+    this.barriosAutocomplete.set([]);
+  }
+
+  onSectorInput(texto: string): void {
+    this.sectorTexto.set(texto);
+    this.form.patchValue({ _sectorNombre: texto });
+    const municipioNombre = this.form.get('_municipioNombre')?.value;
+    const provinciaId = Number(this.form.get('_provinciaId')?.value);
+    if (municipioNombre) {
+      const resultados = this.ubicacionService.buscarSectores(municipioNombre, provinciaId, texto);
+      this.sectoresAutocomplete.set(resultados);
+      this.mostrarSugerenciasSector.set(resultados.length > 0);
+    }
+  }
+
+  seleccionarSector(sector: Sector): void {
+    this.sectorTexto.set(sector.nombre);
+    this.form.patchValue({ _sectorNombre: sector.nombre });
+    this.mostrarSugerenciasSector.set(false);
+    this.sectoresAutocomplete.set([]);
+    this.barrioTexto.set('');
+    this.form.patchValue({ _barrioNombre: '' });
+  }
+
+  onBarrioInput(texto: string): void {
+    this.barrioTexto.set(texto);
+    this.form.patchValue({ _barrioNombre: texto });
+    const sectorNombre = this.sectorTexto();
+    const municipioNombre = this.form.get('_municipioNombre')?.value;
+    const provinciaId = Number(this.form.get('_provinciaId')?.value);
+    const sectores = this.ubicacionService.sectorenDeMunicipio(municipioNombre, provinciaId);
+    const sector = sectores.find(s => s.nombre === sectorNombre);
+    if (sector) {
+      const resultados = this.ubicacionService.buscarBarrios(sector.id, texto);
+      this.barriosAutocomplete.set(resultados);
+      this.mostrarSugerenciasBarrio.set(resultados.length > 0);
+    }
+  }
+
+  seleccionarBarrio(barrio: Barrio): void {
+    this.barrioTexto.set(barrio.nombre);
+    this.form.patchValue({ _barrioNombre: barrio.nombre });
+    this.mostrarSugerenciasBarrio.set(false);
+    this.barriosAutocomplete.set([]);
+  }
+
   async guardar(): Promise<void> {
     if (!this.form.valid || !this.recluso?.id) {
       this.notificacionService.error('Por favor completa todos los campos requeridos');
       return;
     }
-
     this.guardando = true;
-
     try {
-      const formValue = this.form.value;
-      
+      const fv = this.form.value;
+      const partesDireccion = [fv._calle, fv._barrioNombre, fv._sectorNombre, fv._municipioNombre, fv._provinciaNombre].filter(Boolean);
+      const direccion = partesDireccion.join(', ');
+
       const datosActualizados = {
-        ...formValue,
-        fechaNacimiento: Timestamp.fromDate(new Date(formValue.fechaNacimiento)),
-        fechaIngreso: Timestamp.fromDate(new Date(formValue.fechaIngreso)),
-        sentencia: formValue.sentencia ? Number(formValue.sentencia) : null
+        numeroIdentificacion: fv.numeroIdentificacion,
+        numeroExpediente: fv.numeroExpediente,
+        cedula: fv.cedula,
+        nombre: fv.nombre,
+        apellido: fv.apellido,
+        fechaNacimiento: new Date(fv.fechaNacimiento),
+        sexo: fv.sexo,
+        nacionalidad: fv.nacionalidad,
+        estadoCivil: fv.estadoCivil,
+        direccion,
+        telefono: fv.telefono,
+        nombreContactoEmergencia: fv.nombreContactoEmergencia,
+        telefonoEmergencia: fv.telefonoEmergencia,
+        pabellon: fv.pabellon,
+        celda: fv.celda,
+        fechaIngreso: new Date(fv.fechaIngreso),
+        situacionLegal: fv.situacionLegal,
+        estado: fv.estado,
+        delito: fv.delito,
+        sentencia: fv.sentencia ? Number(fv.sentencia) : undefined,
+        observaciones: fv.observaciones
       };
 
-      const resultado = await this.reclusosService.actualizarRecluso(
-        this.recluso.id,
-        datosActualizados
-      );
-
+      const resultado = await this.reclusosService.actualizarRecluso(this.recluso.id, datosActualizados);
       if (resultado.success) {
         this.notificacionService.success(resultado.message);
         this.reclusoActualizado.emit();
@@ -162,5 +266,8 @@ export class ReclusoEditarModalComponent implements OnChanges {
     this.showModal = false;
     this.showModalChange.emit(false);
     this.form.reset();
+    this.municipiosFiltrados.set([]);
+    this.sectorTexto.set('');
+    this.barrioTexto.set('');
   }
 }

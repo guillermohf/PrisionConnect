@@ -93,6 +93,13 @@ export class VisitaCrearModalComponent implements OnChanges {
 
     this.form.get('tipo')?.valueChanges.subscribe((tipo) => {
       this.actualizarValidaciones(tipo);
+      // C4: Recalcular hora fin cuando cambia el tipo
+      const h = this.form.get('horaInicioProgramada')?.value;
+      if (h) {
+        const config = this.configuracionService.configuracion();
+        const dur = config?.duracionMaximaVisita ?? 60;
+        this.form.patchValue({ horaFinProgramada: this.sumarMinutos(h, dur) });
+      }
     });
 
     this.form.get('reclusoId')?.valueChanges.subscribe((reclusoId) => {
@@ -110,7 +117,28 @@ export class VisitaCrearModalComponent implements OnChanges {
       this.searchVisitante = '';
       this.searchAbogado = '';
       this.actualizarValidaciones(TipoVisita.FAMILIAR);
+      // C4: Setear fecha y hora actuales
+      this.inicializarFechaHora();
     }
+  }
+
+  private inicializarFechaHora(): void {
+    const ahora = new Date();
+    const fecha = ahora.toISOString().split('T')[0];
+    const hora = ahora.toTimeString().substring(0, 5);
+    const config = this.configuracionService.configuracion();
+    const dur = config?.duracionMaximaVisita ?? 60;
+    this.form.patchValue({
+      fechaVisita: fecha,
+      horaInicioProgramada: hora,
+      horaFinProgramada: this.sumarMinutos(hora, dur)
+    });
+  }
+
+  private sumarMinutos(hora: string, minutos: number): string {
+    const [h, m] = hora.split(':').map(Number);
+    const total = h * 60 + m + minutos;
+    return `${Math.floor(total / 60) % 24}`.padStart(2, '0') + ':' + `${total % 60}`.padStart(2, '0');
   }
 
   private async cargarDatos(): Promise<void> {

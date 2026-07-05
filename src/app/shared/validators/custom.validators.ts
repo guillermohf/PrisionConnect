@@ -4,11 +4,8 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 /**
  * Validador de cédula dominicana.
- * Acepta el valor SIN guiones (11 dígitos puros)
- * porque la directiva CedulaMaskDirective emite solo dígitos al formulario.
- *
- * Formato esperado internamente: XXXXXXXXXXX (11 dígitos)
- * Formato visual en el input:    XXX-XXXXXXX-X (13 caracteres)
+ * Valida: 11 dígitos, prefijo 001 o 402, y dígito verificador (Luhn-like).
+ * Acepta el valor SIN guiones (11 dígitos puros).
  */
 export function cedulaDominicanaValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -18,18 +15,35 @@ export function cedulaDominicanaValidator(): ValidatorFn {
     if (!valor) return null;
 
     // Debe tener exactamente 11 dígitos
-    if (valor.length !== 11) {
+    if (!/^\d{11}$/.test(valor)) {
       return {
-        cedulaInvalida: {
-          mensaje: 'La cédula debe tener 11 dígitos (formato: XXX-XXXXXXX-X)',
-          digitosActuales: valor.length
+        cedulaFormato: { message: 'La cédula debe tener 11 dígitos.' }
+      };
+    }
+
+    // Validar prefijo: solo 001 o 402
+    const prefijo = valor.substring(0, 3);
+    if (!['001', '402'].includes(prefijo)) {
+      return {
+        cedulaPrefijo: {
+          message: `Prefijo inválido (${prefijo}). Solo se aceptan cédulas que inicien con 001 o 402.`
         }
       };
     }
 
-    // Solo dígitos (ya garantizado por la directiva, pero validamos igual)
-    if (!/^\d{11}$/.test(valor)) {
-      return { cedulaInvalida: { mensaje: 'La cédula solo debe contener números' } };
+    // Dígito verificador (algoritmo oficial JCE)
+    const pesos = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2];
+    let suma = 0;
+    for (let i = 0; i < 10; i++) {
+      let p = parseInt(valor[i]) * pesos[i];
+      if (p > 9) p -= 9;
+      suma += p;
+    }
+    const esperado = (10 - (suma % 10)) % 10;
+    if (esperado !== parseInt(valor[10])) {
+      return {
+        cedulaDigito: { message: 'Cédula inválida (dígito verificador incorrecto).' }
+      };
     }
 
     return null; // ✅ Válido
@@ -108,3 +122,24 @@ export function emailValidator(): ValidatorFn {
     return null; // ✅ Válido
   };
 }
+
+/**
+ * Validador de edad mínima.
+ * Bloquea fechas de nacimiento que resulten en edad < edadMinima años.
+ */
+export function mayorDeEdadValidator(edadMinima = 18): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const nac = new Date(control.value);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nac.getFullYear();
+    const mes = hoy.getMonth() - nac.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nac.getDate())) edad--;
+    return edad >= edadMinima ? null : {
+      menorDeEdad: {
+        edadActual: edad,
+        message: `Debe tener al menos ${edadMinima} años.`
+      }
+    };
+  };
+}

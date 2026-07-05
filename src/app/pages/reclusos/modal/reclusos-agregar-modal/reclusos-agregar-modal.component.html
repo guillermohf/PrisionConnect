@@ -41,6 +41,19 @@
               (inputChange)="aplicarMascaraCedula($event)">
             </prisionConnect-input>
 
+            <!-- Errores de cédula -->
+            @if (form.controls['cedula'].touched) {
+              @if (form.controls['cedula'].errors?.['cedulaFormato']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+              @if (form.controls['cedula'].errors?.['cedulaPrefijo']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+              @if (form.controls['cedula'].errors?.['cedulaDigito']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+            }
+
             <prisionConnect-input
               label="Nombre"
               [formControl]="$any(form.controls['nombre'])"
@@ -55,12 +68,21 @@
               [required]="true">
             </prisionConnect-input>
 
-            <prisionConnect-input
-              label="Fecha de Nacimiento"
-              type="date"
-              [formControl]="$any(form.controls['fechaNacimiento'])"
-              [required]="true">
-            </prisionConnect-input>
+            <!-- Fecha de nacimiento con validación de edad -->
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Fecha de Nacimiento *</label>
+              <input
+                type="date"
+                formControlName="fechaNacimiento"
+                [max]="fechaMaxNacimiento"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (form.controls['fechaNacimiento'].touched && form.controls['fechaNacimiento'].errors?.['menorDeEdad']) {
+                <p class="text-xs text-red-600 mt-1">
+                  ⚠️ {{ form.controls['fechaNacimiento'].errors['menorDeEdad'].message }}
+                  (Edad actual: {{ form.controls['fechaNacimiento'].errors['menorDeEdad'].edadActual }} años)
+                </p>
+              }
+            </div>
 
             <prisionConnect-input
               label="Sexo"
@@ -74,12 +96,21 @@
               ]">
             </prisionConnect-input>
 
-            <prisionConnect-input
-              label="Nacionalidad"
-              [formControl]="$any(form.controls['nacionalidad'])"
-              placeholder="Dominicana"
-              [required]="true">
-            </prisionConnect-input>
+            <!-- Nacionalidad desde API -->
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Nacionalidad *</label>
+              <select
+                formControlName="nacionalidad"
+                [disabled]="cargandoNacionalidades()"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
+                <option value="">
+                  {{ cargandoNacionalidades() ? 'Cargando...' : 'Seleccionar nacionalidad' }}
+                </option>
+                @for (nac of nacionalidades(); track nac) {
+                  <option [value]="nac">{{ nac }}</option>
+                }
+              </select>
+            </div>
 
             <prisionConnect-input
               label="Estado Civil"
@@ -108,17 +139,105 @@
             Información de Contacto
           </h2>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+          <!-- Dirección en cascada -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
 
-            <prisionConnect-input
-              label="Dirección"
-              type="textarea"
-              [formControl]="$any(form.controls['direccion'])"
-              placeholder="Calle, número, sector, ciudad"
-              (rows)="2"
-              [required]="true"
-              class="md:col-span-2">
-            </prisionConnect-input>
+            <!-- PROVINCIA -->
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Provincia *</label>
+              <select
+                formControlName="_provinciaId"
+                (change)="onProvinciaChange($any($event.target).value)"
+                [disabled]="cargandoUbicacion()"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
+                <option value="">
+                  {{ cargandoUbicacion() ? 'Cargando provincias...' : 'Seleccionar provincia' }}
+                </option>
+                @for (p of provincias(); track p.id) {
+                  <option [value]="p.id">{{ p.nombre }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- MUNICIPIO -->
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Municipio *</label>
+              <select
+                formControlName="_municipioNombre"
+                (change)="onMunicipioChange($any($event.target).value)"
+                [disabled]="municipiosFiltrados().length === 0"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
+                <option value="">Seleccionar municipio</option>
+                @for (m of municipiosFiltrados(); track m.nombre) {
+                  <option [value]="m.nombre">{{ m.nombre }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- SECTOR: autocomplete -->
+            <div class="relative">
+              <label class="block text-xs text-gray-600 mb-1">Sector</label>
+              <input
+                type="text"
+                [value]="sectorTexto()"
+                (input)="onSectorInput($any($event.target).value)"
+                (blur)="mostrarSugerenciasSector.set(false)"
+                [disabled]="!form.get('_municipioNombre')?.value"
+                placeholder="Escribe para buscar sector..."
+                autocomplete="off"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
+              @if (mostrarSugerenciasSector() && sectoresAutocomplete().length > 0) {
+                <ul class="absolute z-50 w-full mt-1 bg-white border-2 border-teal-200 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                  @for (sector of sectoresAutocomplete(); track sector.id) {
+                    <li
+                      (mousedown)="seleccionarSector(sector)"
+                      class="px-4 py-2.5 text-sm text-gray-800 hover:bg-teal-50 cursor-pointer border-b border-gray-100 last:border-0">
+                      {{ sector.nombre }}
+                    </li>
+                  }
+                </ul>
+              }
+              <p class="text-xs text-gray-400 mt-1">💡 Escribe al menos 2 letras para ver sugerencias</p>
+            </div>
+
+            <!-- BARRIO: autocomplete -->
+            <div class="relative">
+              <label class="block text-xs text-gray-600 mb-1">Barrio</label>
+              <input
+                type="text"
+                [value]="barrioTexto()"
+                (input)="onBarrioInput($any($event.target).value)"
+                (blur)="mostrarSugerenciasBarrio.set(false)"
+                [disabled]="!sectorTexto()"
+                placeholder="Escribe para buscar barrio..."
+                autocomplete="off"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 disabled:bg-gray-50">
+              @if (mostrarSugerenciasBarrio() && barriosAutocomplete().length > 0) {
+                <ul class="absolute z-50 w-full mt-1 bg-white border-2 border-teal-200 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                  @for (barrio of barriosAutocomplete(); track barrio.id) {
+                    <li
+                      (mousedown)="seleccionarBarrio(barrio)"
+                      class="px-4 py-2.5 text-sm text-gray-800 hover:bg-teal-50 cursor-pointer border-b border-gray-100 last:border-0">
+                      {{ barrio.nombre }}
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+
+            <!-- CALLE -->
+            <div class="md:col-span-2">
+              <label class="block text-xs text-gray-600 mb-1">Calle y número *</label>
+              <input
+                type="text"
+                formControlName="_calle"
+                placeholder="Ej: Calle El Conde #25, Apto 3B"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            </div>
+
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
 
             <prisionConnect-input telefonoMask
               label="Teléfono"

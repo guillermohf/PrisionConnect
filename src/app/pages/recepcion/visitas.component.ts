@@ -92,13 +92,8 @@ export default class VisitasComponent implements OnInit {
   visitaSeleccionada: Visita | null = null;
 
   columnas: ColumnaConfig[] = [
-    {
-      key: 'cedula',
-      label: 'CEDULA',
-      getValue: (row: any) => row.tipo === TipoVisita.LEGAL
-        ? row.abogado?.cedula
-        : row.visitantes?.[0]?.cedula
-    },
+    { key: 'visitanteNombre', label: 'VISITANTE' },
+    { key: 'cedula', label: 'CEDULA' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'totalVisitantes', label: 'CANT. VISITANTES' },

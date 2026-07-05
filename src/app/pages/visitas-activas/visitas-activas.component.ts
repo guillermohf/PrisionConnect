@@ -88,13 +88,8 @@ export default class VisitasActivasComponent implements OnInit {
 
   // Columnas para la tabla
   columnas: ColumnaConfig[] = [
-    {
-      key: 'cedula',
-      label: 'CEDULA',
-      getValue: (row: any) => row.tipo === TipoVisita.LEGAL
-        ? row.abogado?.cedula
-        : row.visitantes?.[0]?.cedula
-    },
+    { key: 'visitanteNombre', label: 'VISITANTE' },
+    { key: 'cedula', label: 'CEDULA' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'totalVisitantes', label: 'CANT. VISITANTES' },
@@ -142,7 +137,6 @@ export default class VisitasActivasComponent implements OnInit {
   // Callbacks
   onCheckInRealizado(): void {
     this.notificacionService.success('Check-in realizado');
-    // No necesitamos aplicarFiltro() - los signals se actualizan solos
   }
 
   onCheckOutRealizado(): void {
@@ -193,4 +187,42 @@ export default class VisitasActivasComponent implements OnInit {
     const mm = diff % 60;
     return `${hh}h ${mm}min`;
   }
-}
+
+  // ── C6: Reporte de pendientes de salida ──────────────────────
+
+  /** Visitas EN_CURSO cuya hora de fin ya pasó */
+  pendientesSalidaVencidas = computed(() => {
+    const ahora = new Date();
+    const horaActual =
+      `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}`;
+    return this.visitasService.visitas().filter(
+      v => v.estado === EstadoVisita.EN_CURSO &&
+        v.horaFinProgramada &&
+        v.horaFinProgramada <= horaActual
+    );
+  });
+
+  /** Calcula cuánto tiempo llevan de exceso desde horaFin */
+  tiempoVencido(horaFin: string): string {
+    const [h, m] = horaFin.split(':').map(Number);
+    const ahora = new Date();
+    const finMs = new Date().setHours(h, m, 0, 0);
+    const diff = ahora.getTime() - finMs;
+    if (diff <= 0) return 'En tiempo';
+    const hrs = Math.floor(diff / 3_600_000);
+    const min = Math.floor((diff % 3_600_000) / 60_000);
+    return hrs > 0 ? `${hrs}h ${min}min vencido` : `${min}min vencido`;
+  }
+
+  generarReportePendientes(): void {
+    const pendientes = this.pendientesSalidaVencidas();
+    if (pendientes.length === 0) return;
+    const resumen = pendientes.map(v =>
+      `• ${v.reclusoNombre} — Fin: ${v.horaFinProgramada} (${this.tiempoVencido(v.horaFinProgramada!)})`
+    ).join('\n');
+    this.notificacionService.warning(
+      `${pendientes.length} visita(s) vencida(s):\n${resumen}`,
+      'Pendientes de Salida'
+    );
+  }
+}

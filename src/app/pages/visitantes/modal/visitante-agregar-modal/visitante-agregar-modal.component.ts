@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { VisitantesService } from '@core/services/visitantes.service';
 import { NotificacionService } from '@core/services/notificacion.service';
+import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { CrearVisitanteDTO, Visitante } from '@core/models';
 import { ModalComponent } from "@shared/modal/modal.component";
 import { CedulaMaskDirective } from "@shared/directives/cedula-mask.directive";
@@ -28,20 +29,27 @@ export class VisitanteAgregarModalComponent {
   private fb = inject(FormBuilder);
   private visitantesService = inject(VisitantesService);
   private notificacion = inject(NotificacionService);
+  private ubicacionService = inject(UbicacionRDService);
 
-  // Inputs
   @Input() showModal = false;
   @Input() visitanteEditar: Visitante | null = null;
-
-  // Outputs
   @Output() close = new EventEmitter<void>();
   @Output() guardado = new EventEmitter<Visitante>();
 
-  // Señales
   guardando = signal(false);
   modoEdicion = signal(false);
 
-  // Formulario
+  // Ubicación
+  provincias = this.ubicacionService.provincias;
+  cargandoUbicacion = this.ubicacionService.cargando;
+  municipiosFiltrados = signal<Municipio[]>([]);
+  sectoresAutocomplete = signal<Sector[]>([]);
+  barriosAutocomplete = signal<Barrio[]>([]);
+  sectorTexto = signal('');
+  barrioTexto = signal('');
+  mostrarSugerenciasSector = signal(false);
+  mostrarSugerenciasBarrio = signal(false);
+
   visitanteForm: FormGroup;
 
   constructor() {
@@ -67,11 +75,13 @@ export class VisitanteAgregarModalComponent {
       ]],
       email: ['', [emailValidator()]],
 
-      // Dirección
-      direccion: ['', [
-        Validators.required,
-        Validators.minLength(10)
-      ]],
+      // Dirección en cascada
+      _provinciaId: [''],
+      _provinciaNombre: [''],
+      _municipioNombre: [''],
+      _sectorNombre: [''],
+      _barrioNombre: [''],
+      _calle: ['', [Validators.required, Validators.minLength(5)]],
 
       // Observaciones
       observaciones: ['']
@@ -79,6 +89,7 @@ export class VisitanteAgregarModalComponent {
   }
 
   ngOnInit() {
+    this.ubicacionService.cargarTodo();
     if (this.visitanteEditar) {
       this.modoEdicion.set(true);
       this.cargarDatos(this.visitanteEditar);
@@ -105,12 +116,73 @@ export class VisitanteAgregarModalComponent {
       apellido: visitante.apellido,
       telefono: visitante.telefono,
       email: visitante.email || '',
-      direccion: visitante.direccion,
+      _calle: visitante.direccion || '',
       observaciones: visitante.observaciones || ''
     });
-
-    // Deshabilitar cédula en modo edición
     this.visitanteForm.get('cedula')?.disable();
+  }
+
+  // ── Dirección en cascada ─────────────────────────────────────
+  onProvinciaChange(provinciaId: string): void {
+    const id = Number(provinciaId);
+    const prov = this.provincias().find(p => p.id === id);
+    this.municipiosFiltrados.set(this.ubicacionService.municipiosDeProvincia(id));
+    this.visitanteForm.patchValue({ _provinciaNombre: prov?.nombre ?? '', _municipioNombre: '', _sectorNombre: '', _barrioNombre: '' });
+    this.sectorTexto.set('');
+    this.barrioTexto.set('');
+    this.sectoresAutocomplete.set([]);
+    this.barriosAutocomplete.set([]);
+  }
+
+  onMunicipioChange(municipioNombre: string): void {
+    this.visitanteForm.patchValue({ _municipioNombre: municipioNombre, _sectorNombre: '', _barrioNombre: '' });
+    this.sectorTexto.set('');
+    this.barrioTexto.set('');
+    this.sectoresAutocomplete.set([]);
+    this.barriosAutocomplete.set([]);
+  }
+
+  onSectorInput(texto: string): void {
+    this.sectorTexto.set(texto);
+    this.visitanteForm.patchValue({ _sectorNombre: texto });
+    const municipioNombre = this.visitanteForm.get('_municipioNombre')?.value;
+    const provinciaId = Number(this.visitanteForm.get('_provinciaId')?.value);
+    if (municipioNombre) {
+      const resultados = this.ubicacionService.buscarSectores(municipioNombre, provinciaId, texto);
+      this.sectoresAutocomplete.set(resultados);
+      this.mostrarSugerenciasSector.set(resultados.length > 0);
+    }
+  }
+
+  seleccionarSector(sector: Sector): void {
+    this.sectorTexto.set(sector.nombre);
+    this.visitanteForm.patchValue({ _sectorNombre: sector.nombre });
+    this.mostrarSugerenciasSector.set(false);
+    this.sectoresAutocomplete.set([]);
+    this.barrioTexto.set('');
+    this.visitanteForm.patchValue({ _barrioNombre: '' });
+  }
+
+  onBarrioInput(texto: string): void {
+    this.barrioTexto.set(texto);
+    this.visitanteForm.patchValue({ _barrioNombre: texto });
+    const sectorNombre = this.sectorTexto();
+    const municipioNombre = this.visitanteForm.get('_municipioNombre')?.value;
+    const provinciaId = Number(this.visitanteForm.get('_provinciaId')?.value);
+    const sectores = this.ubicacionService.sectorenDeMunicipio(municipioNombre, provinciaId);
+    const sector = sectores.find(s => s.nombre === sectorNombre);
+    if (sector) {
+      const resultados = this.ubicacionService.buscarBarrios(sector.id, texto);
+      this.barriosAutocomplete.set(resultados);
+      this.mostrarSugerenciasBarrio.set(resultados.length > 0);
+    }
+  }
+
+  seleccionarBarrio(barrio: Barrio): void {
+    this.barrioTexto.set(barrio.nombre);
+    this.visitanteForm.patchValue({ _barrioNombre: barrio.nombre });
+    this.mostrarSugerenciasBarrio.set(false);
+    this.barriosAutocomplete.set([]);
   }
 
     aplicarMascaraCedula(event: any): void {
@@ -141,6 +213,9 @@ export class VisitanteAgregarModalComponent {
     this.visitanteForm.reset();
     this.modoEdicion.set(false);
     this.visitanteForm.get('cedula')?.enable();
+    this.municipiosFiltrados.set([]);
+    this.sectorTexto.set('');
+    this.barrioTexto.set('');
     this.close.emit();
   }
 
@@ -164,19 +239,21 @@ export class VisitanteAgregarModalComponent {
    */
   async crear(): Promise<void> {
     this.guardando.set(true);
+    const fv = this.visitanteForm.value;
+    const partesDireccion = [fv._calle, fv._barrioNombre, fv._sectorNombre, fv._municipioNombre, fv._provinciaNombre].filter(Boolean);
+    const direccion = partesDireccion.join(', ') || fv._calle || '';
 
     const dto: CrearVisitanteDTO = {
       cedula: this.visitanteForm.value.cedula,
-      nombre: this.visitanteForm.value.nombre,
-      apellido: this.visitanteForm.value.apellido,
-      telefono: this.visitanteForm.value.telefono,
-      direccion: this.visitanteForm.value.direccion,
-      email: this.visitanteForm.value.email || undefined,
+      nombre: fv.nombre,
+      apellido: fv.apellido,
+      telefono: fv.telefono,
+      direccion,
+      email: fv.email || undefined,
       fotoUrl: undefined
     };
 
     const resultado = await this.visitantesService.crear(dto);
-
     this.guardando.set(false);
 
     if (resultado.exito) {
@@ -184,10 +261,7 @@ export class VisitanteAgregarModalComponent {
       this.guardado.emit(resultado.data!);
       this.closeModal();
     } else {
-      await this.notificacion.error(
-        resultado.mensaje,
-        'Error al crear visitante'
-      );
+      await this.notificacion.error(resultado.mensaje, 'Error al crear visitante');
     }
   }
 
