@@ -33,6 +33,12 @@ interface Columna {
   label: string;
 }
 
+interface EstadisticaVista {
+  label: string;
+  value: number;
+  colorHex: string;
+}
+
 @Component({
   selector: 'app-reportes',
   standalone: true,
@@ -58,6 +64,9 @@ export default class ReportesComponent implements OnInit, OnDestroy {
   datosReporte: any[] = [];
   columnasReporte: Columna[] = [];
   tituloReporte: string = '';
+
+  /** Estadísticas para las tarjetas en pantalla (vista previa). Se recalculan cada vez que cambian los datos. */
+  estadisticas: EstadisticaVista[] = [];
 
   private subscripciones: Subscription = new Subscription();
 
@@ -107,7 +116,8 @@ export default class ReportesComponent implements OnInit, OnDestroy {
   }
 
   cargarDatosReporte(): void {
-    this.datosReporte = []; 
+    this.datosReporte = [];
+    this.estadisticas = [];
 
     switch (this.tipoReporteSeleccionado()) {
       case 'visitas':    this.cargarReporteVisitas();    break;
@@ -137,6 +147,7 @@ export default class ReportesComponent implements OnInit, OnDestroy {
             ...v,
             requisaTexto: v.isRequisa ? 'Sí' : 'No'
           }));
+          this.calcularEstadisticasVista();
         },
         error: (err) => console.error('Error cargando reporte de visitas:', err)
       })
@@ -156,7 +167,10 @@ export default class ReportesComponent implements OnInit, OnDestroy {
     
     this.subscripciones.add(
       this.visitantesService.obtenerReporte(this.filtros).subscribe({
-        next: (datos) => this.datosReporte = datos,
+        next: (datos) => {
+          this.datosReporte = datos;
+          this.calcularEstadisticasVista();
+        },
         error: (err) => console.error('Error cargando reporte de visitantes:', err)
       })
     );
@@ -174,7 +188,10 @@ export default class ReportesComponent implements OnInit, OnDestroy {
     
     this.subscripciones.add(
       this.abogadosService.obtenerReporte(this.filtros).subscribe({
-        next: (datos) => this.datosReporte = datos,
+        next: (datos) => {
+          this.datosReporte = datos;
+          this.calcularEstadisticasVista();
+        },
         error: (err) => console.error('Error cargando reporte de abogados:', err)
       })
     );
@@ -192,7 +209,10 @@ export default class ReportesComponent implements OnInit, OnDestroy {
     
     this.subscripciones.add(
       this.reclusosService.obtenerReporte(this.filtros).subscribe({
-        next: (datos) => this.datosReporte = datos,
+        next: (datos) => {
+          this.datosReporte = datos;
+          this.calcularEstadisticasVista();
+        },
         error: (err) => console.error('Error cargando reporte de reclusos:', err)
       })
     );
@@ -441,7 +461,7 @@ export default class ReportesComponent implements OnInit, OnDestroy {
     doc.save(`${reportCode}_${this.tipoReporteSeleccionado()}_${this.formatearFechaArchivo()}.pdf`);
   }
 
-  /** Calcula estadísticas de resumen según el tipo de reporte activo */
+  /** Calcula estadísticas de resumen (formato RGB) usadas dentro del PDF con jsPDF. No tocar: la usa generarPDF/generarExcel. */
   private calcularEstadisticas(): Array<{label: string; value: number; color: number[]}> {
     const tipo  = this.tipoReporteSeleccionado();
     const datos = this.datosReporte;
@@ -467,6 +487,19 @@ export default class ReportesComponent implements OnInit, OnDestroy {
       stats.push({ label: 'Privados', value: datos.filter((d: any) => d.tipo === 'Privado').length, color: [37, 99,235] });
     }
     return stats;
+  }
+
+  /** Igual que calcularEstadisticas() pero en hex, para las tarjetas de la vista previa en pantalla. */
+  private calcularEstadisticasVista(): void {
+    this.estadisticas = this.calcularEstadisticas().map(s => ({
+      label: s.label,
+      value: s.value,
+      colorHex: this.rgbToHex(s.color)
+    }));
+  }
+
+  private rgbToHex([r, g, b]: number[]): string {
+    return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
   }
 
   private loadImageAsBase64(src: string): Promise<string> {

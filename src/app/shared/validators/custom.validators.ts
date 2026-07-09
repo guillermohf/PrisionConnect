@@ -21,17 +21,8 @@ export function cedulaDominicanaValidator(): ValidatorFn {
       };
     }
 
-    // Validar prefijo: solo 001 o 402
-    const prefijo = valor.substring(0, 3);
-    if (!['001', '402'].includes(prefijo)) {
-      return {
-        cedulaPrefijo: {
-          message: `Prefijo inválido (${prefijo}). Solo se aceptan cédulas que inicien con 001 o 402.`
-        }
-      };
-    }
-
     // Dígito verificador (algoritmo oficial JCE)
+    // Pesos alternados 1-2 sobre los primeros 10 dígitos
     const pesos = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2];
     let suma = 0;
     for (let i = 0; i < 10; i++) {
