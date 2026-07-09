@@ -295,19 +295,19 @@ export class AbogadosService {
    * Obtener estadísticas de abogados
    */
   obtenerEstadisticas() {
-    const todos = this.abogados();
+    const todos = this.abogados().filter(a => a.activo);
     
     return {
       total: todos.length,
-      activos: todos.filter(a => a.activo).length,
-      inactivos: todos.filter(a => !a.activo).length,
+      activos: todos.length,
+      inactivos: 0,
       publicos: todos.filter(a => a.tipo === TipoAbogado.PUBLICO).length,
       privados: todos.filter(a => a.tipo === TipoAbogado.PRIVADO).length,
       totalReclusosAtendidos: todos.reduce((sum, a) => sum + (a.estadisticas?.totalReclusos || 0), 0)
     };
   }
 
-    obtenerTodos(): Observable<Abogado[]> {
+  obtenerTodos(): Observable<Abogado[]> {
     return new Observable(observer => {
       const activos = this.abogados().filter(a => a.activo);
       observer.next(activos);
@@ -318,7 +318,7 @@ export class AbogadosService {
 obtenerReporte(filtros: any): Observable<any[]> {
     return new Observable(observer => {
       try {
-        let abogadosFiltrados = this.abogados();
+        let abogadosFiltrados = this.abogados().filter(a => a.activo);
 
         // 1. Filtro por Abogado Específico
         if (filtros.abogadoId) {

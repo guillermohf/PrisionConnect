@@ -165,6 +165,9 @@ export class VisitantesService {
     return from(
       getDocs(collection(this.firestore, this.collectionName)).then(snapshot => {
         let datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+        
+        // Excluir registros inactivos (eliminados logicamente)
+        datos = datos.filter(v => v.activo);
 
         // Filtro por Cédula (ignorando guiones)
         if (filtros.cedula) {
@@ -675,11 +678,8 @@ export class VisitantesService {
   // MÉTODOS DE UTILIDAD
   // ============================================
 
-  /**
-   * Obtener cantidad total de visitantes
-   */
   obtenerTotal(): number {
-    return this.visitantes().length;
+    return this.visitantes().filter(v => v.activo).length;
   }
 
   /**

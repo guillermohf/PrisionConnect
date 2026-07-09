@@ -213,7 +213,7 @@ export class ReclusosService {
    * ESTADÍSTICAS
    */
   obtenerEstadisticas(): any {
-    const r = this.reclusos();
+    const r = this.reclusos().filter(x => x.activo);
     const stats: any = {
       total: r.length,
       porEstado: {},
@@ -253,7 +253,7 @@ export class ReclusosService {
    * REPORTE
    */
   obtenerReporte(filtros: any): Observable<any[]> {
-    let filtrados = this.reclusos();
+    let filtrados = this.reclusos().filter(r => r.activo);
 
     if (filtros.fechaInicio && filtros.fechaFin) {
       const inicio = new Date(`${filtros.fechaInicio}T00:00:00`);
