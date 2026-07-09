@@ -46,10 +46,11 @@ export class VisitaCrearModalComponent implements OnChanges {
   searchAbogado = '';
 
   reclusosFiltrados = computed(() => {
+    const todosActivos = this.reclusos().filter(r => r.activo);
     const search = this.searchRecluso.toLowerCase();
-    if (!search) return this.reclusos();
+    if (!search) return todosActivos;
     
-    return this.reclusos().filter(r => 
+    return todosActivos.filter(r => 
       r.nombreCompleto.toLowerCase().includes(search) ||
       r.cedula?.toLowerCase().includes(search) ||
       r.pabellon?.toLowerCase().includes(search) ||
