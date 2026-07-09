@@ -26,6 +26,7 @@ interface FiltrosReporte {
   nacionalidad?: string;
   genero?: string;          // M, F
   estadoVisita?: string;    // En Curso, Finalizada, etc.
+  incluirInactivos?: boolean; // Mostrar registros eliminados (soft delete)
 }
 
 interface Columna {

@@ -166,8 +166,10 @@ export class VisitantesService {
       getDocs(collection(this.firestore, this.collectionName)).then(snapshot => {
         let datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
         
-        // Excluir registros inactivos (eliminados logicamente)
-        datos = datos.filter(v => v.activo);
+        // Excluir registros inactivos (eliminados logicamente) salvo que el filtro lo indique
+        if (!filtros.incluirInactivos) {
+          datos = datos.filter(v => v.activo);
+        }
 
         // Filtro por Cédula (ignorando guiones)
         if (filtros.cedula) {

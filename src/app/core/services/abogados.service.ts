@@ -315,10 +315,12 @@ export class AbogadosService {
     });
   }
 
-obtenerReporte(filtros: any): Observable<any[]> {
+  obtenerReporte(filtros: any): Observable<any[]> {
     return new Observable(observer => {
       try {
-        let abogadosFiltrados = this.abogados().filter(a => a.activo);
+        let abogadosFiltrados = filtros.incluirInactivos
+          ? this.abogados()
+          : this.abogados().filter(a => a.activo);
 
         // 1. Filtro por Abogado Específico
         if (filtros.abogadoId) {

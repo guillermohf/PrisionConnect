@@ -253,7 +253,9 @@ export class ReclusosService {
    * REPORTE
    */
   obtenerReporte(filtros: any): Observable<any[]> {
-    let filtrados = this.reclusos().filter(r => r.activo);
+    let filtrados = filtros.incluirInactivos
+      ? this.reclusos()
+      : this.reclusos().filter(r => r.activo);
 
     if (filtros.fechaInicio && filtros.fechaFin) {
       const inicio = new Date(`${filtros.fechaInicio}T00:00:00`);

@@ -112,6 +112,10 @@
             <input type="text" [(ngModel)]="filtros.cedula" placeholder="Buscar por documento..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
         </div>
+        <div class="mt-3 flex items-center gap-2">
+          <input type="checkbox" id="inactivosVisitantes" [(ngModel)]="filtros.incluirInactivos" class="w-4 h-4 accent-teal-600 cursor-pointer">
+          <label for="inactivosVisitantes" class="text-xs text-gray-600 cursor-pointer select-none">Incluir registros eliminados (inactivos)</label>
+        </div>
       }
 
       @if (tipoReporteSeleccionado() === 'abogados') {
@@ -133,6 +137,10 @@
             <label class="block text-xs font-bold text-gray-600 mb-1">Matrícula</label>
             <input type="text" [(ngModel)]="filtros.matricula" placeholder="Número de registro..." class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <input type="checkbox" id="inactivosAbogados" [(ngModel)]="filtros.incluirInactivos" class="w-4 h-4 accent-teal-600 cursor-pointer">
+          <label for="inactivosAbogados" class="text-xs text-gray-600 cursor-pointer select-none">Incluir registros eliminados (inactivos)</label>
         </div>
       }
 
@@ -160,6 +168,10 @@
               <option value="Suspendido">Suspendido</option>
             </select>
           </div>
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <input type="checkbox" id="inactivosReclusos" [(ngModel)]="filtros.incluirInactivos" class="w-4 h-4 accent-teal-600 cursor-pointer">
+          <label for="inactivosReclusos" class="text-xs text-gray-600 cursor-pointer select-none">Incluir registros eliminados (inactivos)</label>
         </div>
       }
 

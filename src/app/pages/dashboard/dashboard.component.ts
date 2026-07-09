@@ -24,9 +24,9 @@ export default class DashboardComponent implements OnInit {
   estadisticas = this.visitasService.estadisticas;
   loading = this.visitasService.loading;
 
-  // Métricas adicionales
-  totalReclusos = computed(() => this.reclusosService.reclusos().length);
-  totalVisitantes = computed(() => this.visitantesService.visitantes().length);
+  // Métricas adicionales (solo registros activos)
+  totalReclusos = computed(() => this.reclusosService.reclusos().filter(r => r.activo).length);
+  totalVisitantes = computed(() => this.visitantesService.visitantes().filter(v => v.activo).length);
   
   // Visitas por tipo
   visitasFamiliares = computed(() => 
