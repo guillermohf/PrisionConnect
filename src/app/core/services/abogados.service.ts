@@ -295,15 +295,16 @@ export class AbogadosService {
    * Obtener estadísticas de abogados
    */
   obtenerEstadisticas() {
-    const todos = this.abogados().filter(a => a.activo);
+    const todos = this.abogados();
+    const activos = todos.filter(a => a.activo);
     
     return {
-      total: todos.length,
-      activos: todos.length,
-      inactivos: 0,
-      publicos: todos.filter(a => a.tipo === TipoAbogado.PUBLICO).length,
-      privados: todos.filter(a => a.tipo === TipoAbogado.PRIVADO).length,
-      totalReclusosAtendidos: todos.reduce((sum, a) => sum + (a.estadisticas?.totalReclusos || 0), 0)
+      total: activos.length,
+      activos: activos.length,
+      inactivos: todos.filter(a => !a.activo).length,
+      publicos: activos.filter(a => a.tipo === TipoAbogado.PUBLICO).length,
+      privados: activos.filter(a => a.tipo === TipoAbogado.PRIVADO).length,
+      totalReclusosAtendidos: activos.reduce((sum, a) => sum + (a.estadisticas?.totalReclusos || 0), 0)
     };
   }
 
