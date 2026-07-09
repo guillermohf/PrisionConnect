@@ -457,9 +457,14 @@ export default class ReportesComponent implements OnInit, OnDestroy {
       // Etiqueta sección
       doc.setFillColor(...grayLight);
       doc.roundedRect(6, sigSectionY + 2, pageW - 12, 6, 1, 1, 'F');
+      const firmaLabel = 'AUTORIZACIÓN Y FIRMA DEL REPORTE';
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
       doc.setTextColor(...grayText);
-      doc.text('▌ AUTORIZACIÓN Y FIRMA DEL REPORTE', pageW / 2, sigSectionY + 6, { align: 'center' });
+      const firmaTextW = doc.getTextWidth(firmaLabel);
+      const firmaStartX = pageW / 2 - firmaTextW / 2 - 3;
+      doc.setFillColor(...tealDark);
+      doc.rect(firmaStartX, sigSectionY + 3, 1.2, 4, 'F');
+      doc.text(firmaLabel, firmaStartX + 3.5, sigSectionY + 6);
 
       const sigY = sigSectionY + 12;
       const numSigs = 3;
