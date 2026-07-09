@@ -12,7 +12,6 @@ import { NotificacionService } from '@core/services/notificacion.service';
 import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { SituacionLegal, EstadoCivil, EstadoRecluso } from '@core/models/enums.interface';
 import { ModalComponent } from '@shared/modal/modal.component';
-import { CedulaMaskDirective } from '@shared/directives/cedula-mask.directive';
 import { TelefonoMaskDirective } from '@shared/directives/telefono.mask.directive';
 import {
   cedulaDominicanaValidator,
@@ -29,7 +28,6 @@ import { ButtonComponent } from '@shared/button/buttton.component';
     CommonModule,
     ReactiveFormsModule,
     ModalComponent,
-    CedulaMaskDirective,
     TelefonoMaskDirective,
     InputComponent,
     ButtonComponent

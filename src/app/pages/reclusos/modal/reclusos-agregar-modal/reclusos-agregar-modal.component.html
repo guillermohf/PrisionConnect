@@ -25,7 +25,7 @@
             placeholder="EXP-2024-001">
           </prisionConnect-input>
 
-          <prisionConnect-input cedulaMask label="Cédula" [formControl]="$any(form.controls['cedula'])"
+          <prisionConnect-input label="Cédula" [mask]="'000-0000000-0'" [formControl]="$any(form.controls['cedula'])"
             placeholder="001-0000000-0" [required]="true">
           </prisionConnect-input>
 

@@ -6,7 +6,6 @@ import { NotificacionService } from '@core/services/notificacion.service';
 import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { CrearVisitanteDTO, Visitante } from '@core/models';
 import { ModalComponent } from "@shared/modal/modal.component";
-import { CedulaMaskDirective } from "@shared/directives/cedula-mask.directive";
 import { TelefonoMaskDirective } from "@shared/directives/telefono.mask.directive";
 import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
 import { InputComponent } from '@shared/input/input.component';
@@ -18,7 +17,6 @@ import { ButtonComponent } from '@shared/button/buttton.component';
     CommonModule,
     ReactiveFormsModule,
     ModalComponent,
-    CedulaMaskDirective,
     TelefonoMaskDirective,
     InputComponent,
     ButtonComponent

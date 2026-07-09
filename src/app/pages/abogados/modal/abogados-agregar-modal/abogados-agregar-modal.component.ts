@@ -10,7 +10,6 @@ import { TipoAbogado } from '@core/models/enums.interface';
 import { ModalComponent } from '@shared/modal/modal.component';
 import { ButtonComponent } from '@shared/button/buttton.component';
 import { InputComponent } from '@shared/input/input.component';
-import { CedulaMaskDirective } from "@shared/directives/cedula-mask.directive"; // 🔧 FIX
 import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
 import { TelefonoMaskDirective } from "@shared/directives/telefono.mask.directive";
 
@@ -23,7 +22,6 @@ import { TelefonoMaskDirective } from "@shared/directives/telefono.mask.directiv
     ModalComponent,
     ButtonComponent,
     InputComponent,
-    CedulaMaskDirective,
     TelefonoMaskDirective
 ],
   templateUrl: './abogados-agregar-modal.component.html'

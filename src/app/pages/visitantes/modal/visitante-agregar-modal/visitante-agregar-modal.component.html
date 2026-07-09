@@ -20,8 +20,9 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
 
-            <prisionConnect-input cedulaMask
+            <prisionConnect-input
               label="Cédula"
+              [mask]="'000-0000000-0'"
               [formControl]="$any(visitanteForm.controls['cedula'])"
               placeholder="000-0000000-0"
               (blur)="verificarCedulaDuplicada()"
