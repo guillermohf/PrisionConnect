@@ -92,11 +92,11 @@ export default class VisitasComponent implements OnInit {
   visitaSeleccionada: Visita | null = null;
 
   columnas: ColumnaConfig[] = [
+    { key: 'codigoVisita', label: 'TICKET' },
     { key: 'visitanteNombre', label: 'VISITANTE' },
-    { key: 'cedula', label: 'CEDULA' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
-    { key: 'totalVisitantes', label: 'CANT. VISITANTES' },
+    { key: 'totalVisitantes', label: 'CANT.' },
     { key: 'fechaVisita', label: 'FECHA' },
     { key: 'horaInicioProgramada', label: 'HORA' },
     { key: 'estado', label: 'ESTADO' },

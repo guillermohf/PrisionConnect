@@ -16,6 +16,7 @@ export interface Visitante {
   email?: string;
   fotoUrl?: string;
   activo: boolean;
+  fechaNacimiento?: Date | any;
   fechaRegistro: Timestamp | Date;
   ultimaVisita?: Timestamp | Date | null;
   totalVisitas: number;

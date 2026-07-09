@@ -273,36 +273,58 @@ async guardar(): Promise<void> {
   // ... rest of the code
 
     if (resultado.success) {
-      // Intentar obtener el nombre del recluso para el ticket
       const reclusoSeleccionado = this.reclusos().find(r => r.id === formValue.reclusoId);
       const nombreRecluso = reclusoSeleccionado ? reclusoSeleccionado.nombreCompleto : 'Recluso';
       const areaDestino = formValue.areaVisita;
       const hora = formValue.horaInicioProgramada;
+      const codigo = resultado.codigoVisita ?? '---';
+      const nombreVisitante = resultado.nombreVisitante ?? '---';
 
-      // Generar tarjeta HTML tipo Ticket
+      // Ticket mejorado con ID y visitante principal
       const html = `
-        <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-top: 10px; border: 1px dashed #94a3b8; text-align: center;">
-          <div style="color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Ticket de Entrada</div>
-          <div style="font-size: 24px; font-weight: bold; color: #0f172a; margin-bottom: 12px;">${nombreRecluso}</div>
-          
-          <div style="display: flex; justify-content: space-between; border-top: 1px dashed #cbd5e1; padding-top: 12px; margin-top: 12px; text-align: left;">
+        <div style="background: #f8fafc; border-radius: 12px; padding: 16px; margin-top: 10px; border: 1px dashed #94a3b8; font-family: monospace;">
+
+          <!-- Código de visita -->
+          <div style="text-align: center; margin-bottom: 14px;">
+            <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 2px;">N° de Visita</div>
+            <div style="font-size: 22px; font-weight: 900; color: #0f766e; letter-spacing: 3px; margin-top: 4px;">${codigo}</div>
+          </div>
+
+          <hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0;">
+
+          <!-- Visitante -->
+          <div style="margin-bottom: 8px;">
+            <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Visitante</div>
+            <div style="font-size: 15px; font-weight: bold; color: #0f172a;">${nombreVisitante}</div>
+          </div>
+
+          <!-- Recluso -->
+          <div style="margin-bottom: 8px;">
+            <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Visita a</div>
+            <div style="font-size: 15px; font-weight: bold; color: #0f172a;">${nombreRecluso}</div>
+          </div>
+
+          <hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 10px 0;">
+
+          <!-- Área y hora -->
+          <div style="display: flex; justify-content: space-between;">
             <div>
-              <div style="color: #64748b; font-size: 12px;">Área</div>
-              <div style="color: #0f766e; font-weight: bold; font-size: 14px;">${areaDestino}</div>
+              <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Área</div>
+              <div style="color: #0f766e; font-weight: bold; font-size: 13px;">${areaDestino}</div>
             </div>
             <div style="text-align: right;">
-              <div style="color: #64748b; font-size: 12px;">Hora Inicio</div>
-              <div style="color: #0f172a; font-weight: bold; font-size: 14px;">${hora}</div>
+              <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Hora</div>
+              <div style="color: #0f172a; font-weight: bold; font-size: 13px;">${hora}</div>
             </div>
-          </div>
-          
-          <div style="margin-top: 12px; font-size: 13px; color: #64748b; font-weight: 500;">
-            Tipo: ${formValue.tipo}
+            <div style="text-align: right;">
+              <div style="color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Tipo</div>
+              <div style="color: #0f172a; font-weight: bold; font-size: 13px;">${formValue.tipo}</div>
+            </div>
           </div>
         </div>
       `;
 
-      this.notificacionService.successCard('Visita Registrada', html);
+      this.notificacionService.successCard('✅ Visita Registrada', html);
       this.visitaCreada.emit();
       this.cerrar();
     } else {

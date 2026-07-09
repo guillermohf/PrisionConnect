@@ -144,7 +144,7 @@ export class VisitasService {
     this.visitas.set([]);
   }
 
-  async crearVisita(dto: CrearVisitaDTO): Promise<{ success: boolean; message: string; visitaId?: string }> {
+  async crearVisita(dto: CrearVisitaDTO): Promise<{ success: boolean; message: string; visitaId?: string; codigoVisita?: string; nombreVisitante?: string }> {
     try {
       const currentUser = this.auth.currentUser;
       if (!currentUser) {
@@ -195,7 +195,20 @@ export class VisitasService {
         }
       }
 
+      // ── Generar código de visita legible: VS-YYYY-NNNNN ──────────
+      const anio = new Date().getFullYear();
+      const prefijo = `VS-${anio}-`;
+      const codigosExistentes = this.visitas()
+        .map(v => v.codigoVisita)
+        .filter(c => c?.startsWith(prefijo));
+      const ultimoNum = codigosExistentes.reduce((max, c) => {
+        const n = parseInt(c!.split('-')[2] ?? '0', 10);
+        return n > max ? n : max;
+      }, 0);
+      const codigoVisita = `${prefijo}${String(ultimoNum + 1).padStart(5, '0')}`;
+
       const nuevaVisita = {
+        codigoVisita,
         tipo: dto.tipo,
         reclusoId: dto.reclusoId,
         reclusoNombre: reclusoData['nombreCompleto'],
@@ -245,7 +258,15 @@ export class VisitasService {
         `Visita ${dto.tipo} creada para: ${reclusoData['nombreCompleto']} (Visitantes: ${visitantes.length})`,
         'INFO'
       );
-      return { success: true, message: 'Visita creada exitosamente', visitaId: docRef.id };
+      return {
+        success: true,
+        message: 'Visita creada exitosamente',
+        visitaId: docRef.id,
+        codigoVisita,
+        nombreVisitante: dto.tipo === TipoVisita.LEGAL
+          ? abogado?.nombre ?? 'Abogado'
+          : visitantes[0]?.nombre ?? 'Visitante'
+      };
     } catch (error: any) {
       console.error('Error creando visita:', error);
       await this.auditService.registrarAccion('Recepción', 'ERROR_CREAR_VISITA', `Error: ${error.message}`, 'ERROR');

@@ -25,8 +25,7 @@
               [formControl]="$any(visitanteForm.controls['cedula'])"
               placeholder="000-0000000-0"
               (blur)="verificarCedulaDuplicada()"
-              [required]="true"
-              (inputChange)="aplicarMascaraCedula($event)">
+              [required]="true">
             </prisionConnect-input>
 
             <prisionConnect-input
@@ -42,6 +41,22 @@
               placeholder="Ingresa el apellido"
               [required]="true">
             </prisionConnect-input>
+
+            <!-- Fecha de nacimiento con validación de edad -->
+            <div class="md:col-span-2">
+              <label class="block text-xs text-gray-600 mb-1">Fecha de Nacimiento *</label>
+              <input type="date" formControlName="fechaNacimiento" [max]="fechaMaxNacimiento"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (visitanteForm.controls['fechaNacimiento'].touched && visitanteForm.controls['fechaNacimiento'].errors?.['menorDeEdad']) {
+                <p class="text-xs text-red-600 mt-1">
+                  ⚠️ {{ visitanteForm.controls['fechaNacimiento'].getError('menorDeEdad').message }}
+                  (Edad actual: {{ visitanteForm.controls['fechaNacimiento'].getError('menorDeEdad').edadActual }} años)
+                </p>
+              }
+              @if (visitanteForm.controls['fechaNacimiento'].touched && visitanteForm.controls['fechaNacimiento'].errors?.['required']) {
+                <p class="text-xs text-red-600 mt-1">⚠️ Este campo es obligatorio</p>
+              }
+            </div>
 
           </div>
         </section>
@@ -63,8 +78,7 @@
               type="tel"
               [formControl]="$any(visitanteForm.controls['telefono'])"
               placeholder="809-555-0000"
-              [required]="true"
-              (inputChange)="aplicarMascaraTelefono($event)">
+              [required]="true">
             </prisionConnect-input>
 
             <prisionConnect-input

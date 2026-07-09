@@ -67,26 +67,6 @@ export class AbogadoEditarModalComponent implements OnChanges {
     });
   }
 
-  // Máscara para teléfono
-  aplicarMascaraTelefono(event: any): void {
-    let valor = event.target.value.replace(/\D/g, '');
-    
-    if (valor.length > 10) {
-      valor = valor.substring(0, 10);
-    }
-    
-    if (valor.length >= 3) {
-      valor = '(' + valor.substring(0, 3) + ') ' + valor.substring(3);
-    }
-    if (valor.length >= 9) {
-      const parts = valor.split(') ');
-      if (parts[1] && parts[1].length > 3) {
-        valor = parts[0] + ') ' + parts[1].substring(0, 3) + '-' + parts[1].substring(3);
-      }
-    }
-    
-    this.form.patchValue({ telefono: valor }, { emitEvent: false });
-  }
 
   async guardar(): Promise<void> {
     if (!this.form.valid || !this.abogado?.id) {

@@ -15,6 +15,7 @@ import { RequisaEntrada, RequisaSalida } from './requisa.interface';
  */
 export interface Visita {
   id?: string;
+  codigoVisita?: string;      // Ej: VS-2026-00001
   tipo: TipoVisita;
   
   // Recluso

@@ -66,7 +66,11 @@
         [showDelete]="false">
 
         <ng-template #columnBody let-visita let-column="column">
-          @if (column.key === 'fechaVisita') {
+          @if (column.key === 'codigoVisita') {
+            <span class="font-mono text-xs font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded border border-teal-200">
+              {{ visita.codigoVisita || '—' }}
+            </span>
+          } @else if (column.key === 'fechaVisita') {
             <span class="text-gray-700 font-medium">{{ formatearFecha(visita.fechaVisita) }}</span>
           } @else if (column.key === 'estado') {
             <span [ngClass]="obtenerColorEstado(visita.estado)" class="px-3 py-1 rounded-full text-[10px] font-black uppercase border">
@@ -78,8 +82,6 @@
             </span>
           } @else if (column.key === 'visitanteNombre') {
             <span class="text-gray-800 font-medium">{{ visita.tipo === 'Legal' ? visita.abogado?.nombre : (visita.visitantes?.length ? visita.visitantes[0].nombre : 'N/A') }}</span>
-          } @else if (column.key === 'cedula') {
-            <span class="text-gray-600">{{ visita.tipo === 'Legal' ? visita.abogado?.cedula : (visita.visitantes?.length ? visita.visitantes[0].cedula : 'N/A') }}</span>
           } @else {
             <span class="text-gray-600">{{ visita[column.key] }}</span>
           }

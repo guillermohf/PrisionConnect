@@ -8,7 +8,7 @@ import { CrearVisitanteDTO, Visitante } from '@core/models';
 import { ModalComponent } from "@shared/modal/modal.component";
 import { CedulaMaskDirective } from "@shared/directives/cedula-mask.directive";
 import { TelefonoMaskDirective } from "@shared/directives/telefono.mask.directive";
-import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator } from '@shared/validators/custom.validators';
+import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
 import { InputComponent } from '@shared/input/input.component';
 import { ButtonComponent } from '@shared/button/buttton.component';
 
@@ -67,6 +67,7 @@ export class VisitanteAgregarModalComponent {
         Validators.required, 
         Validators.minLength(2)
       ]],
+      fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator()]],
 
       // Contacto
       telefono: ['', [
@@ -86,6 +87,12 @@ export class VisitanteAgregarModalComponent {
       // Observaciones
       observaciones: ['']
     });
+  }
+
+  get fechaMaxNacimiento(): string {
+    const f = new Date();
+    f.setFullYear(f.getFullYear() - 18);
+    return f.toISOString().split('T')[0];
   }
 
   ngOnInit() {
@@ -198,26 +205,6 @@ export class VisitanteAgregarModalComponent {
     this.barriosAutocomplete.set([]);
   }
 
-    aplicarMascaraCedula(event: any): void {
-    let valor = event.target.value.replace(/\D/g, '');
-    if (valor.length > 11) valor = valor.substring(0, 11);
-    if (valor.length >= 3) valor = valor.substring(0, 3) + '-' + valor.substring(3);
-    if (valor.length >= 11) valor = valor.substring(0, 11) + '-' + valor.substring(11);
-    this.visitanteForm.patchValue({ cedula: valor }, { emitEvent: false });
-  }
-
-  aplicarMascaraTelefono(event: any): void {
-    let valor = event.target.value.replace(/\D/g, '');
-    if (valor.length > 10) valor = valor.substring(0, 10);
-    if (valor.length >= 3) valor = '(' + valor.substring(0, 3) + ') ' + valor.substring(3);
-    if (valor.length >= 9) {
-      const parts = valor.split(') ');
-      if (parts[1] && parts[1].length > 3) {
-        valor = parts[0] + ') ' + parts[1].substring(0, 3) + '-' + parts[1].substring(3);
-      }
-    }
-    this.visitanteForm.patchValue({ telefono: valor }, { emitEvent: false });
-  }
 
   /**
    * Cerrar modal

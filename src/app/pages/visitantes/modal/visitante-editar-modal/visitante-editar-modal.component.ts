@@ -6,7 +6,7 @@ import { NotificacionService } from '@core/services/notificacion.service';
 import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { ActualizarVisitanteDTO, Visitante } from '@core/models';
 import { ModalComponent } from "src/app/shared/modal/modal.component";
-import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator } from '@shared/validators/custom.validators';
+import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
 
 @Component({
   selector: 'prisionConnect-visitante-editar-modal',
@@ -60,6 +60,7 @@ export class VisitanteEditarModalComponent {
         Validators.required, 
         Validators.minLength(2)
       ]],
+      fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator()]],
 
       // Contacto
       telefono: ['', [
@@ -81,6 +82,12 @@ export class VisitanteEditarModalComponent {
     });
   }
 
+  get fechaMaxNacimiento(): string {
+    const f = new Date();
+    f.setFullYear(f.getFullYear() - 18);
+    return f.toISOString().split('T')[0];
+  }
+
   ngOnInit() {
     this.ubicacionService.cargarTodo();
     if (this.visitanteEditar) {
@@ -98,10 +105,16 @@ export class VisitanteEditarModalComponent {
    * Cargar datos del visitante en el formulario
    */
   cargarDatos(visitante: Visitante): void {
+    const fechaNacimiento = visitante.fechaNacimiento
+      ? (visitante.fechaNacimiento as any)?.toDate
+        ? (visitante.fechaNacimiento as any).toDate().toISOString().split('T')[0]
+        : new Date(visitante.fechaNacimiento as any).toISOString().split('T')[0]
+      : '';
     this.visitanteForm.patchValue({
       cedula: visitante.cedula,
       nombre: visitante.nombre,
       apellido: visitante.apellido,
+      fechaNacimiento,
       telefono: visitante.telefono,
       email: visitante.email || '',
       _calle: visitante.direccion || '',
