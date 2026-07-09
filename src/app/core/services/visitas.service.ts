@@ -539,6 +539,11 @@ export class VisitasService {
           visitasFiltradas = visitasFiltradas.filter(v => v.requisaEntrada?.realizada === pasoRequisa);
         }
 
+        // Filtro por Estado de Visita
+        if (filtros.estadoVisita) {
+          visitasFiltradas = visitasFiltradas.filter(v => v.estado === filtros.estadoVisita);
+        }
+
         // Mapeo para el formato exacto esperado por la tabla y el PDF
         const datos = visitasFiltradas.map(v => {
           
@@ -570,6 +575,7 @@ export class VisitasService {
             visitante: this.obtenerNombresVisitantes(v),
             recluso: v.reclusoNombre || 'N/A',
             tipo_visita: v.tipo,
+            estado_visita: v.estado,
             isRequisa: v.requisaSalida?.realizada || false // Fallback por si la propiedad no existe
           };
         });

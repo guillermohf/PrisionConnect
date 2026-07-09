@@ -54,7 +54,7 @@
       <h2 class="text-base font-semibold text-teal-700 mb-4">Filtros del Reporte</h2>
 
       @if (tipoReporteSeleccionado() === 'visitas') {
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <label class="block text-xs font-bold text-gray-600 mb-1">Fecha (Desde)</label>
             <input type="date" [(ngModel)]="filtros.fechaInicio" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
@@ -69,6 +69,7 @@
               <option value="">Todas</option>
               <option value="Familiar">Familiar</option>
               <option value="Legal">Legal</option>
+              <option value="Amistades">Amistades</option>
             </select>
           </div>
           <div>
@@ -77,6 +78,16 @@
               <option value="">Todos</option>
               <option value="true">Sí (Requisado)</option>
               <option value="false">No</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-600 mb-1">Estado</label>
+            <select [(ngModel)]="filtros.estadoVisita" class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600 bg-white">
+              <option value="">Todos</option>
+              <option value="Registrada">Registrada</option>
+              <option value="En Curso">En Curso</option>
+              <option value="Finalizada">Finalizada</option>
+              <option value="Cancelada">Cancelada</option>
             </select>
           </div>
         </div>

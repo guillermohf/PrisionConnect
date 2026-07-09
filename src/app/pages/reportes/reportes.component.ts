@@ -25,6 +25,7 @@ interface FiltrosReporte {
   cedula?: string;
   nacionalidad?: string;
   genero?: string;          // M, F
+  estadoVisita?: string;    // En Curso, Finalizada, etc.
 }
 
 interface Columna {
@@ -125,6 +126,7 @@ export default class ReportesComponent implements OnInit, OnDestroy {
       { key: 'visitante',      label: 'PERSONA' },
       { key: 'recluso',        label: 'RECLUSO' },
       { key: 'tipo_visita',    label: 'TIPO' },
+      { key: 'estado_visita',  label: 'ESTADO' },
       { key: 'requisaTexto',   label: 'REQUISA' }
     ];
     
