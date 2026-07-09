@@ -59,7 +59,7 @@ export default class VisitantesComponent implements OnInit {
   });
 
   // Computed - Estadísticas
-  totalVisitantes = computed(() => this.visitantes().length);
+  totalVisitantes = computed(() => this.visitantes().filter(v => v.activo).length);
   
   totalActivos = computed(() => 
     this.visitantes().filter(v => v.activo).length
