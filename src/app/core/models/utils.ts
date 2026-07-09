@@ -51,9 +51,13 @@ export function getNombreCompleto(nombre: string, apellido: string): string {
 }
 
 /**
- * Valida formato de cédula dominicana (XXX-XXXXXXX-X)
+ * Valida formato de cédula dominicana.
+ * Acepta tanto XXX-XXXXXXX-X como 11 dígitos puros (sin guiones).
  */
-export function validarCedula(cedula: string): boolean {
+export function validarCedula(cedula: string | null | undefined): boolean {
+  if (!cedula) return false;
+  const soloDigitos = cedula.replace(/\D/g, '');
+  if (soloDigitos.length === 11) return true;
   const regex = /^\d{3}-\d{7}-\d{1}$/;
   return regex.test(cedula);
 }
