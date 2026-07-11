@@ -128,9 +128,14 @@ export class RelacionesVisitantesService {
 
       // Ordenar localmente por fecha de creación descendente
       relaciones.sort((a, b) => {
-        const timeA = a.fechaCreacion?.seconds ?? 0;
-        const timeB = b.fechaCreacion?.seconds ?? 0;
-        return timeB - timeA;
+        const getMs = (dateObj: any) => {
+          if (!dateObj) return 0;
+          if (typeof dateObj.toMillis === 'function') return dateObj.toMillis();
+          if (dateObj.seconds !== undefined) return dateObj.seconds * 1000;
+          if (dateObj instanceof Date) return dateObj.getTime();
+          return new Date(dateObj).getTime();
+        };
+        return getMs(b.fechaCreacion) - getMs(a.fechaCreacion);
       });
 
       console.log(`✅ ${relaciones.length} visitantes autorizados para recluso ${reclusoId}`);
