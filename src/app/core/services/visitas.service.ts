@@ -158,15 +158,19 @@ export class VisitasService {
 
       const reclusoData = reclusoDoc.data();
       const visitantes: any[] = [];
-      let abogado = null;
+      let abogado: any = null;
 
-      if (dto.tipo === TipoVisita.FAMILIAR && dto.visitantes) {
+      if (dto.tipo !== TipoVisita.LEGAL && dto.visitantes) {
         for (const visitanteId of dto.visitantes) {
-          const relDoc = await getDoc(
-            doc(this.firestore, 'relaciones_visitantes', `${dto.reclusoId}_${visitanteId}`)
+          const qRel = query(
+            collection(this.firestore, 'relaciones_visitantes'),
+            where('reclusoId', '==', dto.reclusoId),
+            where('visitanteId', '==', visitanteId),
+            where('activo', '==', true)
           );
-          if (relDoc.exists()) {
-            const rel = relDoc.data();
+          const qSnap = await getDocs(qRel);
+          if (!qSnap.empty) {
+            const rel = qSnap.docs[0].data();
             visitantes.push({
               visitanteId: rel['visitanteId'],
               nombre: rel['visitanteNombre'],
@@ -182,15 +186,21 @@ export class VisitasService {
       }
 
       if (dto.tipo === TipoVisita.LEGAL && dto.abogadoId) {
-        const relDoc = await getDoc(
-          doc(this.firestore, 'relaciones_abogados', `${dto.reclusoId}_${dto.abogadoId}`)
+        const qRel = query(
+          collection(this.firestore, 'relaciones_abogados'),
+          where('reclusoId', '==', dto.reclusoId),
+          where('abogadoId', '==', dto.abogadoId),
+          where('activo', '==', true)
         );
-        if (relDoc.exists()) {
-          const rel = relDoc.data();
+        const qSnap = await getDocs(qRel);
+        if (!qSnap.empty) {
+          const rel = qSnap.docs[0].data();
           abogado = {
             abogadoId: rel['abogadoId'],
             nombre: rel['abogadoNombre'],
-            exequatur: rel['abogadoExequatur']
+            exequatur: rel['abogadoExequatur'],
+            cedula: rel['abogadoCedula'] || '',
+            institucion: rel['abogadoInstitucion'] || ''
           };
         }
       }
@@ -214,7 +224,7 @@ export class VisitasService {
         reclusoNombre: reclusoData['nombreCompleto'],
         reclusoPabellon: reclusoData['pabellon'],
         reclusoCelda: reclusoData['celda'],
-        visitantes: dto.tipo === TipoVisita.FAMILIAR ? visitantes : [],
+        visitantes: dto.tipo !== TipoVisita.LEGAL ? visitantes : [],
         totalVisitantes: visitantes.length,
         visitantesPresentes: 0,
         abogado: dto.tipo === TipoVisita.LEGAL ? abogado : null,
@@ -547,21 +557,49 @@ export class VisitasService {
         // Mapeo para el formato exacto esperado por la tabla y el PDF
         const datos = visitasFiltradas.map(v => {
           
-          // Extraer la hora de entrada y salida del primer visitante que hizo check-in/out
           let horaEntrada = '---';
           let horaSalida = '---';
-          const visitanteAtivo = v.visitantes?.find(vis => vis.checkIn) || v.visitantes?.[0];
 
-          if (visitanteAtivo?.checkIn) {
-            const checkInObj = (visitanteAtivo.checkIn as any);
+          // 1. Intentar con checkInPrincipal y checkOutFinal de la visita general (sirve para Abogados y Familiares)
+          if (v.checkInPrincipal) {
+            const checkInObj = (v.checkInPrincipal as any);
+            const d = checkInObj?.toDate ? checkInObj.toDate() : new Date(checkInObj);
+            horaEntrada = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          } else if (v.tiempos?.ingresoArea) {
+            const checkInObj = (v.tiempos.ingresoArea as any);
             const d = checkInObj?.toDate ? checkInObj.toDate() : new Date(checkInObj);
             horaEntrada = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
           }
 
-          if (visitanteAtivo?.checkOut) {
-            const checkOutObj = (visitanteAtivo.checkOut as any);
+          if (v.checkOutFinal) {
+            const checkOutObj = (v.checkOutFinal as any);
             const d = checkOutObj?.toDate ? checkOutObj.toDate() : new Date(checkOutObj);
             horaSalida = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          } else if (v.tiempos?.finalizacion) {
+            const checkOutObj = (v.tiempos.finalizacion as any);
+            const d = checkOutObj?.toDate ? checkOutObj.toDate() : new Date(checkOutObj);
+            horaSalida = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          } else if (v.tiempos?.salidaArea) {
+            const checkOutObj = (v.tiempos.salidaArea as any);
+            const d = checkOutObj?.toDate ? checkOutObj.toDate() : new Date(checkOutObj);
+            horaSalida = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+          }
+
+          // 2. Si no están en la visita general (por ejemplo, para visitas familiares viejas), usar el primer visitante como fallback
+          if (horaEntrada === '---' || horaSalida === '---') {
+            const visitanteActivo = v.visitantes?.find(vis => vis.checkIn) || v.visitantes?.[0];
+            if (visitanteActivo) {
+              if (horaEntrada === '---' && visitanteActivo.checkIn) {
+                const checkInObj = (visitanteActivo.checkIn as any);
+                const d = checkInObj?.toDate ? checkInObj.toDate() : new Date(checkInObj);
+                horaEntrada = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+              }
+              if (horaSalida === '---' && visitanteActivo.checkOut) {
+                const checkOutObj = (visitanteActivo.checkOut as any);
+                const d = checkOutObj?.toDate ? checkOutObj.toDate() : new Date(checkOutObj);
+                horaSalida = d.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' });
+              }
+            }
           }
 
           const fechaObj = (v.fechaVisita as any);
@@ -576,7 +614,7 @@ export class VisitasService {
             recluso: v.reclusoNombre || 'N/A',
             tipo_visita: v.tipo,
             estado_visita: v.estado,
-            isRequisa: v.requisaSalida?.realizada || false // Fallback por si la propiedad no existe
+            isRequisa: v.requisaSalida?.realizada || false
           };
         });
 
@@ -601,7 +639,7 @@ export class VisitasService {
       return visita.abogado.nombre || 'Abogado';
     }
     
-    if (visita.tipo === TipoVisita.FAMILIAR && visita.visitantes && visita.visitantes.length > 0) {
+    if (visita.tipo !== TipoVisita.LEGAL && visita.visitantes && visita.visitantes.length > 0) {
       if (visita.visitantes.length === 1) {
         return visita.visitantes[0].nombre;
       }

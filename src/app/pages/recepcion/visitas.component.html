@@ -78,10 +78,20 @@
             </span>
           } @else if (column.key === 'totalVisitantes') {
             <span class="text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded">
-              {{ visita.tipo === 'Legal' ? 1 : (visita.totalVisitantes || 0) }}
+              {{ (visita.tipo === 'Legal' || visita.tipo === TipoVisita.LEGAL) ? 1 : (visita.totalVisitantes || 0) }}
             </span>
           } @else if (column.key === 'visitanteNombre') {
-            <span class="text-gray-800 font-medium">{{ visita.tipo === 'Legal' ? visita.abogado?.nombre : (visita.visitantes?.length ? visita.visitantes[0].nombre : 'N/A') }}</span>
+            <span class="text-gray-800 font-medium">
+              @if (visita.tipo === 'Legal' || visita.tipo === TipoVisita.LEGAL) {
+                Abogado: {{ visita.abogado?.nombre || 'N/A' }}
+              } @else {
+                @if (visita.visitantes && visita.visitantes.length > 0) {
+                  {{ visita.visitantes[0].parentesco }}: {{ visita.visitantes[0].nombre }}
+                } @else {
+                  N/A
+                }
+              }
+            </span>
           } @else {
             <span class="text-gray-600">{{ visita[column.key] }}</span>
           }
