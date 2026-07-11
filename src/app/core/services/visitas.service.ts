@@ -194,14 +194,26 @@ export class VisitasService {
         );
         const qSnap = await getDocs(qRel);
         if (!qSnap.empty) {
-          const rel = qSnap.docs[0].data();
-          abogado = {
-            abogadoId: rel['abogadoId'],
-            nombre: rel['abogadoNombre'],
-            exequatur: rel['abogadoExequatur'],
-            cedula: rel['abogadoCedula'] || '',
-            institucion: rel['abogadoInstitucion'] || ''
-          };
+          const abogadoDoc = await getDoc(doc(this.firestore, 'abogados', dto.abogadoId));
+          if (abogadoDoc.exists()) {
+            const ab = abogadoDoc.data();
+            abogado = {
+              abogadoId: dto.abogadoId,
+              nombre: ab['nombreCompleto'] || ab['nombre'] || 'Abogado',
+              exequatur: ab['exequatur'] || '',
+              cedula: ab['cedula'] || '',
+              institucion: ab['institucion'] || ''
+            };
+          } else {
+            const rel = qSnap.docs[0].data();
+            abogado = {
+              abogadoId: dto.abogadoId,
+              nombre: rel['abogadoNombre'] || 'Abogado',
+              exequatur: '',
+              cedula: '',
+              institucion: ''
+            };
+          }
         }
       }
 
