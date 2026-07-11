@@ -90,7 +90,8 @@ export function validarTelefono(telefono: string): boolean {
 /**
  * Formatea cédula agregando guiones si no los tiene
  */
-export function formatearCedula(cedula: string): string {
+export function formatearCedula(cedula: string | null | undefined): string {
+  if (!cedula) return '';
   // Remove all non-digit characters
   const digits = cedula.replace(/\D/g, '');
   
@@ -105,7 +106,8 @@ export function formatearCedula(cedula: string): string {
 /**
  * Formatea teléfono agregando guiones si no los tiene
  */
-export function formatearTelefono(telefono: string): string {
+export function formatearTelefono(telefono: string | null | undefined): string {
+  if (!telefono) return '';
   // Remove all non-digit characters
   const digits = telefono.replace(/\D/g, '');
   
