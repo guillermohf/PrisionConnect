@@ -176,14 +176,12 @@
             </div>
 
             <!-- CALLE -->
-            <div class="md:col-span-2">
-              <label class="block text-xs text-gray-600 mb-1">Calle y número *</label>
-              <input
-                type="text"
-                formControlName="_calle"
-                placeholder="Ej: Calle El Conde #25, Apto 3B"
-                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-            </div>
+            <prisionConnect-input class="md:col-span-2"
+              label="Calle y número"
+              [formControl]="$any(visitanteForm.controls['_calle'])"
+              placeholder="Ej: Calle El Conde #25, Apto 3B"
+              [required]="true">
+            </prisionConnect-input>
 
           </div>
 

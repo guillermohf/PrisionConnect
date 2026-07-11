@@ -95,6 +95,18 @@
       @if (errors['duplicado']) {
         <span>Este valor ya existe en el sistema</span>
       }
+      @if (errors['cedulaFormato']) {
+        <span>{{ errors['cedulaFormato'].message }}</span>
+      }
+      @if (errors['cedulaDigito']) {
+        <span>{{ errors['cedulaDigito'].message }}</span>
+      }
+      @if (errors['telefonoInvalido']) {
+        <span>{{ errors['telefonoInvalido'].mensaje }}</span>
+      }
+      @if (errors['emailInvalido']) {
+        <span>{{ errors['emailInvalido'].mensaje }}</span>
+      }
     </small>
   }
 </div>
