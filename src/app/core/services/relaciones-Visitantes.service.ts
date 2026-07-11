@@ -113,8 +113,7 @@ export class RelacionesVisitantesService {
       const q = query(
         this.relacionesCollection,
         where('reclusoId', '==', reclusoId),
-        where('activo', '==', true),
-        orderBy('fechaCreacion', 'desc')
+        where('activo', '==', true)
       );
 
       const querySnapshot = await getDocs(q);
@@ -125,6 +124,13 @@ export class RelacionesVisitantesService {
           id: docSnap.id, 
           ...docSnap.data() 
         } as RelacionVisitante);
+      });
+
+      // Ordenar localmente por fecha de creación descendente
+      relaciones.sort((a, b) => {
+        const timeA = a.fechaCreacion?.seconds ?? 0;
+        const timeB = b.fechaCreacion?.seconds ?? 0;
+        return timeB - timeA;
       });
 
       console.log(`✅ ${relaciones.length} visitantes autorizados para recluso ${reclusoId}`);

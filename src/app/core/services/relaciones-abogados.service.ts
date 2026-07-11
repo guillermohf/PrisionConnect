@@ -133,8 +133,7 @@ export class RelacionesAbogadosService {
       const q = query(
         this.relacionesCollection,
         where('reclusoId', '==', reclusoId),
-        where('activo', '==', true),
-        orderBy('fechaCreacion', 'desc')
+        where('activo', '==', true)
       );
 
       const querySnapshot = await getDocs(q);
@@ -145,6 +144,13 @@ export class RelacionesAbogadosService {
           id: docSnap.id, 
           ...docSnap.data() 
         } as RelacionAbogado);
+      });
+
+      // Ordenar localmente por fecha de creación descendente
+      relaciones.sort((a, b) => {
+        const timeA = a.fechaCreacion?.seconds ?? 0;
+        const timeB = b.fechaCreacion?.seconds ?? 0;
+        return timeB - timeA;
       });
 
       console.log(`✅ ${relaciones.length} abogados asignados al recluso ${reclusoId}`);
@@ -168,8 +174,7 @@ export class RelacionesAbogadosService {
       const q = query(
         this.relacionesCollection,
         where('abogadoId', '==', abogadoId),
-        where('activo', '==', true),
-        orderBy('fechaCreacion', 'desc')
+        where('activo', '==', true)
       );
 
       const querySnapshot = await getDocs(q);
@@ -180,6 +185,13 @@ export class RelacionesAbogadosService {
           id: docSnap.id, 
           ...docSnap.data() 
         } as RelacionAbogado);
+      });
+
+      // Ordenar localmente por fecha de creación descendente
+      relaciones.sort((a, b) => {
+        const timeA = a.fechaCreacion?.seconds ?? 0;
+        const timeB = b.fechaCreacion?.seconds ?? 0;
+        return timeB - timeA;
       });
 
       console.log(`✅ ${relaciones.length} reclusos asignados al abogado ${abogadoId}`);
