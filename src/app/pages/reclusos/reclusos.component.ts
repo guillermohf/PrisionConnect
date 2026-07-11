@@ -11,7 +11,7 @@ import { DataTableComponent } from '@shared/datatable/datatable.component';
 import { ReclusoAgregarModalComponent } from './modal/reclusos-agregar-modal/reclusos-agregar-modal.component';
 import { ReclusoEditarModalComponent } from './modal/reclusos-editar-modal/reclusos-editar-modal.component';
 import { ReclusoDetalleModalComponent } from './modal/reclusos-detalle-modal/reclusos-detalle-modal.component';
-import { AutorizarVisitanteModalComponent } from "./modal/autorizar-visitante-modal/autorizar-visitante-modal.component";
+import { VisitantesAutorizadosComponent } from './modal/visitantes-autorizados-modal/visitantes-autorizados-modal.component';
 
 @Component({
   selector: 'prisionConnect-reclusos',
@@ -23,7 +23,7 @@ import { AutorizarVisitanteModalComponent } from "./modal/autorizar-visitante-mo
     ReclusoAgregarModalComponent,
     ReclusoEditarModalComponent,
     ReclusoDetalleModalComponent,
-    AutorizarVisitanteModalComponent
+    VisitantesAutorizadosComponent
   ],
   templateUrl: './reclusos.component.html'
 })

@@ -1,6 +1,6 @@
 // src/app/features/reclusos/components/autorizar-visitante-modal/autorizar-visitante-modal.component.ts
 
-import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +32,7 @@ interface VisitanteSeleccionado {
 ],
   templateUrl: './autorizar-visitante-modal.component.html'
 })
-export class AutorizarVisitanteModalComponent implements OnInit {
+export class AutorizarVisitanteModalComponent implements OnInit, OnChanges {
   @Input() showModal = false;
   @Input() recluso: Recluso | null = null;
   @Output() showModalChange = new EventEmitter<boolean>();
@@ -69,6 +69,12 @@ export class AutorizarVisitanteModalComponent implements OnInit {
       fechaVencimiento: [''],
       observaciones: ['']
     });
+  }
+
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes['showModal']?.currentValue === true) {
+      await this.cargarVisitantes();
+    }
   }
 
   async ngOnInit(): Promise<void> {

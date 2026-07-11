@@ -1,6 +1,6 @@
 // src/app/features/abogados/components/asignar-recluso-modal/asignar-recluso-modal.component.ts
 
-import { Component, EventEmitter, Input, Output, inject, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
@@ -33,7 +33,7 @@ interface ReclusoSeleccionado {
 ],
   templateUrl: './asignar-recluso-modal.component.html'
 })
-export class AsignarReclusoModalComponent implements OnInit {
+export class AsignarReclusoModalComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() abogado: Abogado | null = null;
   @Output() isOpenChange = new EventEmitter<boolean>();
@@ -67,6 +67,12 @@ export class AsignarReclusoModalComponent implements OnInit {
       fechaVencimiento: [''],
       observaciones: ['']
     });
+  }
+
+  async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    if (changes['isOpen']?.currentValue === true) {
+      await this.cargarReclusos();
+    }
   }
 
   async ngOnInit(): Promise<void> {
