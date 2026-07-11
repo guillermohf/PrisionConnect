@@ -41,6 +41,7 @@ export class InputComponent implements ControlValueAccessor {
   @Input() class: string = '';
   @Input() options: SelectOption[] = [];
   @Input() formControl?: AbstractControl;
+  @Input() max?: string;
 
   // 🔧 FIX: permitir binding [value]
   @Input() value: any = '';

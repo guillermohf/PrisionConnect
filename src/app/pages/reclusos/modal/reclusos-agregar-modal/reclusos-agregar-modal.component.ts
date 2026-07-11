@@ -16,7 +16,8 @@ import { TelefonoMaskDirective } from '@shared/directives/telefono.mask.directiv
 import {
   cedulaDominicanaValidator,
   telefonoDominicanoValidator,
-  mayorDeEdadValidator
+  mayorDeEdadValidator,
+  fechaNoFuturaValidator
 } from '@shared/validators/custom.validators';
 import { InputComponent } from '@shared/input/input.component';
 import { ButtonComponent } from '@shared/button/buttton.component';
@@ -75,6 +76,11 @@ export class ReclusoAgregarModalComponent implements OnChanges {
     return f.toISOString().split('T')[0];
   }
 
+  // Fecha máxima de ingreso (hoy)
+  get fechaMaxIngreso(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   constructor() {
     this.form = this.fb.group({
       // Identificación
@@ -106,7 +112,7 @@ export class ReclusoAgregarModalComponent implements OnChanges {
       celda: ['', Validators.required],
 
       // Información Penal
-      fechaIngreso: ['', Validators.required],
+      fechaIngreso: ['', [Validators.required, fechaNoFuturaValidator()]],
       situacionLegal: ['', Validators.required],
       estado: ['', Validators.required],
       delito: [''],

@@ -26,6 +26,7 @@
       (focus)="onFocus()"
       [mask]="mask || ''"
       [dropSpecialCharacters]="true"
+      [max]="max || ''"
     />
   }
 
@@ -106,6 +107,9 @@
       }
       @if (errors['emailInvalido']) {
         <span>{{ errors['emailInvalido'].mensaje }}</span>
+      }
+      @if (errors['fechaFutura']) {
+        <span>{{ errors['fechaFutura'].message }}</span>
       }
     </small>
   }

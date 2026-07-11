@@ -133,4 +133,20 @@ export function mayorDeEdadValidator(edadMinima = 18): ValidatorFn {
       }
     };
   };
+}
+
+/**
+ * Validador para impedir fechas futuras.
+ */
+export function fechaNoFuturaValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) return null;
+    const fechaSeleccionada = new Date(control.value + 'T00:00:00');
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+
+    return fechaSeleccionada <= hoy ? null : {
+      fechaFutura: { message: 'La fecha de ingreso no puede ser una fecha futura.' }
+    };
+  };
 }

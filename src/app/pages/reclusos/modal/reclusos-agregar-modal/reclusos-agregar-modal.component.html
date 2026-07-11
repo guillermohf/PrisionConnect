@@ -230,7 +230,7 @@
           </prisionConnect-input>
 
           <prisionConnect-input label="Fecha de Ingreso" type="date" [formControl]="$any(form.controls['fechaIngreso'])"
-            [required]="true">
+            [required]="true" [max]="fechaMaxIngreso">
           </prisionConnect-input>
 
           <prisionConnect-input label="Sentencia (años)" type="number" [formControl]="$any(form.controls['sentencia'])"

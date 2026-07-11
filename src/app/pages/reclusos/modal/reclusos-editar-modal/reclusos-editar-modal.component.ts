@@ -14,7 +14,7 @@ import { Recluso } from '@core/models/recluso.interface';
 import { SituacionLegal, EstadoCivil, EstadoRecluso } from '@core/models/enums.interface';
 import { ModalComponent } from '@shared/modal/modal.component';
 import { TelefonoMaskDirective } from '@shared/directives/telefono.mask.directive';
-import { telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
+import { telefonoDominicanoValidator, mayorDeEdadValidator, fechaNoFuturaValidator } from '@shared/validators/custom.validators';
 
 @Component({
   selector: 'prisionConnect-recluso-editar-modal',
@@ -66,6 +66,11 @@ export class ReclusoEditarModalComponent implements OnChanges {
     return f.toISOString().split('T')[0];
   }
 
+  // Fecha máxima de ingreso (hoy)
+  get fechaMaxIngreso(): string {
+    return new Date().toISOString().split('T')[0];
+  }
+
   constructor() {
     this.form = this.fb.group({
       numeroIdentificacion: ['', Validators.required],
@@ -94,7 +99,7 @@ export class ReclusoEditarModalComponent implements OnChanges {
       pabellon: ['', Validators.required],
       celda: ['', Validators.required],
 
-      fechaIngreso: ['', Validators.required],
+      fechaIngreso: ['', [Validators.required, fechaNoFuturaValidator()]],
       situacionLegal: ['', Validators.required],
       estado: ['', Validators.required],
       delito: [''],
