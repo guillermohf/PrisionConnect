@@ -21,6 +21,18 @@ export function cedulaDominicanaValidator(): ValidatorFn {
       };
     }
 
+    // Validar prefijo (primeros 3 dígitos) — provincias 001–010, 099 extranjeros, 402 naturalizados
+    const prefijo = parseInt(valor.substring(0, 3), 10);
+    const prefijoValido =
+      (prefijo >= 1 && prefijo <= 10) || // 001–010 provincias
+      prefijo === 99 ||                   // 099 extranjeros residentes
+      prefijo === 402;                    // 402 naturalizados
+    if (!prefijoValido) {
+      return {
+        cedulaPrefijo: { message: 'Prefijo de cédula inválido. Use un prefijo de provincia (001-010), 099 o 402.' }
+      };
+    }
+
     // Dígito verificador (algoritmo oficial JCE)
     // Pesos alternados 1-2 sobre los primeros 10 dígitos
     const pesos = [1, 2, 1, 2, 1, 2, 1, 2, 1, 2];

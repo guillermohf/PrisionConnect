@@ -13,6 +13,8 @@ import { CheckOutModalComponent } from '../recepcion/modal/check-out-modal/check
 import { CheckInModalComponent } from '../recepcion/modal/check-in-modal/check-in-modal.component';
 import { CambiarEstadoVisitaModalComponent } from '../recepcion/modal/cambiar-estado-visita-modal/cambiar-estado-visita-modal.component';
 import { AgregarIncidenciaModalComponent } from '../recepcion/modal/agregar-incidencia-modal/agregar-incidencia-modal.component';
+import { VisitasMonitorService } from '@core/services/visitas-monitor.service';
+import { ConfiguracionService } from '@core/services/configuracion.service';
 
 @Component({
   selector: 'prisionConnect-visitas-activas',
@@ -32,6 +34,8 @@ import { AgregarIncidenciaModalComponent } from '../recepcion/modal/agregar-inci
 export default class VisitasActivasComponent implements OnInit {
   private visitasService = inject(VisitasService);
   private notificacionService = inject(NotificacionService);
+  private visitasMonitor = inject(VisitasMonitorService);
+  private configuracionService = inject(ConfiguracionService);
 
   EstadoVisita = EstadoVisita;
   TipoVisita = TipoVisita;
@@ -225,4 +229,12 @@ export default class VisitasActivasComponent implements OnInit {
       'Pendientes de Salida'
     );
   }
-}
+
+  /** True si la visita termina en <= tiempoAdvertencia minutos */
+  esPorTerminar(visita: Visita): boolean {
+    if (visita.estado !== EstadoVisita.EN_CURSO || !visita.horaFinProgramada) return false;
+    const minutosAviso = this.configuracionService.configuracion()?.tiempoAdvertencia ?? 15;
+    return this.visitasMonitor.obtenerVisitasPorTerminar(minutosAviso)
+      .some(v => v.id === visita.id);
+  }
+}

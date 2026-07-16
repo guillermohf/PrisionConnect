@@ -20,14 +20,39 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
 
-            <prisionConnect-input
-              label="Cédula"
-              [mask]="'000-0000000-0'"
-              [formControl]="$any(visitanteForm.controls['cedula'])"
-              placeholder="000-0000000-0"
-              (blur)="verificarCedulaDuplicada()"
-              [required]="true">
-            </prisionConnect-input>
+            <!-- Nacionalidad -->
+            <div class="md:col-span-2">
+              <label class="block text-xs text-gray-600 mb-1">Nacionalidad *</label>
+              <select
+                formControlName="nacionalidad"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+                @for (nac of NACIONALIDADES; track nac) {
+                  <option [value]="nac">{{ nac }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Cédula (Dominicanos) -->
+            @if (esDominicano()) {
+              <prisionConnect-input
+                label="Cédula"
+                [mask]="'000-0000000-0'"
+                [formControl]="$any(visitanteForm.controls['cedula'])"
+                placeholder="000-0000000-0"
+                (blur)="verificarCedulaDuplicada()"
+                [required]="true">
+              </prisionConnect-input>
+            }
+
+            <!-- Pasaporte (Extranjeros) -->
+            @if (!esDominicano()) {
+              <prisionConnect-input
+                label="Pasaporte"
+                [formControl]="$any(visitanteForm.controls['pasaporte'])"
+                placeholder="Número de pasaporte"
+                [required]="true">
+              </prisionConnect-input>
+            }
 
             <prisionConnect-input
               label="Nombre"

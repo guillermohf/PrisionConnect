@@ -22,7 +22,7 @@
           </prisionConnect-input>
 
           <prisionConnect-input label="Número de Expediente" [formControl]="$any(form.controls['numeroExpediente'])"
-            placeholder="EXP-2024-001">
+            placeholder="Número de expediente">
           </prisionConnect-input>
 
           <prisionConnect-input label="Cédula" [mask]="'000-0000000-0'" [formControl]="$any(form.controls['cedula'])"
@@ -42,12 +42,12 @@
           }
           }
 
-          <prisionConnect-input label="Nombre" [formControl]="$any(form.controls['nombre'])" placeholder="Juan Carlos"
+          <prisionConnect-input label="Nombre" [formControl]="$any(form.controls['nombre'])" placeholder="Ingrese el nombre"
             [required]="true">
           </prisionConnect-input>
 
           <prisionConnect-input label="Apellido" [formControl]="$any(form.controls['apellido'])"
-            placeholder="Pérez García" [required]="true">
+            placeholder="Ingrese el apellido" [required]="true">
           </prisionConnect-input>
 
           <!-- Fecha de nacimiento con validación de edad -->
@@ -189,7 +189,7 @@
           <!-- CALLE -->
           <div class="md:col-span-2">
             <label class="block text-xs text-gray-600 mb-1">Calle y número *</label>
-            <input type="text" formControlName="_calle" placeholder="Ej: Calle El Conde #25, Apto 3B"
+            <input type="text" formControlName="_calle" placeholder="Ingrese la calle y número"
               class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
 
@@ -202,7 +202,7 @@
           </prisionConnect-input>
 
           <prisionConnect-input label="Nombre Contacto Emergencia"
-            [formControl]="$any(form.controls['nombreContactoEmergencia'])" placeholder="María Pérez" [required]="true">
+            [formControl]="$any(form.controls['nombreContactoEmergencia'])" placeholder="Ingrese nombre del contacto" [required]="true">
           </prisionConnect-input>
 
           <prisionConnect-input telefonoMask label="Teléfono de Emergencia" type="tel"
@@ -234,7 +234,7 @@
           </prisionConnect-input>
 
           <prisionConnect-input label="Sentencia (años)" type="number" [formControl]="$any(form.controls['sentencia'])"
-            placeholder="10">
+            placeholder="Años de condena">
           </prisionConnect-input>
 
           <prisionConnect-input label="Situación Legal" type="select"
@@ -259,10 +259,10 @@
           </prisionConnect-input>
 
           <prisionConnect-input label="Pabellón" [formControl]="$any(form.controls['pabellon'])"
-            placeholder="A, B, C..." [required]="true">
+            placeholder="Ingrese el pabellón" [required]="true">
           </prisionConnect-input>
 
-          <prisionConnect-input label="Celda" [formControl]="$any(form.controls['celda'])" placeholder="101"
+          <prisionConnect-input label="Celda" [formControl]="$any(form.controls['celda'])" placeholder="Ingrese el número de celda"
             [required]="true">
           </prisionConnect-input>
 

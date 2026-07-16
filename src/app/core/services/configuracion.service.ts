@@ -50,6 +50,12 @@
         'Sala de Visitas Privadas',
         'Área Legal',
         'Patio de Visitas'
+      ],
+      pabellones: [
+        'Pabellón A',
+        'Pabellón B',
+        'Pabellón C',
+        'Pabellón D'
       ]
     };
 
@@ -454,6 +460,90 @@
      */
     obtenerAreas(): string[] {
       return this.configuracion()?.areasVisita || [];
+    }
+
+    /**
+     * Obtener lista de pabellones
+     */
+    obtenerPabellones(): string[] {
+      return this.configuracion()?.pabellones || [];
+    }
+
+    /**
+     * Agregar pabellón
+     */
+    async agregarPabellon(pabellon: string): Promise<{ success: boolean; message: string }> {
+      try {
+        const config = this.configuracion();
+        if (!config) return { success: false, message: 'No hay configuración cargada' };
+
+        const pabellonLimpio = pabellon.trim();
+        if (!pabellonLimpio || pabellonLimpio.length < 2)
+          return { success: false, message: 'El nombre debe tener al menos 2 caracteres' };
+
+        if ((config.pabellones || []).some(p => p.toLowerCase() === pabellonLimpio.toLowerCase()))
+          return { success: false, message: 'Este pabellón ya existe' };
+
+        this.loading.set(true);
+        const nuevos = [...(config.pabellones || []), pabellonLimpio];
+        await updateDoc(this.configuracionDocRef, { pabellones: nuevos });
+        await this.cargarConfiguracion();
+        await this.auditService.registrarAccion('Configuración', 'AGREGAR_PABELLON', `Pabellón agregado: "${pabellonLimpio}"`, 'WARNING');
+        return { success: true, message: 'Pabellón agregado exitosamente' };
+      } catch (e: any) {
+        return { success: false, message: 'Error al agregar pabellón: ' + e.message };
+      } finally {
+        this.loading.set(false);
+      }
+    }
+
+    /**
+     * Eliminar pabellón
+     */
+    async eliminarPabellon(pabellon: string): Promise<{ success: boolean; message: string }> {
+      try {
+        const config = this.configuracion();
+        if (!config) return { success: false, message: 'No hay configuración cargada' };
+
+        if ((config.pabellones || []).length <= 1)
+          return { success: false, message: 'Debe existir al menos 1 pabellón' };
+
+        this.loading.set(true);
+        const nuevos = (config.pabellones || []).filter(p => p !== pabellon);
+        await updateDoc(this.configuracionDocRef, { pabellones: nuevos });
+        await this.cargarConfiguracion();
+        return { success: true, message: 'Pabellón eliminado exitosamente' };
+      } catch (e: any) {
+        return { success: false, message: 'Error al eliminar pabellón: ' + e.message };
+      } finally {
+        this.loading.set(false);
+      }
+    }
+
+    /**
+     * Editar nombre de pabellón
+     */
+    async editarPabellon(antiguo: string, nuevo: string): Promise<{ success: boolean; message: string }> {
+      try {
+        const config = this.configuracion();
+        if (!config) return { success: false, message: 'No hay configuración cargada' };
+
+        const nuevoLimpio = nuevo.trim();
+        if (!nuevoLimpio || nuevoLimpio.length < 2)
+          return { success: false, message: 'El nombre debe tener al menos 2 caracteres' };
+
+        if (antiguo === nuevoLimpio) return { success: true, message: 'Sin cambios' };
+
+        this.loading.set(true);
+        const nuevos = (config.pabellones || []).map(p => p === antiguo ? nuevoLimpio : p);
+        await updateDoc(this.configuracionDocRef, { pabellones: nuevos });
+        await this.cargarConfiguracion();
+        return { success: true, message: 'Pabellón editado exitosamente' };
+      } catch (e: any) {
+        return { success: false, message: 'Error al editar pabellón: ' + e.message };
+      } finally {
+        this.loading.set(false);
+      }
     }
 
     /**

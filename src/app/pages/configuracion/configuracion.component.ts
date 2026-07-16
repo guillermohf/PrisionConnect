@@ -9,8 +9,9 @@ import { Auth } from '@angular/fire/auth';
 import { HorariosVisitaModalComponent } from "./modal/horarios-visita-modal/horarios-visita-modal.component";
 import { ParametrosSistemaModalComponent } from "./modal/parametros-sistema-modal/parametros-sistema-modal.component";
 import { AreasVisitaModalComponent } from "./modal/areas-visita-modal/areas-visita-modal.component";
+import { PabellonesModalComponent } from "./modal/pabellones-modal/pabellones-modal.component";
 
-type TabActivo = 'horarios' | 'parametros' | 'areas' | 'mantenimiento';
+type TabActivo = 'horarios' | 'parametros' | 'areas' | 'pabellones';
 
 @Component({
   selector: 'prisionConnect-configuracion',
@@ -19,8 +20,9 @@ type TabActivo = 'horarios' | 'parametros' | 'areas' | 'mantenimiento';
     CommonModule,
     HorariosVisitaModalComponent,
     ParametrosSistemaModalComponent,
-    AreasVisitaModalComponent
-],
+    AreasVisitaModalComponent,
+    PabellonesModalComponent
+  ],
   templateUrl: './configuracion.component.html'
 })
 export default class ConfiguracionComponent implements OnInit {

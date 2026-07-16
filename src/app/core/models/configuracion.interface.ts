@@ -11,6 +11,7 @@ export interface Configuracion {
   visitantesPorRecluso: number;
   tiempoAdvertencia: number;
   areasVisita: string[];
+  pabellones: string[];
 }
 
 /**
@@ -45,6 +46,7 @@ export interface ActualizarConfiguracionDTO {
   visitantesPorRecluso?: number;
   tiempoAdvertencia?: number;
   areasVisita?: string[];
+  pabellones?: string[];
 }
 
 /**

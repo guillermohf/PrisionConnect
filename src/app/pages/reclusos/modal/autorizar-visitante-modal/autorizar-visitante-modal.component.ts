@@ -13,6 +13,7 @@ import { Parentesco } from '@core/models/enums.interface';
 import { ModalComponent } from '@shared/modal/modal.component';
 import { ButtonComponent } from '@shared/button/buttton.component';
 import { InputComponent } from '@shared/input/input.component';
+import { VisitanteAgregarModalComponent } from '../../../visitantes/modal/visitante-agregar-modal/visitante-agregar-modal.component';
 
 interface VisitanteSeleccionado {
   visitante: Visitante;
@@ -28,8 +29,9 @@ interface VisitanteSeleccionado {
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    ModalComponent
-],
+    ModalComponent,
+    VisitanteAgregarModalComponent
+  ],
   templateUrl: './autorizar-visitante-modal.component.html'
 })
 export class AutorizarVisitanteModalComponent implements OnInit, OnChanges {
@@ -47,6 +49,9 @@ export class AutorizarVisitanteModalComponent implements OnInit, OnChanges {
   visitantesDisponibles: Visitante[] = [];
   visitantesFiltrados: Visitante[] = [];
   busquedaVisitante = '';
+
+  // Modal crear visitante
+  mostrarModalCrearVisitante = false;
 
   // ⭐ NUEVO: Lista de visitantes seleccionados
   visitantesSeleccionados: VisitanteSeleccionado[] = [];
@@ -100,6 +105,19 @@ export class AutorizarVisitanteModalComponent implements OnInit, OnChanges {
       v.nombreCompleto.toLowerCase().includes(busqueda) ||
       (v.cedula && v.cedula.includes(busqueda))
     );
+  }
+
+  // Abrir/cerrar modal de nuevo visitante
+  abrirModalCrearVisitante(): void {
+    this.mostrarModalCrearVisitante = true;
+  }
+
+  async onVisitanteCreado(visitante: Visitante): Promise<void> {
+    this.mostrarModalCrearVisitante = false;
+    await this.cargarVisitantes();
+    // Preseleccionar el recién creado
+    this.form.patchValue({ visitanteId: visitante.id });
+    this.notificacionService.success(`${visitante.nombreCompleto} listo para autorizar`);
   }
 
   // ⭐ NUEVO: Cambiar modo de autorización

@@ -471,9 +471,9 @@ export default class ReportesComponent implements OnInit, OnDestroy {
       const numSigs = 3;
       const sigW = (pageW - 30) / numSigs;
       const sigs = [
-        { label: 'Director del Centro Penitenciario', role: 'Firma y Sello Oficial' },
+        { label: 'Responsable del Sistema', role: 'Generación y Verificación de Datos' },
         { label: 'Supervisor de Turno', role: 'Supervisión Operativa' },
-        { label: 'Responsable del Sistema', role: 'Verificación de Datos' }
+        { label: 'Director del Centro Penitenciario', role: 'Firma y Sello Oficial' }
       ];
       sigs.forEach((sig, i) => {
         const x = 10 + i * (sigW + 5);
@@ -619,7 +619,7 @@ export default class ReportesComponent implements OnInit, OnDestroy {
     if (this.filtros.colegioAbogados) resumenData.push(['Colegio:', this.filtros.colegioAbogados]);
     resumenData.push([''], ['── ESTADÍSTICAS ──']);
     stats.forEach(s => resumenData.push([s.label + ':', s.value]));
-    resumenData.push([''], ['── FIRMAS ──'], ['Director del Centro:', '___________________________'], ['Supervisor de Turno:', '___________________________'], ['Fecha:', '___________________________']);
+    resumenData.push([''], ['── FIRMAS ──'], ['Responsable del Sistema:', '___________________________'], ['Supervisor de Turno:', '___________________________'], ['Director del Centro:', '___________________________'], ['Fecha:', '___________________________']);
 
     const wsRes = XLSX.utils.aoa_to_sheet(resumenData);
     wsRes['!cols'] = [{ wch: 26 }, { wch: 42 }];

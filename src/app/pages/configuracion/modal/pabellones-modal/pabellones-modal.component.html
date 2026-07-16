@@ -1,0 +1,135 @@
+<div class="p-4 sm:p-6 space-y-6">
+
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl p-5 text-white shadow-md">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold">Pabellones</h1>
+        <p class="text-purple-100 text-xs sm:text-sm">
+          Gestiona los pabellones del centro penitenciario
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+      <p class="text-2xl font-bold text-purple-700">{{ pabellones.length }}</p>
+      <p class="text-xs text-gray-500">Total</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
+      <p class="text-2xl font-bold text-green-700">{{ pabellones.length }}</p>
+      <p class="text-xs text-gray-500">Activos</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 text-center shadow-sm col-span-2 sm:col-span-1">
+      <p class="text-2xl font-bold text-gray-700">{{ 30 - pabellones.length }}</p>
+      <p class="text-xs text-gray-500">Disponibles</p>
+    </div>
+  </div>
+
+  <!-- Agregar Pabellón -->
+  <section class="space-y-3">
+    <h2 class="text-sm font-semibold text-purple-700">Nuevo Pabellón</h2>
+    <div class="bg-purple-50 rounded-xl p-4 sm:p-5 space-y-3">
+      <input
+        type="text"
+        [(ngModel)]="nuevoPabellon"
+        placeholder="Ej: Pabellón E"
+        [disabled]="agregando || guardando"
+        (keyup.enter)="agregarPabellon()"
+        maxlength="50"
+        class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
+      <button
+        (click)="agregarPabellon()"
+        [disabled]="!nuevoPabellon.trim() || agregando || guardando"
+        class="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50">
+        Agregar Pabellón
+      </button>
+      <p class="text-xs text-purple-700 text-center">Mínimo 2 caracteres</p>
+    </div>
+  </section>
+
+  <!-- Lista de Pabellones -->
+  <section class="space-y-3">
+    <h2 class="text-sm font-semibold text-purple-700">Pabellones Configurados</h2>
+
+    @if (pabellones.length === 0) {
+      <div class="text-center py-14 bg-gray-50 rounded-xl">
+        <h3 class="font-semibold text-gray-900">No hay pabellones configurados</h3>
+        <p class="text-sm text-gray-500">Agrega uno para comenzar</p>
+      </div>
+    }
+
+    <div class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+      @for (pabellon of pabellones; track pabellon; let index = $index) {
+
+        <div
+          class="bg-white rounded-xl p-4 shadow-sm space-y-3"
+          [class.bg-purple-50]="pabellonEditando === pabellon">
+
+          <!-- Info -->
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center">
+              <span class="font-bold text-purple-700 text-sm">{{ index + 1 }}</span>
+            </div>
+
+            <div class="flex-1">
+              @if (pabellonEditando === pabellon) {
+                <input
+                  type="text"
+                  [(ngModel)]="valorEditando"
+                  class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+              }
+              @if (pabellonEditando !== pabellon) {
+                <p class="font-medium text-gray-900">{{ pabellon }}</p>
+                <p class="text-xs text-gray-500">Pabellón {{ index + 1 }}</p>
+              }
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          @if (pabellonEditando === pabellon) {
+            <div class="flex gap-2">
+              <button
+                (click)="guardarEdicion(pabellon)"
+                [disabled]="guardando"
+                class="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm">
+                Guardar
+              </button>
+              <button
+                (click)="cancelarEdicion()"
+                class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">
+                Cancelar
+              </button>
+            </div>
+          }
+          @if (pabellonEditando !== pabellon) {
+            <div class="flex gap-2">
+              <button
+                (click)="iniciarEdicion(pabellon)"
+                class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                Editar
+              </button>
+              <button
+                (click)="eliminarPabellon(pabellon)"
+                [disabled]="!puedeEliminar()"
+                class="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm">
+                Eliminar
+              </button>
+            </div>
+          }
+
+        </div>
+
+      }
+    </div>
+  </section>
+
+</div>

@@ -61,14 +61,24 @@
         <section>
           <h2 class="text-sm font-semibold mb-3 text-teal-700">Seleccionar Visitante</h2>
           
-          <div class="mb-3">
+          <div class="flex gap-2 mb-3">
             <input
               type="text"
               [(ngModel)]="busquedaVisitante"
               (ngModelChange)="filtrarVisitantes()"
               [ngModelOptions]="{standalone: true}"
               placeholder="Buscar por nombre o cédula..."
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              class="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+            <button
+              type="button"
+              (click)="abrirModalCrearVisitante()"
+              title="Registrar nuevo visitante"
+              class="flex items-center gap-1.5 px-3 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm font-medium whitespace-nowrap">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Nuevo
+            </button>
           </div>
 
           <div>
@@ -83,6 +93,14 @@
             </select>
           </div>
         </section>
+
+<!-- Modal inline: crear visitante -->
+<prisionConnect-visitante-agregar-modal
+  [showModal]="mostrarModalCrearVisitante"
+  (close)="mostrarModalCrearVisitante = false"
+  (guardado)="onVisitanteCreado($event)">
+</prisionConnect-visitante-agregar-modal>
+
 
         <!-- Información de la Relación -->
         <section>

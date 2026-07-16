@@ -21,6 +21,8 @@ export interface Visitante {
   ultimaVisita?: Timestamp | Date | null;
   totalVisitas: number;
   observaciones?: string;
+  nacionalidad?: string;
+  pasaporte?: string;
 }
 
 /**
@@ -34,6 +36,8 @@ export interface CrearVisitanteDTO {
   direccion: string;
   email?: string;
   fotoUrl?: string;
+  nacionalidad?: string;
+  pasaporte?: string;
 }
 
 /**

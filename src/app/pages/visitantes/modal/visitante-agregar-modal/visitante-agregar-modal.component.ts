@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal, Input, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { VisitantesService } from '@core/services/visitantes.service';
 import { NotificacionService } from '@core/services/notificacion.service';
@@ -37,6 +37,15 @@ export class VisitanteAgregarModalComponent {
   guardando = signal(false);
   modoEdicion = signal(false);
 
+  // Controla si mostrar pasaporte o cédula
+  esDominicano = signal(true);
+
+  // Lista de nacionalidades frecuentes
+  readonly NACIONALIDADES = [
+    'Dominicana', 'Haitiana', 'Venezolana', 'Colombiana', 'Cubana',
+    'Jamaicana', 'Estadounidense', 'Española', 'Italiana', 'China', 'Otra'
+  ];
+
   // Ubicación
   provincias = this.ubicacionService.provincias;
   cargandoUbicacion = this.ubicacionService.cargando;
@@ -53,16 +62,18 @@ export class VisitanteAgregarModalComponent {
   constructor() {
     this.visitanteForm = this.fb.group({
       // Datos personales
+      nacionalidad: ['Dominicana', Validators.required],
       cedula: ['', [
-        Validators.required, 
+        Validators.required,
         cedulaDominicanaValidator()
       ]],
+      pasaporte: [''],
       nombre: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(2)
       ]],
       apellido: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(2)
       ]],
       fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator()]],
@@ -85,12 +96,37 @@ export class VisitanteAgregarModalComponent {
       // Observaciones
       observaciones: ['']
     });
+
+    // Reaccionar al cambio de nacionalidad
+    this.visitanteForm.get('nacionalidad')!.valueChanges.subscribe((nac: string) => {
+      this.actualizarCampoIdentificacion(nac);
+    });
   }
 
   get fechaMaxNacimiento(): string {
     const f = new Date();
     f.setFullYear(f.getFullYear() - 18);
     return f.toISOString().split('T')[0];
+  }
+
+  /** Alterna validadores según si es dominicano o extranjero */
+  private actualizarCampoIdentificacion(nacionalidad: string): void {
+    const esDom = nacionalidad === 'Dominicana';
+    this.esDominicano.set(esDom);
+    const cedulaCtrl = this.visitanteForm.get('cedula')!;
+    const pasaporteCtrl = this.visitanteForm.get('pasaporte')!;
+
+    if (esDom) {
+      cedulaCtrl.setValidators([Validators.required, cedulaDominicanaValidator()]);
+      pasaporteCtrl.clearValidators();
+      pasaporteCtrl.setValue('');
+    } else {
+      cedulaCtrl.clearValidators();
+      cedulaCtrl.setValue('');
+      pasaporteCtrl.setValidators([Validators.required, Validators.minLength(4)]);
+    }
+    cedulaCtrl.updateValueAndValidity();
+    pasaporteCtrl.updateValueAndValidity();
   }
 
   ngOnInit() {
@@ -107,7 +143,8 @@ export class VisitanteAgregarModalComponent {
       this.cargarDatos(this.visitanteEditar);
     } else {
       this.modoEdicion.set(false);
-      this.visitanteForm.reset();
+      this.visitanteForm.reset({ nacionalidad: 'Dominicana' });
+      this.esDominicano.set(true);
     }
   }
 
@@ -115,8 +152,12 @@ export class VisitanteAgregarModalComponent {
    * Cargar datos del visitante en el formulario
    */
   cargarDatos(visitante: Visitante): void {
+    const nac = visitante.nacionalidad || 'Dominicana';
+    this.actualizarCampoIdentificacion(nac);
     this.visitanteForm.patchValue({
+      nacionalidad: nac,
       cedula: visitante.cedula,
+      pasaporte: visitante.pasaporte || '',
       nombre: visitante.nombre,
       apellido: visitante.apellido,
       telefono: visitante.telefono,
@@ -125,6 +166,7 @@ export class VisitanteAgregarModalComponent {
       observaciones: visitante.observaciones || ''
     });
     this.visitanteForm.get('cedula')?.disable();
+    this.visitanteForm.get('pasaporte')?.disable();
   }
 
   // ── Dirección en cascada ─────────────────────────────────────
@@ -208,9 +250,11 @@ export class VisitanteAgregarModalComponent {
    * Cerrar modal
    */
   closeModal(): void {
-    this.visitanteForm.reset();
+    this.visitanteForm.reset({ nacionalidad: 'Dominicana' });
+    this.esDominicano.set(true);
     this.modoEdicion.set(false);
     this.visitanteForm.get('cedula')?.enable();
+    this.visitanteForm.get('pasaporte')?.enable();
     this.municipiosFiltrados.set([]);
     this.sectorTexto.set('');
     this.barrioTexto.set('');
@@ -242,13 +286,15 @@ export class VisitanteAgregarModalComponent {
     const direccion = partesDireccion.join(', ') || fv._calle || '';
 
     const dto: CrearVisitanteDTO = {
-      cedula: this.visitanteForm.value.cedula,
+      cedula: this.esDominicano() ? (this.visitanteForm.get('cedula')?.value || '') : '',
       nombre: fv.nombre,
       apellido: fv.apellido,
       telefono: fv.telefono,
       direccion,
       email: fv.email || undefined,
-      fotoUrl: undefined
+      fotoUrl: undefined,
+      nacionalidad: fv.nacionalidad,
+      pasaporte: this.esDominicano() ? undefined : (fv.pasaporte || undefined)
     };
 
     const resultado = await this.visitantesService.crear(dto);

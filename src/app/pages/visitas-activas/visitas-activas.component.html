@@ -161,7 +161,9 @@
   @if (!loading() && visitasFiltradas().length > 0) {
     <div class="md:hidden space-y-3">
       @for (visita of visitasFiltradas(); track visita.id) {
-        <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200 overflow-hidden transform transition-all duration-200 hover:shadow-xl">
+        <div
+          class="rounded-lg shadow-lg overflow-hidden transform transition-all duration-200 hover:shadow-xl border-2"
+          [ngClass]="esPorTerminar(visita) ? 'bg-red-50 border-red-500' : 'bg-white border-gray-200'">
           
           <!-- Header con Estado -->
           <div class="px-3 py-2.5 bg-gradient-to-r from-[#006666] to-[#008080] flex items-center justify-between">
@@ -292,9 +294,16 @@
 
           <ng-template #columnBody let-visita let-column="column">
             @if (column.key === 'estado') {
-              <span [ngClass]="obtenerColorEstado(visita.estado)" class="px-3 py-1 rounded-full text-[10px] font-black uppercase border">
-                {{ visita.estado }}
-              </span>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span [ngClass]="obtenerColorEstado(visita.estado)" class="px-3 py-1 rounded-full text-[10px] font-black uppercase border">
+                  {{ visita.estado }}
+                </span>
+                @if (esPorTerminar(visita)) {
+                  <span class="px-2 py-0.5 bg-red-100 text-red-700 border border-red-300 rounded-full text-[9px] font-bold animate-pulse">
+                    ⏰ Por terminar
+                  </span>
+                }
+              </div>
             } @else if (column.key === 'visitantesPresentes') {
               <span class="text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded">
                 {{ visita.tipo === 'Legal' ? '1/1' : (visita.visitantesPresentes + '/' + visita.totalVisitantes) }}

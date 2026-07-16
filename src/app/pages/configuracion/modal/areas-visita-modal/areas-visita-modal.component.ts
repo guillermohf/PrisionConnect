@@ -20,7 +20,10 @@ export class AreasVisitaModalComponent {
   private configuracionService = inject(ConfiguracionService);
   private notificacionService = inject(NotificacionService);
 
-  areas: string[] = [];
+  // Leer directamente del signal reactivo (siempre actualizado)
+  get areas(): string[] {
+    return this.configuracionService.configuracion()?.areasVisita ?? [];
+  }
   nuevaArea = '';
   areaEditando: string | null = null;
   valorEditando = '';
@@ -28,14 +31,7 @@ export class AreasVisitaModalComponent {
   agregando = false;
 
   ngOnChanges(): void {
-    if (this.configuracion) {
-      this.cargarAreas();
-    }
-  }
-
-  private cargarAreas(): void {
-    if (!this.configuracion) return;
-    this.areas = [...this.configuracion.areasVisita];
+    // Mantenemos por compatibilidad pero ya no es necesario
   }
 
   async agregarArea(): Promise<void> {
