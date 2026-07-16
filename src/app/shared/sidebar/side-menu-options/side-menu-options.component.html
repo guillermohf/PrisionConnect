@@ -9,6 +9,7 @@
         routerLinkActive="bg-[#008080]"
         class="flex items-center px-4 py-3 hover:bg-[#008080] transition-all group relative"
         [ngClass]="{ 'justify-center': !expanded(), 'gap-3': expanded() }"
+        [title]="!expanded() ? option.label : ''"
       >
         <div class="relative flex-shrink-0">
           <i class="material-icons text-[#FEEBDD]">{{ option.icon }}</i>
@@ -75,6 +76,7 @@
       (click)="onLogout()"
       class="w-full flex items-center py-3 px-3 hover:bg-[#008080] rounded-lg transition-all group relative"
       [ngClass]="{ 'justify-center': !expanded(), 'gap-3': expanded() }"
+      [title]="!expanded() ? 'Cerrar sesión' : ''"
     >
       <i class="material-icons text-[#FCD2C9]">logout</i>
       <span

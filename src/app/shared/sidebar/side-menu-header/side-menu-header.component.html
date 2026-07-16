@@ -10,6 +10,7 @@
       'justify-start': expanded(),
       'justify-center': !expanded()
     }"
+    [title]="!expanded() ? 'Expandir menú' : 'Contraer menú'"
   >
     <!-- Figura (solo cuando está colapsado) -->
     <img
@@ -44,6 +45,7 @@
       'justify-start gap-3': expanded(),
       'justify-center': !expanded()
     }"
+    [title]="!expanded() ? (user()?.displayName || 'Usuario') : ''"
   >
     <img
       [src]="user()?.photoURL || '/assets/avatar.png'"
