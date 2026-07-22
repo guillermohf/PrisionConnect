@@ -17,7 +17,7 @@
             Tipo de Visita
           </h2>
 
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <button
               type="button"
               (click)="form.patchValue({ tipo: TipoVisita.FAMILIAR })"
@@ -78,6 +78,27 @@
                  [class.text-teal-700]="form.get('tipo')?.value === TipoVisita.LEGAL"
                  [class.text-gray-700]="form.get('tipo')?.value !== TipoVisita.LEGAL">
                 Legal
+              </p>
+            </button>
+
+            <button
+              type="button"
+              (click)="form.patchValue({ tipo: TipoVisita.CONYUGAL })"
+              class="p-4 rounded-lg border-2 transition-all"
+              [class.border-teal-600]="form.get('tipo')?.value === TipoVisita.CONYUGAL"
+              [class.bg-teal-50]="form.get('tipo')?.value === TipoVisita.CONYUGAL"
+              [class.border-gray-300]="form.get('tipo')?.value !== TipoVisita.CONYUGAL">
+              <svg class="w-8 h-8 mx-auto mb-2"
+                   [class.text-teal-600]="form.get('tipo')?.value === TipoVisita.CONYUGAL"
+                   [class.text-gray-400]="form.get('tipo')?.value !== TipoVisita.CONYUGAL"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <p class="font-medium text-center text-sm"
+                 [class.text-teal-700]="form.get('tipo')?.value === TipoVisita.CONYUGAL"
+                 [class.text-gray-700]="form.get('tipo')?.value !== TipoVisita.CONYUGAL">
+                Conyugal
               </p>
             </button>
           </div>

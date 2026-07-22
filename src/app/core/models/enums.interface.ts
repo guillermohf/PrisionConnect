@@ -46,7 +46,8 @@ export enum TipoAbogado {
 export enum TipoVisita {
   FAMILIAR = 'Familiar',
   LEGAL = 'Legal',
-  AMISTADES = 'Amistades'
+  AMISTADES = 'Amistades',
+  CONYUGAL = 'Conyugal'
 }
 
 /**

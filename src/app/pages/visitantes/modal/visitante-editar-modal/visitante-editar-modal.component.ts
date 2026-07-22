@@ -32,6 +32,14 @@ export class VisitanteEditarModalComponent {
   guardando = signal(false);
   modoEdicion = signal(true);
 
+  // Lista de nacionalidades
+  readonly NACIONALIDADES = [
+    'Dominicana', 'Haitiana', 'Cubana', 'Venezolana', 'Colombiana',
+    'Puertorriqueña', 'Estadounidense', 'Española', 'Italiana',
+    'Francesa', 'Alemana', 'China', 'Japonesa', 'Mexicana',
+    'Argentina', 'Brasileña', 'Chilena', 'Peruana', 'Ecuatoriana', 'Otra'
+  ];
+
   // Ubicación
   provincias = this.ubicacionService.provincias;
   cargandoUbicacion = this.ubicacionService.cargando;
@@ -78,7 +86,22 @@ export class VisitanteEditarModalComponent {
       _calle: ['', [Validators.required, Validators.minLength(5)]],
 
       // Observaciones
-      observaciones: ['']
+      observaciones: [''],
+      nacionalidad: ['Dominicana', Validators.required],
+      pasaporte: ['']
+    });
+
+    // Mostrar/ocultar pasaporte según nacionalidad
+    this.visitanteForm.get('nacionalidad')!.valueChanges.subscribe((nac: string) => {
+      const esDom = nac === 'Dominicana';
+      const pasaporteCtrl = this.visitanteForm.get('pasaporte')!;
+      if (esDom) {
+        pasaporteCtrl.clearValidators();
+        pasaporteCtrl.setValue('');
+      } else {
+        pasaporteCtrl.setValidators([Validators.required]);
+      }
+      pasaporteCtrl.updateValueAndValidity();
     });
   }
 
@@ -118,7 +141,9 @@ export class VisitanteEditarModalComponent {
       telefono: visitante.telefono,
       email: visitante.email || '',
       _calle: visitante.direccion || '',
-      observaciones: visitante.observaciones || ''
+      observaciones: visitante.observaciones || '',
+      nacionalidad: visitante.nacionalidad || 'Dominicana',
+      pasaporte: visitante.pasaporte || ''
     });
     this.visitanteForm.get('cedula')?.disable();
   }
@@ -238,7 +263,9 @@ export class VisitanteEditarModalComponent {
       telefono: fv.telefono,
       direccion,
       email: fv.email || undefined,
-      observaciones: fv.observaciones || undefined
+      observaciones: fv.observaciones || undefined,
+      nacionalidad: fv.nacionalidad || undefined,
+      pasaporte: fv.pasaporte || undefined
     };
 
     const resultado = await this.visitantesService.actualizar(this.visitanteEditar.id, dto);

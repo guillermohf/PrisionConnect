@@ -1,6 +1,16 @@
 // src/app/core/models/configuracion.interface.ts
 
 /**
+ * Configuración de un pabellón con celdas y capacidad
+ */
+export interface PabellonConfig {
+  nombre: string;         // Ej: 'Pabellón E'
+  celdaInicio: number;    // Ej: 1
+  celdaFin: number;       // Ej: 100
+  capacidadPorCelda: number; // Personas por celda
+}
+
+/**
  * Interface para Configuración del Sistema
  */
 export interface Configuracion {
@@ -10,8 +20,13 @@ export interface Configuracion {
   visitantesPorDia: number;
   visitantesPorRecluso: number;
   tiempoAdvertencia: number;
+  intervaloRevisionMonitor?: number; // Frecuencia de revisión del monitor en segundos
+  maxVisitasSimultaneasRecluso?: number; // Máximo de visitas activas al mismo tiempo por recluso
+  diasSancionIncidencia?: number; // Días de prohibición/sanción tras incidencia grave
+  edadMinimaAdulto?: number; // Edad mínima para visitantes independientes
   areasVisita: string[];
-  pabellones: string[];
+  pabellones: string[];          // nombres simples (compatibilidad)
+  pabellonesConfig?: PabellonConfig[]; // configuración extendida
 }
 
 /**
@@ -45,8 +60,13 @@ export interface ActualizarConfiguracionDTO {
   visitantesPorDia?: number;
   visitantesPorRecluso?: number;
   tiempoAdvertencia?: number;
+  intervaloRevisionMonitor?: number;
+  maxVisitasSimultaneasRecluso?: number;
+  diasSancionIncidencia?: number;
+  edadMinimaAdulto?: number;
   areasVisita?: string[];
   pabellones?: string[];
+  pabellonesConfig?: PabellonConfig[];
 }
 
 /**

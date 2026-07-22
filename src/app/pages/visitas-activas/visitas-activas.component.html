@@ -211,13 +211,32 @@
               <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
                 <p class="text-xs text-gray-500 mb-0.5 font-medium">Visitantes</p>
                 <p class="text-sm font-semibold text-gray-900">
-                  {{ visita.visitantesPresentes }}/{{ visita.totalVisitantes }}
+                  {{ visita.tipo === 'Legal' ? '1/1' : (visita.visitantesPresentes + '/' + visita.totalVisitantes) }}
                 </p>
               </div>
 
               <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
-                <p class="text-xs text-gray-500 mb-0.5 font-medium">Hora Inicio</p>
-                <p class="text-sm font-semibold text-gray-900">{{ visita.horaInicioProgramada }}</p>
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Inicio / Fin</p>
+                <p class="text-sm font-semibold text-gray-900">{{ visita.horaInicioProgramada }} — {{ visita.horaFinProgramada }}</p>
+              </div>
+
+              @let tm = calcularTiempoEnInstalacion(visita);
+              <div
+                class="rounded-lg p-2.5 border"
+                [ngClass]="{
+                  'bg-red-50 border-red-300': tm.vencida,
+                  'bg-orange-50 border-orange-300': tm.porVencer,
+                  'bg-green-50 border-green-200': !tm.vencida && !tm.porVencer
+                }">
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">⏱ Tiempo</p>
+                <p class="text-sm font-bold"
+                  [ngClass]="{
+                    'text-red-700': tm.vencida,
+                    'text-orange-700': tm.porVencer,
+                    'text-green-700': !tm.vencida && !tm.porVencer
+                  }">
+                  {{ tm.vencida ? '⚠️ ' : '' }}{{ tm.texto }}
+                </p>
               </div>
 
               <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
@@ -307,6 +326,17 @@
             } @else if (column.key === 'visitantesPresentes') {
               <span class="text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded">
                 {{ visita.tipo === 'Legal' ? '1/1' : (visita.visitantesPresentes + '/' + visita.totalVisitantes) }}
+              </span>
+            } @else if (column.key === 'tiempoEnInstalacion') {
+              @let t = calcularTiempoEnInstalacion(visita);
+              <span
+                class="px-2 py-0.5 rounded-full text-xs font-bold"
+                [ngClass]="{
+                  'bg-red-100 text-red-700 border border-red-300 animate-pulse': t.vencida,
+                  'bg-orange-100 text-orange-700 border border-orange-300': t.porVencer,
+                  'bg-green-100 text-green-700 border border-green-300': !t.vencida && !t.porVencer
+                }">
+                {{ t.vencida ? '⚠️ ' : '' }}{{ t.texto }}
               </span>
             } @else if (column.key === 'visitanteNombre') {
               <span class="text-gray-800 font-medium">{{ visita.tipo === 'Legal' ? visita.abogado?.nombre : (visita.visitantes?.length ? visita.visitantes[0].nombre : 'N/A') }}</span>

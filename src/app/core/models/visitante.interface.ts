@@ -50,6 +50,8 @@ export interface ActualizarVisitanteDTO {
   fotoUrl?: string;
   activo?: boolean;
   observaciones?: string;
+  nacionalidad?: string;
+  pasaporte?: string;
 }
 
 /**

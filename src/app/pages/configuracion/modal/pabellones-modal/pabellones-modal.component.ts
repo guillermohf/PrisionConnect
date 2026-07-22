@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfiguracionService } from '@core/services/configuracion.service';
 import { NotificacionService } from '@core/services/notificacion.service';
+import { PabellonConfig } from '@core/models/configuracion.interface';
 
 @Component({
   selector: 'prisionConnect-pabellones-modal',
@@ -14,29 +15,51 @@ export class PabellonesModalComponent {
   @Output() cambiosRealizados = new EventEmitter<void>();
 
   private configuracionService = inject(ConfiguracionService);
-  private notificacionService = inject(NotificacionService);
+  private notificacionService  = inject(NotificacionService);
 
-  get pabellones(): string[] {
-    return this.configuracionService.configuracion()?.pabellones ?? [];
-  }
-
-  nuevoPabellon = '';
-  pabellonEditando: string | null = null;
-  valorEditando = '';
   guardando = false;
   agregando = false;
 
+  // ── Formulario de nuevo pabellón ─────────────────────────────
+  nuevo: PabellonConfig = { nombre: '', celdaInicio: 1, celdaFin: 100, capacidadPorCelda: 2 };
+
+  // ── Edición inline ───────────────────────────────────────────
+  editandoNombre: string | null = null;
+  edicion: PabellonConfig = { nombre: '', celdaInicio: 1, celdaFin: 100, capacidadPorCelda: 2 };
+
+  // ── Getter reactivo ──────────────────────────────────────────
+  get pabellonesConfig(): PabellonConfig[] {
+    const cfg = this.configuracionService.configuracion();
+    // Si existen en pabellonesConfig los usa; sino convierte el string[] legacy
+    if (cfg?.pabellonesConfig?.length) return cfg.pabellonesConfig;
+    return (cfg?.pabellones ?? []).map(nombre => ({
+      nombre,
+      celdaInicio: 1,
+      celdaFin: 30,
+      capacidadPorCelda: 2
+    }));
+  }
+
+  // ── Métricas ─────────────────────────────────────────────────
+  get totalCeldas(): number {
+    return this.pabellonesConfig.reduce(
+      (acc, p) => acc + (p.celdaFin - p.celdaInicio + 1), 0
+    );
+  }
+
+  get capacidadTotal(): number {
+    return this.pabellonesConfig.reduce(
+      (acc, p) => acc + (p.celdaFin - p.celdaInicio + 1) * p.capacidadPorCelda, 0
+    );
+  }
+
+  // ── Agregar ──────────────────────────────────────────────────
   async agregarPabellon(): Promise<void> {
-    const nombre = this.nuevoPabellon.trim();
-    if (!nombre) {
-      this.notificacionService.error('El nombre no puede estar vacío');
-      return;
-    }
     this.agregando = true;
-    const resultado = await this.configuracionService.agregarPabellon(nombre);
+    const resultado = await this.configuracionService.agregarPabellonConfig({ ...this.nuevo });
     if (resultado.success) {
       this.notificacionService.success(resultado.message);
-      this.nuevoPabellon = '';
+      this.nuevo = { nombre: '', celdaInicio: 1, celdaFin: 100, capacidadPorCelda: 2 };
       this.cambiosRealizados.emit();
     } else {
       this.notificacionService.error(resultado.message);
@@ -44,29 +67,25 @@ export class PabellonesModalComponent {
     this.agregando = false;
   }
 
-  iniciarEdicion(pabellon: string): void {
-    this.pabellonEditando = pabellon;
-    this.valorEditando = pabellon;
+  // ── Edición ──────────────────────────────────────────────────
+  iniciarEdicion(p: PabellonConfig): void {
+    this.editandoNombre = p.nombre;
+    this.edicion = { ...p };
   }
 
   cancelarEdicion(): void {
-    this.pabellonEditando = null;
-    this.valorEditando = '';
+    this.editandoNombre = null;
   }
 
-  async guardarEdicion(antiguo: string): Promise<void> {
-    const nuevo = this.valorEditando.trim();
-    if (!nuevo) {
-      this.notificacionService.error('El nombre no puede estar vacío');
-      return;
-    }
-    if (nuevo === antiguo) { this.cancelarEdicion(); return; }
-
+  async guardarEdicion(): Promise<void> {
+    if (!this.editandoNombre) return;
     this.guardando = true;
-    const resultado = await this.configuracionService.editarPabellon(antiguo, nuevo);
+    const resultado = await this.configuracionService.actualizarPabellonConfig(
+      this.editandoNombre, { ...this.edicion }
+    );
     if (resultado.success) {
       this.notificacionService.success(resultado.message);
-      this.pabellonEditando = null;
+      this.editandoNombre = null;
       this.cambiosRealizados.emit();
     } else {
       this.notificacionService.error(resultado.message);
@@ -74,17 +93,17 @@ export class PabellonesModalComponent {
     this.guardando = false;
   }
 
-  async eliminarPabellon(pabellon: string): Promise<void> {
+  // ── Eliminar ─────────────────────────────────────────────────
+  async eliminarPabellon(nombre: string): Promise<void> {
     const confirmar = await this.notificacionService.confirmar(
       'Eliminar pabellón',
-      `¿Eliminar el pabellón "${pabellon}"? Esta acción no se puede deshacer.`,
+      `¿Eliminar el pabellón "${nombre}"? Esta acción no se puede deshacer.`,
       'Sí, eliminar',
       'Cancelar'
     );
     if (!confirmar) return;
-
     this.guardando = true;
-    const resultado = await this.configuracionService.eliminarPabellon(pabellon);
+    const resultado = await this.configuracionService.eliminarPabellon(nombre);
     if (resultado.success) {
       this.notificacionService.success(resultado.message);
       this.cambiosRealizados.emit();
@@ -95,6 +114,17 @@ export class PabellonesModalComponent {
   }
 
   puedeEliminar(): boolean {
-    return this.pabellones.length > 1;
+    return this.pabellonesConfig.length > 1;
+  }
+
+  /** Genera el texto del rango: "01 — 100 (100 celdas)" */
+  rangoCeldas(p: PabellonConfig): string {
+    const cant = p.celdaFin - p.celdaInicio + 1;
+    return `${String(p.celdaInicio).padStart(2, '0')} – ${String(p.celdaFin).padStart(2, '0')}  (${cant} celdas)`;
+  }
+
+  /** Capacidad total del pabellón */
+  capacidadPabellon(p: PabellonConfig): number {
+    return (p.celdaFin - p.celdaInicio + 1) * p.capacidadPorCelda;
   }
 }

@@ -12,7 +12,8 @@
     Configuracion, 
     ActualizarConfiguracionDTO,
     HorarioDia,
-    DiaSemana
+    DiaSemana,
+    PabellonConfig
   } from '@core/models/configuracion.interface';
   import { AuditService } from './audit.service';
 
@@ -45,6 +46,10 @@
       visitantesPorDia: 100,
       visitantesPorRecluso: 5,
       tiempoAdvertencia: 15,
+      intervaloRevisionMonitor: 15,
+      maxVisitasSimultaneasRecluso: 1,
+      diasSancionIncidencia: 30,
+      edadMinimaAdulto: 18,
       areasVisita: [
         'Sala de Visitas General',
         'Sala de Visitas Privadas',
@@ -56,6 +61,12 @@
         'Pabellón B',
         'Pabellón C',
         'Pabellón D'
+      ],
+      pabellonesConfig: [
+        { nombre: 'Pabellón A', celdaInicio: 1, celdaFin: 30, capacidadPorCelda: 2 },
+        { nombre: 'Pabellón B', celdaInicio: 1, celdaFin: 30, capacidadPorCelda: 2 },
+        { nombre: 'Pabellón C', celdaInicio: 1, celdaFin: 30, capacidadPorCelda: 2 },
+        { nombre: 'Pabellón D', celdaInicio: 1, celdaFin: 30, capacidadPorCelda: 2 }
       ]
     };
 
@@ -423,6 +434,46 @@
         }
       }
 
+      // Validar intervalo de revisión del monitor
+      if (config.intervaloRevisionMonitor !== undefined) {
+        if (config.intervaloRevisionMonitor < 5 || config.intervaloRevisionMonitor > 60) {
+          return {
+            valido: false,
+            mensaje: 'El intervalo de revisión del monitor debe estar entre 5 y 60 segundos'
+          };
+        }
+      }
+
+      // Validar máximo de visitas simultáneas por recluso
+      if (config.maxVisitasSimultaneasRecluso !== undefined) {
+        if (config.maxVisitasSimultaneasRecluso < 1 || config.maxVisitasSimultaneasRecluso > 5) {
+          return {
+            valido: false,
+            mensaje: 'El número de visitas simultáneas por recluso debe estar entre 1 y 5'
+          };
+        }
+      }
+
+      // Validar días de sanción por incidencia
+      if (config.diasSancionIncidencia !== undefined) {
+        if (config.diasSancionIncidencia < 1 || config.diasSancionIncidencia > 180) {
+          return {
+            valido: false,
+            mensaje: 'Los días de sanción deben estar entre 1 y 180 días'
+          };
+        }
+      }
+
+      // Validar edad mínima para adulto
+      if (config.edadMinimaAdulto !== undefined) {
+        if (config.edadMinimaAdulto < 18 || config.edadMinimaAdulto > 21) {
+          return {
+            valido: false,
+            mensaje: 'La edad mínima debe estar entre 18 y 21 años'
+          };
+        }
+      }
+
       return { valido: true, mensaje: '' };
     }
 
@@ -498,6 +549,44 @@
     }
 
     /**
+     * Agregar pabellón con configuración completa (celdas + capacidad)
+     */
+    async agregarPabellonConfig(cfg: PabellonConfig): Promise<{ success: boolean; message: string }> {
+      try {
+        const config = this.configuracion();
+        if (!config) return { success: false, message: 'No hay configuración cargada' };
+
+        const nombre = cfg.nombre.trim();
+        if (!nombre || nombre.length < 2)
+          return { success: false, message: 'El nombre debe tener al menos 2 caracteres' };
+        if (cfg.celdaInicio < 1 || cfg.celdaFin < cfg.celdaInicio)
+          return { success: false, message: 'Rango de celdas inválido' };
+        if (cfg.capacidadPorCelda < 1)
+          return { success: false, message: 'La capacidad debe ser mínimo 1 persona' };
+
+        const pabellonesConfig = [...(config.pabellonesConfig || [])];
+        if (pabellonesConfig.some(p => p.nombre.toLowerCase() === nombre.toLowerCase()))
+          return { success: false, message: 'Este pabellón ya existe' };
+
+        pabellonesConfig.push({ ...cfg, nombre });
+
+        // Sincronizar también pabellones (string[])
+        const pabellones = [...(config.pabellones || [])]
+        if (!pabellones.includes(nombre)) pabellones.push(nombre);
+
+        this.loading.set(true);
+        await updateDoc(this.configuracionDocRef, { pabellonesConfig, pabellones });
+        await this.cargarConfiguracion();
+        await this.auditService.registrarAccion('Configuración', 'AGREGAR_PABELLON', `Pabellón con celdas agregado: "${nombre}"`, 'WARNING');
+        return { success: true, message: 'Pabellón agregado exitosamente' };
+      } catch (e: any) {
+        return { success: false, message: 'Error al agregar pabellón: ' + e.message };
+      } finally {
+        this.loading.set(false);
+      }
+    }
+
+    /**
      * Eliminar pabellón
      */
     async eliminarPabellon(pabellon: string): Promise<{ success: boolean; message: string }> {
@@ -509,8 +598,9 @@
           return { success: false, message: 'Debe existir al menos 1 pabellón' };
 
         this.loading.set(true);
-        const nuevos = (config.pabellones || []).filter(p => p !== pabellon);
-        await updateDoc(this.configuracionDocRef, { pabellones: nuevos });
+        const pabellones = (config.pabellones || []).filter(p => p !== pabellon);
+        const pabellonesConfig = (config.pabellonesConfig || []).filter(p => p.nombre !== pabellon);
+        await updateDoc(this.configuracionDocRef, { pabellones, pabellonesConfig });
         await this.cargarConfiguracion();
         return { success: true, message: 'Pabellón eliminado exitosamente' };
       } catch (e: any) {
@@ -541,6 +631,34 @@
         return { success: true, message: 'Pabellón editado exitosamente' };
       } catch (e: any) {
         return { success: false, message: 'Error al editar pabellón: ' + e.message };
+      } finally {
+        this.loading.set(false);
+      }
+    }
+
+    /**
+     * Actualizar configuración completa de un pabellón
+     */
+    async actualizarPabellonConfig(nombreAntiguo: string, cfg: PabellonConfig): Promise<{ success: boolean; message: string }> {
+      try {
+        const config = this.configuracion();
+        if (!config) return { success: false, message: 'No hay configuración cargada' };
+        if (cfg.celdaInicio < 1 || cfg.celdaFin < cfg.celdaInicio)
+          return { success: false, message: 'Rango de celdas inválido' };
+        if (cfg.capacidadPorCelda < 1)
+          return { success: false, message: 'La capacidad debe ser mínimo 1 persona' };
+
+        this.loading.set(true);
+        const pabellonesConfig = (config.pabellonesConfig || []).map(p =>
+          p.nombre === nombreAntiguo ? { ...cfg } : p
+        );
+        // Sincronizar nombre en string[]
+        const pabellones = (config.pabellones || []).map(p => p === nombreAntiguo ? cfg.nombre : p);
+        await updateDoc(this.configuracionDocRef, { pabellonesConfig, pabellones });
+        await this.cargarConfiguracion();
+        return { success: true, message: 'Pabellón actualizado exitosamente' };
+      } catch (e: any) {
+        return { success: false, message: 'Error al actualizar pabellón: ' + e.message };
       } finally {
         this.loading.set(false);
       }

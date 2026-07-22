@@ -89,6 +89,16 @@
               <dt class="text-xs text-gray-500 mb-1">Cédula</dt>
               <dd class="text-sm font-semibold text-gray-900">{{ visitante.cedula }}</dd>
             </div>
+            <div>
+              <dt class="text-xs text-gray-500 mb-1">Nacionalidad</dt>
+              <dd class="text-sm font-semibold text-gray-900">{{ visitante.nacionalidad || 'Dominicana' }}</dd>
+            </div>
+            @if (visitante.pasaporte) {
+              <div>
+                <dt class="text-xs text-gray-500 mb-1">Pasaporte</dt>
+                <dd class="text-sm font-semibold text-gray-900">{{ visitante.pasaporte }}</dd>
+              </div>
+            }
           </dl>
         </div>
       </section>

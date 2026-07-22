@@ -1,7 +1,7 @@
 <div class="p-4 sm:p-6 space-y-6">
 
   <!-- Header -->
-  <div class="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl p-5 text-white shadow-md">
+  <div class="bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl p-5 text-white shadow-md">
     <div class="flex items-center gap-4">
       <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
         <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -11,123 +11,247 @@
       </div>
       <div>
         <h1 class="text-xl sm:text-2xl font-bold">Pabellones</h1>
-        <p class="text-purple-100 text-xs sm:text-sm">
-          Gestiona los pabellones del centro penitenciario
-        </p>
+        <p class="text-purple-100 text-xs sm:text-sm">Gestiona pabellones, celdas y capacidad</p>
       </div>
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
-      <p class="text-2xl font-bold text-purple-700">{{ pabellones.length }}</p>
-      <p class="text-xs text-gray-500">Total</p>
+  <!-- Métricas -->
+  <div class="grid grid-cols-3 gap-3">
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-purple-700">{{ pabellonesConfig.length }}</p>
+      <p class="text-xs text-gray-500 mt-0.5">Pabellones</p>
     </div>
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm">
-      <p class="text-2xl font-bold text-green-700">{{ pabellones.length }}</p>
-      <p class="text-xs text-gray-500">Activos</p>
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-blue-700">{{ totalCeldas }}</p>
+      <p class="text-xs text-gray-500 mt-0.5">Total Celdas</p>
     </div>
-    <div class="bg-white rounded-xl p-4 text-center shadow-sm col-span-2 sm:col-span-1">
-      <p class="text-2xl font-bold text-gray-700">{{ 30 - pabellones.length }}</p>
-      <p class="text-xs text-gray-500">Disponibles</p>
+    <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold text-green-700">{{ capacidadTotal }}</p>
+      <p class="text-xs text-gray-500 mt-0.5">Cap. Total</p>
     </div>
   </div>
 
-  <!-- Agregar Pabellón -->
+  <!-- ── Formulario Nuevo Pabellón ───────────────────────────── -->
   <section class="space-y-3">
-    <h2 class="text-sm font-semibold text-purple-700">Nuevo Pabellón</h2>
-    <div class="bg-purple-50 rounded-xl p-4 sm:p-5 space-y-3">
-      <input
-        type="text"
-        [(ngModel)]="nuevoPabellon"
-        placeholder="Ej: Pabellón E"
-        [disabled]="agregando || guardando"
-        (keyup.enter)="agregarPabellon()"
-        maxlength="50"
-        class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
+    <h2 class="text-sm font-semibold text-purple-700 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Nuevo Pabellón
+    </h2>
+
+    <div class="bg-purple-50 border border-purple-200 rounded-xl p-4 sm:p-5 space-y-4">
+
+      <!-- Nombre -->
+      <div>
+        <label class="block text-xs font-medium text-purple-800 mb-1">Nombre *</label>
+        <input
+          type="text"
+          [(ngModel)]="nuevo.nombre"
+          placeholder="Ej: Pabellón E"
+          maxlength="50"
+          [disabled]="agregando || guardando"
+          class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white disabled:opacity-50">
+      </div>
+
+      <!-- Rango de celdas -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-purple-800 mb-1">Celda Inicio *</label>
+          <input
+            type="number"
+            [(ngModel)]="nuevo.celdaInicio"
+            min="1" max="999"
+            [disabled]="agregando || guardando"
+            class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white disabled:opacity-50">
+          <p class="text-[10px] text-purple-600 mt-0.5">Ej: 01</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-purple-800 mb-1">Celda Fin *</label>
+          <input
+            type="number"
+            [(ngModel)]="nuevo.celdaFin"
+            min="1" max="999"
+            [disabled]="agregando || guardando"
+            class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white disabled:opacity-50">
+          <p class="text-[10px] text-purple-600 mt-0.5">Ej: 100</p>
+        </div>
+      </div>
+
+      <!-- Capacidad -->
+      <div>
+        <label class="block text-xs font-medium text-purple-800 mb-1">Capacidad por Celda (personas) *</label>
+        <input
+          type="number"
+          [(ngModel)]="nuevo.capacidadPorCelda"
+          min="1" max="20"
+          [disabled]="agregando || guardando"
+          class="w-full px-3 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:border-purple-500 bg-white disabled:opacity-50">
+        @if (nuevo.celdaFin >= nuevo.celdaInicio && nuevo.capacidadPorCelda > 0) {
+          <p class="text-[10px] text-green-700 mt-1 font-medium">
+            📊 {{ nuevo.celdaFin - nuevo.celdaInicio + 1 }} celdas ×
+            {{ nuevo.capacidadPorCelda }} personas =
+            <strong>{{ (nuevo.celdaFin - nuevo.celdaInicio + 1) * nuevo.capacidadPorCelda }} personas</strong>
+          </p>
+        }
+      </div>
+
       <button
         (click)="agregarPabellon()"
-        [disabled]="!nuevoPabellon.trim() || agregando || guardando"
-        class="w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50">
-        Agregar Pabellón
+        [disabled]="!nuevo.nombre.trim() || nuevo.celdaFin < nuevo.celdaInicio || nuevo.capacidadPorCelda < 1 || agregando || guardando"
+        class="w-full py-2.5 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 text-sm">
+        @if (agregando) {
+          <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          Agregando...
+        } @else {
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Agregar Pabellón
+        }
       </button>
-      <p class="text-xs text-purple-700 text-center">Mínimo 2 caracteres</p>
     </div>
   </section>
 
-  <!-- Lista de Pabellones -->
+  <!-- ── Lista de Pabellones ─────────────────────────────────── -->
   <section class="space-y-3">
-    <h2 class="text-sm font-semibold text-purple-700">Pabellones Configurados</h2>
+    <h2 class="text-sm font-semibold text-purple-700 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+      </svg>
+      Pabellones Configurados
+    </h2>
 
-    @if (pabellones.length === 0) {
-      <div class="text-center py-14 bg-gray-50 rounded-xl">
-        <h3 class="font-semibold text-gray-900">No hay pabellones configurados</h3>
-        <p class="text-sm text-gray-500">Agrega uno para comenzar</p>
+    @if (pabellonesConfig.length === 0) {
+      <div class="text-center py-14 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+        <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <p class="font-semibold text-gray-700">No hay pabellones configurados</p>
+        <p class="text-sm text-gray-400 mt-1">Agrega el primero para comenzar</p>
       </div>
     }
 
-    <div class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
-      @for (pabellon of pabellones; track pabellon; let index = $index) {
+    <div class="space-y-3 max-h-[65vh] overflow-y-auto pr-1">
+      @for (p of pabellonesConfig; track p.nombre; let i = $index) {
 
         <div
-          class="bg-white rounded-xl p-4 shadow-sm space-y-3"
-          [class.bg-purple-50]="pabellonEditando === pabellon">
+          class="rounded-xl shadow-sm overflow-hidden border-2 transition-all"
+          [class.border-purple-400]="editandoNombre === p.nombre"
+          [class.bg-purple-50]="editandoNombre === p.nombre"
+          [class.border-gray-200]="editandoNombre !== p.nombre"
+          [class.bg-white]="editandoNombre !== p.nombre">
 
-          <!-- Info -->
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center">
-              <span class="font-bold text-purple-700 text-sm">{{ index + 1 }}</span>
-            </div>
+          <!-- Vista normal -->
+          @if (editandoNombre !== p.nombre) {
+            <div class="p-4">
+              <div class="flex items-start justify-between gap-3">
 
-            <div class="flex-1">
-              @if (pabellonEditando === pabellon) {
-                <input
-                  type="text"
-                  [(ngModel)]="valorEditando"
-                  class="w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
-              }
-              @if (pabellonEditando !== pabellon) {
-                <p class="font-medium text-gray-900">{{ pabellon }}</p>
-                <p class="text-xs text-gray-500">Pabellón {{ index + 1 }}</p>
-              }
-            </div>
-          </div>
+                <!-- Icono + info -->
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                  <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span class="font-bold text-purple-700 text-sm">{{ i + 1 }}</span>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-bold text-gray-900 text-sm">{{ p.nombre }}</p>
+                    <div class="flex flex-wrap gap-2 mt-1.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-semibold">
+                        🔢 Celdas: {{ rangoCeldas(p) }}
+                      </span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-semibold">
+                        👤 {{ p.capacidadPorCelda }} p/celda
+                      </span>
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[10px] font-semibold">
+                        🏠 Cap. total: {{ capacidadPabellon(p) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-          <!-- Acciones -->
-          @if (pabellonEditando === pabellon) {
-            <div class="flex gap-2">
-              <button
-                (click)="guardarEdicion(pabellon)"
-                [disabled]="guardando"
-                class="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm">
-                Guardar
-              </button>
-              <button
-                (click)="cancelarEdicion()"
-                class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">
-                Cancelar
-              </button>
+                <!-- Acciones -->
+                <div class="flex gap-1.5 flex-shrink-0">
+                  <button
+                    (click)="iniciarEdicion(p)"
+                    [disabled]="guardando || agregando"
+                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all disabled:opacity-50"
+                    title="Editar">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    (click)="eliminarPabellon(p.nombre)"
+                    [disabled]="!puedeEliminar() || guardando || agregando"
+                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                    title="Eliminar">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           }
-          @if (pabellonEditando !== pabellon) {
-            <div class="flex gap-2">
-              <button
-                (click)="iniciarEdicion(pabellon)"
-                class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-                Editar
-              </button>
-              <button
-                (click)="eliminarPabellon(pabellon)"
-                [disabled]="!puedeEliminar()"
-                class="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm">
-                Eliminar
-              </button>
+
+          <!-- Formulario de edición inline -->
+          @if (editandoNombre === p.nombre) {
+            <div class="p-4 space-y-3">
+              <p class="text-xs font-bold text-purple-700 uppercase tracking-wide">Editando: {{ p.nombre }}</p>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Nombre</label>
+                <input type="text" [(ngModel)]="edicion.nombre" maxlength="50"
+                  class="w-full px-3 py-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 text-sm">
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Celda Inicio</label>
+                  <input type="number" [(ngModel)]="edicion.celdaInicio" min="1" max="999"
+                    class="w-full px-3 py-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Celda Fin</label>
+                  <input type="number" [(ngModel)]="edicion.celdaFin" min="1" max="999"
+                    class="w-full px-3 py-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 text-sm">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Capacidad por Celda</label>
+                <input type="number" [(ngModel)]="edicion.capacidadPorCelda" min="1" max="20"
+                  class="w-full px-3 py-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 text-sm">
+                @if (edicion.celdaFin >= edicion.celdaInicio) {
+                  <p class="text-[10px] text-green-700 mt-1">
+                    {{ edicion.celdaFin - edicion.celdaInicio + 1 }} celdas ×
+                    {{ edicion.capacidadPorCelda }} =
+                    <strong>{{ (edicion.celdaFin - edicion.celdaInicio + 1) * edicion.capacidadPorCelda }} personas</strong>
+                  </p>
+                }
+              </div>
+
+              <div class="flex gap-2 pt-1">
+                <button
+                  (click)="guardarEdicion()"
+                  [disabled]="guardando"
+                  class="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm font-semibold transition-colors">
+                  @if (guardando) { Guardando... } @else { Guardar }
+                </button>
+                <button
+                  (click)="cancelarEdicion()"
+                  class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors">
+                  Cancelar
+                </button>
+              </div>
             </div>
           }
 
         </div>
-
       }
     </div>
   </section>

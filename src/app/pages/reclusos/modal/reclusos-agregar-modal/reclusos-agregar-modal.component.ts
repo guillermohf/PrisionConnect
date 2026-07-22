@@ -9,8 +9,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Timestamp } from '@angular/fire/firestore';
 import { ReclusosService } from '@core/services/reclusos.service';
 import { NotificacionService } from '@core/services/notificacion.service';
+import { ConfiguracionService } from '@core/services/configuracion.service';
 import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { SituacionLegal, EstadoCivil, EstadoRecluso } from '@core/models/enums.interface';
+import { PabellonConfig } from '@core/models/configuracion.interface';
 import { ModalComponent } from '@shared/modal/modal.component';
 import { TelefonoMaskDirective } from '@shared/directives/telefono.mask.directive';
 import {
@@ -43,6 +45,7 @@ export class ReclusoAgregarModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private reclusosService = inject(ReclusosService);
   private notificacionService = inject(NotificacionService);
+  private configuracionService = inject(ConfiguracionService);
   private ubicacionService = inject(UbicacionRDService);
 
   form: FormGroup;
@@ -69,7 +72,66 @@ export class ReclusoAgregarModalComponent implements OnChanges {
   nacionalidades = this.ubicacionService.nacionalidades;
   cargandoNacionalidades = this.ubicacionService.cargandoNacionalidades;
 
-  // Fecha máxima (18 años atrás)
+  // Pabellones y celdas
+  get pabellonesConfig(): PabellonConfig[] {
+    const cfg = this.configuracionService.configuracion();
+    if (cfg?.pabellonesConfig?.length) return cfg.pabellonesConfig;
+    return (cfg?.pabellones ?? []).map(nombre => ({
+      nombre, celdaInicio: 1, celdaFin: 30, capacidadPorCelda: 2
+    }));
+  }
+
+  celdaSeleccionada: string | null = null;
+  capacidadCeldaInfo: { ocupados: number; capacidad: number } | null = null;
+  verificandoCapacidad = false;
+
+  /** Rango de celdas del pabellón seleccionado */
+  get celdasDelPabellon(): string[] {
+    const pabNombre = this.form.get('pabellon')?.value;
+    const pab = this.pabellonesConfig.find(p => p.nombre === pabNombre);
+    if (!pab) return [];
+    const celdas: string[] = [];
+    for (let i = pab.celdaInicio; i <= pab.celdaFin; i++) {
+      celdas.push(String(i).padStart(2, '0'));
+    }
+    return celdas;
+  }
+
+  /** Capacidad de la celda actualmente seleccionada */
+  get capacidadPorCelda(): number {
+    const pabNombre = this.form.get('pabellon')?.value;
+    const pab = this.pabellonesConfig.find(p => p.nombre === pabNombre);
+    return pab?.capacidadPorCelda ?? 2;
+  }
+
+  /** Reclusos activos en la celda seleccionada */
+  get ocupantesActuales(): number {
+    const pab = this.form.get('pabellon')?.value;
+    const cel = this.form.get('celda')?.value;
+    if (!pab || !cel) return 0;
+    return this.reclusosService.reclusos().filter(
+      r => r.pabellon === pab && r.celda === cel && r.activo
+    ).length;
+  }
+
+  /** True si la celda ya está llena */
+  get celdaLlena(): boolean {
+    return this.ocupantesActuales >= this.capacidadPorCelda;
+  }
+
+  onPabellonChange(): void {
+    // Resetear celda al cambiar pabellón
+    this.form.patchValue({ celda: '' });
+    this.capacidadCeldaInfo = null;
+  }
+
+  onCeldaChange(): void {
+    // Actualizar info de capacidad al cambiar celda
+    this.capacidadCeldaInfo = this.celdaLlena
+      ? { ocupados: this.ocupantesActuales, capacidad: this.capacidadPorCelda }
+      : null;
+  }
+
   get fechaMaxNacimiento(): string {
     const f = new Date();
     f.setFullYear(f.getFullYear() - 18);
@@ -230,6 +292,11 @@ export class ReclusoAgregarModalComponent implements OnChanges {
     if (!this.form.valid) {
       this.notificacionService.error('Por favor completa todos los campos requeridos');
       this.form.markAllAsTouched();
+      return;
+    }
+
+    if (this.celdaLlena) {
+      this.notificacionService.error(`La celda ${this.form.get('celda')?.value} del pabellón ${this.form.get('pabellon')?.value} ha alcanzado su capacidad máxima (${this.capacidadPorCelda} personas).`);
       return;
     }
     this.guardando = true;

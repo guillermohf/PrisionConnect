@@ -156,7 +156,7 @@ export class VisitaCrearModalComponent implements OnChanges {
     visitantesControl?.clearValidators();
     abogadoControl?.clearValidators();
 
-    if (tipo === TipoVisita.FAMILIAR || tipo === TipoVisita.AMISTADES) {
+    if (tipo === TipoVisita.FAMILIAR || tipo === TipoVisita.AMISTADES || tipo === TipoVisita.CONYUGAL) {
       visitantesControl?.setValidators([Validators.required, Validators.minLength(1)]);
       abogadoControl?.setValue('');
     } else {

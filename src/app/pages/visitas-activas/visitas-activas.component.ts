@@ -96,9 +96,10 @@ export default class VisitasActivasComponent implements OnInit {
     { key: 'cedula', label: 'CEDULA' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
-    { key: 'totalVisitantes', label: 'CANT. VISITANTES' },
-    { key: 'fechaVisita', label: 'FECHA' },
-    { key: 'horaInicioProgramada', label: 'HORA' },
+    { key: 'visitantesPresentes', label: 'VISITANTES' },
+    { key: 'horaInicioProgramada', label: 'INICIO' },
+    { key: 'horaFinProgramada', label: 'FIN' },
+    { key: 'tiempoEnInstalacion', label: 'TIEMPO' },
     { key: 'estado', label: 'ESTADO' },
     { key: 'areaVisita', label: 'ÁREA' }
   ];
@@ -190,6 +191,47 @@ export default class VisitasActivasComponent implements OnInit {
     const hh = Math.floor(diff / 60);
     const mm = diff % 60;
     return `${hh}h ${mm}min`;
+  }
+
+  /** Tiempo que lleva el visitante en las instalaciones desde checkInPrincipal */
+  calcularTiempoEnInstalacion(visita: Visita): { texto: string; vencida: boolean; porVencer: boolean } {
+    // Si aún no hizo check-in, mostrar tiempo desde la hora programada
+    const ahora = new Date();
+
+    // Usar checkInPrincipal si existe, sino horaInicioProgramada
+    let inicioMs: number;
+    if (visita.checkInPrincipal) {
+      const ci = visita.checkInPrincipal as any;
+      inicioMs = (ci?.toDate ? ci.toDate() : new Date(ci)).getTime();
+    } else if (visita.horaInicioProgramada) {
+      const [h, m] = visita.horaInicioProgramada.split(':').map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      inicioMs = d.getTime();
+    } else {
+      return { texto: 'N/A', vencida: false, porVencer: false };
+    }
+
+    const diffMin = Math.floor((ahora.getTime() - inicioMs) / 60_000);
+    if (diffMin < 0) return { texto: 'Aún no inicia', vencida: false, porVencer: false };
+
+    const hh = Math.floor(diffMin / 60);
+    const mm = diffMin % 60;
+    const texto = hh > 0 ? `${hh}h ${mm}min` : `${mm} min`;
+
+    // Comparar con horaFinProgramada
+    let vencida = false;
+    let porVencer = false;
+    if (visita.horaFinProgramada) {
+      const [fh, fm] = visita.horaFinProgramada.split(':').map(Number);
+      const finMs = new Date().setHours(fh, fm, 0, 0);
+      const minutosRestantes = Math.floor((finMs - ahora.getTime()) / 60_000);
+      const minutosAviso = this.configuracionService.configuracion()?.tiempoAdvertencia ?? 15;
+      vencida = minutosRestantes < 0;
+      porVencer = !vencida && minutosRestantes <= minutosAviso;
+    }
+
+    return { texto, vencida, porVencer };
   }
 
   // ── C6: Reporte de pendientes de salida ──────────────────────

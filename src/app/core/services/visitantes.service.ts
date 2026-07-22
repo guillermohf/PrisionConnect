@@ -266,6 +266,8 @@ export class VisitantesService {
       if (dto.fotoUrl !== undefined) actualizacion.fotoUrl = dto.fotoUrl;
       if (dto.activo !== undefined) actualizacion.activo = dto.activo;
       if (dto.observaciones !== undefined) actualizacion.observaciones = dto.observaciones;
+      if (dto.nacionalidad !== undefined) actualizacion.nacionalidad = dto.nacionalidad;
+      if (dto.pasaporte !== undefined) actualizacion.pasaporte = dto.pasaporte;
 
       // Actualizar en Firestore
       await updateDoc(docRef, actualizacion);
