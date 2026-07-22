@@ -161,4 +161,24 @@ export function fechaNoFuturaValidator(): ValidatorFn {
       fechaFutura: { message: 'La fecha de ingreso no puede ser una fecha futura.' }
     };
   };
+}
+
+/**
+ * Validador de pasaporte internacional.
+ * Acepta entre 6 y 15 caracteres alfanuméricos.
+ */
+export function pasaporteValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const valor: string = (control.value ?? '').trim();
+    if (!valor) return null;
+
+    const regex = /^[a-zA-Z0-9]{6,15}$/;
+    if (!regex.test(valor)) {
+      return {
+        pasaporteInvalido: { message: 'El pasaporte debe ser alfanumérico (6 a 15 caracteres).' }
+      };
+    }
+
+    return null;
+  };
 }

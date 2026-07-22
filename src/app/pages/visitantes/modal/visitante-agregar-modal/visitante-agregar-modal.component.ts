@@ -7,7 +7,7 @@ import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ub
 import { CrearVisitanteDTO, Visitante } from '@core/models';
 import { ModalComponent } from "@shared/modal/modal.component";
 import { TelefonoMaskDirective } from "@shared/directives/telefono.mask.directive";
-import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
+import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator, pasaporteValidator } from '@shared/validators/custom.validators';
 import { InputComponent } from '@shared/input/input.component';
 import { ButtonComponent } from '@shared/button/buttton.component';
 
@@ -123,7 +123,7 @@ export class VisitanteAgregarModalComponent {
     } else {
       cedulaCtrl.clearValidators();
       cedulaCtrl.setValue('');
-      pasaporteCtrl.setValidators([Validators.required, Validators.minLength(4)]);
+      pasaporteCtrl.setValidators([Validators.required, pasaporteValidator()]);
     }
     cedulaCtrl.updateValueAndValidity();
     pasaporteCtrl.updateValueAndValidity();

@@ -6,7 +6,7 @@ import { NotificacionService } from '@core/services/notificacion.service';
 import { UbicacionRDService, Municipio, Sector, Barrio } from '@core/services/ubicacion-rd.service';
 import { ActualizarVisitanteDTO, Visitante } from '@core/models';
 import { ModalComponent } from "src/app/shared/modal/modal.component";
-import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator } from '@shared/validators/custom.validators';
+import { cedulaDominicanaValidator, emailValidator, telefonoDominicanoValidator, mayorDeEdadValidator, pasaporteValidator } from '@shared/validators/custom.validators';
 
 @Component({
   selector: 'prisionConnect-visitante-editar-modal',
@@ -99,7 +99,7 @@ export class VisitanteEditarModalComponent {
         pasaporteCtrl.clearValidators();
         pasaporteCtrl.setValue('');
       } else {
-        pasaporteCtrl.setValidators([Validators.required]);
+        pasaporteCtrl.setValidators([Validators.required, pasaporteValidator()]);
       }
       pasaporteCtrl.updateValueAndValidity();
     });
