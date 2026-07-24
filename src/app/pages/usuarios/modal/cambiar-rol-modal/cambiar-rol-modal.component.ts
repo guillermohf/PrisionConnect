@@ -62,6 +62,12 @@ export class CambiarRolModalComponent implements OnChanges {
       nombre: 'Seguridad de Requisa',
       descripcion: 'Realizar requisas y control de objetos',
       color: 'bg-teal-50 text-teal-900 border-teal-600'
+    },
+    { 
+      valor: RolUsuario.SEGURIDAD_PUERTA, 
+      nombre: 'Seguridad Puerta (Control Entrada)',
+      descripcion: 'Control de acceso e ingreso final a visitas activas',
+      color: 'bg-teal-50 text-teal-900 border-teal-600'
     }
   ];
 

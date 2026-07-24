@@ -16,7 +16,7 @@ import { SituacionLegal, EstadoCivil, EstadoRecluso } from '@core/models/enums.i
 import { PabellonConfig } from '@core/models/configuracion.interface';
 import { ModalComponent } from '@shared/modal/modal.component';
 import { TelefonoMaskDirective } from '@shared/directives/telefono.mask.directive';
-import { telefonoDominicanoValidator, mayorDeEdadValidator, fechaNoFuturaValidator } from '@shared/validators/custom.validators';
+import { cedulaDominicanaValidator, telefonoDominicanoValidator, mayorDeEdadValidator, fechaNoFuturaValidator, pasaporteValidator } from '@shared/validators/custom.validators';
 
 @Component({
   selector: 'prisionConnect-recluso-editar-modal',
@@ -121,17 +121,39 @@ export class ReclusoEditarModalComponent implements OnChanges {
     return new Date().toISOString().split('T')[0];
   }
 
+  esDominicano = signal<boolean>(true);
+
+  private actualizarCampoIdentificacion(nacionalidad: string): void {
+    const esDom = !nacionalidad || nacionalidad === 'Dominicana';
+    this.esDominicano.set(esDom);
+    const cedulaCtrl = this.form.get('cedula')!;
+    const pasaporteCtrl = this.form.get('pasaporte')!;
+
+    if (esDom) {
+      cedulaCtrl.setValidators([Validators.required, cedulaDominicanaValidator()]);
+      pasaporteCtrl.clearValidators();
+      pasaporteCtrl.setValue('');
+    } else {
+      cedulaCtrl.clearValidators();
+      cedulaCtrl.setValue('');
+      pasaporteCtrl.setValidators([Validators.required, pasaporteValidator()]);
+    }
+    cedulaCtrl.updateValueAndValidity();
+    pasaporteCtrl.updateValueAndValidity();
+  }
+
   constructor() {
     this.form = this.fb.group({
       numeroIdentificacion: ['', Validators.required],
       numeroExpediente: [''],
-      cedula: ['', Validators.required],
+      cedula: [''],
+      pasaporte: [''],
 
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator()]],
       sexo: ['', Validators.required],
-      nacionalidad: ['', Validators.required],
+      nacionalidad: ['Dominicana', Validators.required],
       estadoCivil: [''],
 
       // Dirección en cascada
@@ -157,6 +179,8 @@ export class ReclusoEditarModalComponent implements OnChanges {
 
       observaciones: ['']
     });
+
+    this.form.get('nacionalidad')?.valueChanges.subscribe(nac => this.actualizarCampoIdentificacion(nac));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -171,11 +195,15 @@ export class ReclusoEditarModalComponent implements OnChanges {
 
   private cargarDatos(): void {
     if (!this.recluso) return;
+    const nac = this.recluso.nacionalidad || 'Dominicana';
+    this.actualizarCampoIdentificacion(nac);
+
     // La dirección existente (string) se carga en _calle para no perder datos
     this.form.patchValue({
       numeroIdentificacion: this.recluso.numeroIdentificacion,
       numeroExpediente: this.recluso.numeroExpediente || '',
       cedula: this.recluso.cedula || '',
+      pasaporte: this.recluso.pasaporte || '',
       nombre: this.recluso.nombre,
       apellido: this.recluso.apellido,
       fechaNacimiento: this.formatDate(this.recluso.fechaNacimiento),
@@ -298,7 +326,8 @@ export class ReclusoEditarModalComponent implements OnChanges {
       const datosActualizados = {
         numeroIdentificacion: fv.numeroIdentificacion,
         numeroExpediente: fv.numeroExpediente,
-        cedula: fv.cedula,
+        cedula: this.esDominicano() ? (fv.cedula || undefined) : undefined,
+        pasaporte: !this.esDominicano() ? (fv.pasaporte || undefined) : undefined,
         nombre: fv.nombre,
         apellido: fv.apellido,
         fechaNacimiento: new Date(fv.fechaNacimiento),

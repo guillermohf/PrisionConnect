@@ -40,23 +40,65 @@ export class NotificacionService {
   }
 
   /**
-   * Muestra un "recibo" o tarjeta de confirmación de éxito con detalles HTML.
-   * Usar para validación visual de registros complejos creados.
+   * Muestra un "recibo" o tarjeta de confirmación de éxito con detalles HTML y opción de imprimir.
    */
   successCard(titulo: string, htmlContent: string): void {
     Swal.fire({
       title: titulo,
       html: htmlContent,
       icon: 'success',
+      showDenyButton: true,
+      denyButtonText: '🖨️ Imprimir Ticket',
+      denyButtonColor: '#0284c7',
       confirmButtonText: 'Cerrar y Continuar',
-      confirmButtonColor: '#0f766e', // teal-700
+      confirmButtonColor: '#0f766e',
       customClass: {
         popup: 'rounded-2xl shadow-2xl p-6',
         title: 'text-2xl font-bold text-gray-800 mt-2',
         htmlContainer: 'text-left mt-4 !m-0',
-        confirmButton: 'rounded-lg px-6 py-2.5 font-semibold w-full'
+        confirmButton: 'rounded-lg px-6 py-2.5 font-semibold',
+        denyButton: 'rounded-lg px-6 py-2.5 font-semibold'
+      }
+    }).then((result) => {
+      if (result.isDenied) {
+        this.imprimirContenidoHtml(titulo, htmlContent);
       }
     });
+  }
+
+  /**
+   * Abre una ventana emergente limpia para imprimir el ticket
+   */
+  imprimirContenidoHtml(titulo: string, htmlContent: string): void {
+    const ventana = window.open('', '_blank', 'width=400,height=600');
+    if (!ventana) return;
+    ventana.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${titulo}</title>
+          <style>
+            body { font-family: monospace; font-size: 12px; display: flex; justify-content: center; padding: 20px; }
+            @media print {
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div style="width: 280px; text-align: center;">
+            <h3 style="margin-bottom: 4px; text-transform: uppercase; font-family: sans-serif;">PRISION CONNECT</h3>
+            ${htmlContent}
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    ventana.document.close();
   }
 
   /**

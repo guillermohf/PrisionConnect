@@ -50,8 +50,8 @@
               <dd class="text-sm font-medium text-gray-900">{{ recluso.nombreCompleto || (recluso.nombre + ' ' + recluso.apellido) }}</dd>
             </div>
             <div>
-              <dt class="text-xs text-gray-500 mb-1">Cédula</dt>
-              <dd class="text-sm font-medium text-gray-900">{{ recluso.cedula || 'N/A' }}</dd>
+              <dt class="text-xs text-gray-500 mb-1">{{ recluso.pasaporte ? 'Pasaporte' : 'Cédula' }}</dt>
+              <dd class="text-sm font-medium text-gray-900">{{ recluso.pasaporte || recluso.cedula || 'N/A' }}</dd>
             </div>
             <div>
               <dt class="text-xs text-gray-500 mb-1">Número de Identificación</dt>

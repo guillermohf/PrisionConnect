@@ -19,7 +19,8 @@ import {
   cedulaDominicanaValidator,
   telefonoDominicanoValidator,
   mayorDeEdadValidator,
-  fechaNoFuturaValidator
+  fechaNoFuturaValidator,
+  pasaporteValidator
 } from '@shared/validators/custom.validators';
 import { InputComponent } from '@shared/input/input.component';
 import { ButtonComponent } from '@shared/button/buttton.component';
@@ -143,19 +144,41 @@ export class ReclusoAgregarModalComponent implements OnChanges {
     return new Date().toISOString().split('T')[0];
   }
 
+  esDominicano = signal<boolean>(true);
+
+  private actualizarCampoIdentificacion(nacionalidad: string): void {
+    const esDom = !nacionalidad || nacionalidad === 'Dominicana';
+    this.esDominicano.set(esDom);
+    const cedulaCtrl = this.form.get('cedula')!;
+    const pasaporteCtrl = this.form.get('pasaporte')!;
+
+    if (esDom) {
+      cedulaCtrl.setValidators([Validators.required, cedulaDominicanaValidator()]);
+      pasaporteCtrl.clearValidators();
+      pasaporteCtrl.setValue('');
+    } else {
+      cedulaCtrl.clearValidators();
+      cedulaCtrl.setValue('');
+      pasaporteCtrl.setValidators([Validators.required, pasaporteValidator()]);
+    }
+    cedulaCtrl.updateValueAndValidity();
+    pasaporteCtrl.updateValueAndValidity();
+  }
+
   constructor() {
     this.form = this.fb.group({
       // Identificación
       numeroIdentificacion: [{ value: '', disabled: true }, Validators.required],
       numeroExpediente: [''],
       cedula: ['', [Validators.required, cedulaDominicanaValidator()]],
+      pasaporte: [''],
 
       // Información Personal
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       fechaNacimiento: ['', [Validators.required, mayorDeEdadValidator()]],
       sexo: ['', Validators.required],
-      nacionalidad: ['', Validators.required],
+      nacionalidad: ['Dominicana', Validators.required],
       estadoCivil: [''],
 
       // Contacto — Dirección en cascada
@@ -182,6 +205,8 @@ export class ReclusoAgregarModalComponent implements OnChanges {
 
       observaciones: ['']
     });
+
+    this.form.get('nacionalidad')?.valueChanges.subscribe(nac => this.actualizarCampoIdentificacion(nac));
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -316,7 +341,8 @@ export class ReclusoAgregarModalComponent implements OnChanges {
       const recluso = {
         numeroIdentificacion: fv.numeroIdentificacion,
         numeroExpediente: fv.numeroExpediente,
-        cedula: fv.cedula,
+        cedula: this.esDominicano() ? (fv.cedula || undefined) : undefined,
+        pasaporte: !this.esDominicano() ? (fv.pasaporte || undefined) : undefined,
         nombre: fv.nombre,
         apellido: fv.apellido,
         fechaNacimiento: new Date(fv.fechaNacimiento),

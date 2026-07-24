@@ -43,11 +43,29 @@
               class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
           </div>
 
-          <div>
-            <label class="block text-xs text-gray-600 mb-1">Cédula *</label>
-            <input type="text" formControlName="cedula"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
-          </div>
+          @if (esDominicano()) {
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Cédula *</label>
+              <input type="text" formControlName="cedula" placeholder="001-0000000-0"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (form.controls['cedula'].touched && form.controls['cedula'].errors) {
+                <p class="text-xs text-red-500 mt-1">
+                  {{ form.controls['cedula'].getError('cedulaFormato')?.message || form.controls['cedula'].getError('cedulaPrefijo')?.message || form.controls['cedula'].getError('cedulaDigito')?.message || 'Cédula requerida' }}
+                </p>
+              }
+            </div>
+          } @else {
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Pasaporte *</label>
+              <input type="text" formControlName="pasaporte" placeholder="Número de pasaporte"
+                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              @if (form.controls['pasaporte'].touched && form.controls['pasaporte'].errors) {
+                <p class="text-xs text-red-500 mt-1">
+                  {{ form.controls['pasaporte'].getError('pasaporteInvalido')?.message || 'Pasaporte requerido' }}
+                </p>
+              }
+            </div>
+          }
 
           <div>
             <label class="block text-xs text-gray-600 mb-1">Nombre *</label>

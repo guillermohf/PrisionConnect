@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
+import { RolUsuario } from '@core/models/enums.interface';
 
 @Component({
   standalone: true,
@@ -74,7 +75,18 @@ export default class LoginComponent {
       // Si el perfil cargó con éxito
       if (this.authService.usuario()) {
         clearInterval(interval);
-        this.router.navigate(['/dashboard']);
+        const rol = this.authService.userRole();
+        if (rol === RolUsuario.SEGURIDAD_PUERTA) {
+          this.router.navigate(['/visitas-activas']);
+        } else if (rol === RolUsuario.SEGURIDAD_RECEPCION) {
+          this.router.navigate(['/visitas']);
+        } else if (rol === RolUsuario.SEGURIDAD_REQUISA) {
+          this.router.navigate(['/requisa']);
+        } else if (rol === RolUsuario.DATA_ENTRY) {
+          this.router.navigate(['/visitantes']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
         this.loading = false;
       } 
       // Si llegamos al límite y no hay perfil, probablemente no existe en Firestore

@@ -174,7 +174,8 @@ export default class PerfilComponent implements OnInit {
       [RolUsuario.SUPERVISOR]: 'Supervisor',
       [RolUsuario.DATA_ENTRY]: 'Operador de Datos',
       [RolUsuario.SEGURIDAD_RECEPCION]: 'Seguridad - Recepción',
-      [RolUsuario.SEGURIDAD_REQUISA]: 'Seguridad - Requisa'
+      [RolUsuario.SEGURIDAD_REQUISA]: 'Seguridad - Requisa',
+      [RolUsuario.SEGURIDAD_PUERTA]: 'Seguridad - Puerta'
     };
     return roles[rol] || rol;
   }
@@ -185,7 +186,8 @@ export default class PerfilComponent implements OnInit {
       [RolUsuario.SUPERVISOR]: 'bg-blue-100 text-blue-800 border-blue-300',
       [RolUsuario.DATA_ENTRY]: 'bg-green-100 text-green-800 border-green-300',
       [RolUsuario.SEGURIDAD_RECEPCION]: 'bg-orange-100 text-orange-800 border-orange-300',
-      [RolUsuario.SEGURIDAD_REQUISA]: 'bg-red-100 text-red-800 border-red-300'
+      [RolUsuario.SEGURIDAD_REQUISA]: 'bg-red-100 text-red-800 border-red-300',
+      [RolUsuario.SEGURIDAD_PUERTA]: 'bg-teal-100 text-teal-800 border-teal-300'
     };
     return colores[rol] || 'bg-gray-100 text-gray-800 border-gray-300';
   }

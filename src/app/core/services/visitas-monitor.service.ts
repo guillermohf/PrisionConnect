@@ -3,22 +3,16 @@
 import { Injectable, inject } from '@angular/core';
 import { VisitasService } from './visitas.service';
 import { ConfiguracionService } from './configuracion.service';
-import { EstadoVisita } from '@core/models/enums.interface';
+import { AuthService } from './auth.service';
+import { EstadoVisita, RolUsuario } from '@core/models/enums.interface';
 import { Visita } from '@core/models/visitas.interface';
 import Swal from 'sweetalert2';
 
-/**
- * Monitor automático de visitas.
- *
- * Cada 60s ejecuta revisar() que:
- *  1. Mueve a PENDIENTE_REQUISA_SALIDA las visitas EN_CURSO cuyo horaFin ya pasó.
- *  2. Alerta (⏰) cuando una visita EN_CURSO está por terminar (dentro del tiempoAdvertencia).
- *  3. Alerta (🚨) cuando una visita quedó PENDIENTE_REQUISA_SALIDA y aún no se procesó la requisa.
- */
 @Injectable({ providedIn: 'root' })
 export class VisitasMonitorService {
   private visitasService    = inject(VisitasService);
   private configuracionService = inject(ConfiguracionService);
+  private authService = inject(AuthService);
 
   private timer: ReturnType<typeof setInterval> | null = null;
 
@@ -58,6 +52,9 @@ export class VisitasMonitorService {
   // ─────────────────────────────────────────────────────────────
 
   private async revisar(): Promise<void> {
+    const rol = this.authService.userRole();
+    if (!rol) return;
+
     const ahora = new Date();
     const horaActual =
       `${ahora.getHours().toString().padStart(2, '0')}:${ahora.getMinutes().toString().padStart(2, '0')}`;
@@ -74,27 +71,43 @@ export class VisitasMonitorService {
       await this.visitasService.cambiarEstado(v.id, EstadoVisita.PENDIENTE_REQUISA_SALIDA);
     }
 
-    // ── 2. Alerta "por terminar" ───────────────────────────────
-    const porTerminar = this.obtenerVisitasPorTerminar(minutosAviso);
-    const nuevasPorTerminar = porTerminar.filter(
-      v => v.id && !this.alertadasPorTerminarIds.has(v.id!)
-    );
-    if (nuevasPorTerminar.length > 0) {
-      nuevasPorTerminar.forEach(v => this.alertadasPorTerminarIds.add(v.id!));
-      this.mostrarAlertaPorTerminar(nuevasPorTerminar, minutosAviso);
+    // ── 2. Alerta "por terminar" (Módulo Visitas Activas / Control Entrada) ──
+    const puedeVerAlertaPorTerminar = [
+      RolUsuario.SUPER_ADMINISTRADOR,
+      RolUsuario.SUPERVISOR,
+      RolUsuario.SEGURIDAD_PUERTA
+    ].includes(rol);
+
+    if (puedeVerAlertaPorTerminar) {
+      const porTerminar = this.obtenerVisitasPorTerminar(minutosAviso);
+      const nuevasPorTerminar = porTerminar.filter(
+        v => v.id && !this.alertadasPorTerminarIds.has(v.id!)
+      );
+      if (nuevasPorTerminar.length > 0) {
+        nuevasPorTerminar.forEach(v => this.alertadasPorTerminarIds.add(v.id!));
+        this.mostrarAlertaPorTerminar(nuevasPorTerminar, minutosAviso);
+      }
     }
 
-    // ── 3. Alerta "pendiente requisa salida sin procesar" ──────
-    const pendientesRequisa = this.visitasService.visitas().filter(
-      v => v.estado === EstadoVisita.PENDIENTE_REQUISA_SALIDA &&
-           !v.requisaSalida           // aún no se inició la requisa de salida
-    );
-    const nuevasPendientes = pendientesRequisa.filter(
-      v => v.id && !this.alertadasPendienteIds.has(v.id!)
-    );
-    if (nuevasPendientes.length > 0) {
-      nuevasPendientes.forEach(v => this.alertadasPendienteIds.add(v.id!));
-      this.mostrarAlertaPendienteRequisa(nuevasPendientes);
+    // ── 3. Alerta "pendiente requisa salida sin procesar" (Módulo Requisa) ──
+    const puedeVerAlertaRequisa = [
+      RolUsuario.SUPER_ADMINISTRADOR,
+      RolUsuario.SUPERVISOR,
+      RolUsuario.SEGURIDAD_REQUISA
+    ].includes(rol);
+
+    if (puedeVerAlertaRequisa) {
+      const pendientesRequisa = this.visitasService.visitas().filter(
+        v => v.estado === EstadoVisita.PENDIENTE_REQUISA_SALIDA &&
+             !v.requisaSalida
+      );
+      const nuevasPendientes = pendientesRequisa.filter(
+        v => v.id && !this.alertadasPendienteIds.has(v.id!)
+      );
+      if (nuevasPendientes.length > 0) {
+        nuevasPendientes.forEach(v => this.alertadasPendienteIds.add(v.id!));
+        this.mostrarAlertaPendienteRequisa(nuevasPendientes);
+      }
     }
   }
 

@@ -6,25 +6,36 @@
 
     <div class="p-6 space-y-6">
 
-      <!-- Estado y Tipo -->
-      <div class="flex flex-wrap items-center gap-3">
-        <span class="px-4 py-2 rounded-full text-sm font-bold shadow-sm"
-              [class]="obtenerColorEstado(visita.estado)">
-          {{ visita.estado }}
-        </span>
-
-        <span class="px-4 py-2 rounded-lg text-sm font-bold shadow-sm"
-              [class]="visita.tipo === TipoVisita.FAMILIAR 
-                  ? 'bg-blue-100 text-blue-800 border-2 border-blue-300' 
-                  : 'bg-purple-100 text-purple-800 border-2 border-purple-300'">
-          {{ visita.tipo }}
-        </span>
-
-        @if (visita.duracionVisitaReal) {
-          <span class="px-4 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-800 border-2 border-green-300 shadow-sm">
-            Duración: {{ visita.duracionVisitaReal }} min
+      <!-- Estado, Tipo y Botón de Imprimir -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="px-4 py-2 rounded-full text-sm font-bold shadow-sm"
+                [class]="obtenerColorEstado(visita.estado)">
+            {{ visita.estado }}
           </span>
-        }
+
+          <span class="px-4 py-2 rounded-lg text-sm font-bold shadow-sm"
+                [class]="visita.tipo === TipoVisita.FAMILIAR 
+                    ? 'bg-blue-100 text-blue-800 border-2 border-blue-300' 
+                    : 'bg-purple-100 text-purple-800 border-2 border-purple-300'">
+            {{ visita.tipo }}
+          </span>
+
+          @if (visita.duracionVisitaReal) {
+            <span class="px-4 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-800 border-2 border-green-300 shadow-sm">
+              Duración: {{ visita.duracionVisitaReal }} min
+            </span>
+          }
+        </div>
+
+        <button
+          (click)="imprimirTicket()"
+          class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-lg transition-colors flex items-center gap-2 shadow">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          Imprimir Ticket
+        </button>
       </div>
 
       <!-- Info Recluso -->

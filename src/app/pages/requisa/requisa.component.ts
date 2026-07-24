@@ -78,21 +78,25 @@ visitasFiltradas = computed(() => {
   // COLUMNAS TABLA
   // =========================
   columnasEntrada = [
+    { key: 'codigoVisita', label: 'TICKET' },
+    { key: 'visitanteNombre', label: 'VISITANTE' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'totalVisitantes', label: 'VISITANTES' },
-    { key: 'horaInicioProgramada', label: 'HORA PROGRAMADA' },
+    { key: 'horaInicioProgramada', label: 'HORA' },
     { key: 'areaVisita', label: 'ÁREA' },
     { key: 'estado', label: 'ESTADO' }
   ];
 
   columnasSalida = [
-    { key: 'id', label: 'ID', hidden: true },
+    { key: 'codigoVisita', label: 'TICKET' },
+    { key: 'visitanteNombre', label: 'VISITANTE' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
     { key: 'tipo', label: 'TIPO' },
-    { key: 'visitantesPresentes', label: 'VISITANTES' },
-    { key: 'duracionVisitaReal', label: 'DURACIÓN (min)' },
-    { key: 'areaVisita', label: 'ÁREA' }
+    { key: 'totalVisitantes', label: 'VISITANTES' },
+    { key: 'horaInicioProgramada', label: 'HORA' },
+    { key: 'areaVisita', label: 'ÁREA' },
+    { key: 'estado', label: 'ESTADO' }
   ];
 
   // =========================

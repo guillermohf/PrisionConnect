@@ -180,7 +180,7 @@ export class AuthService {
   });
 
   puedeGestionarVisitantes = computed(() =>
-    this.esAdminLogica() || this.userRole() === RolUsuario.DATA_ENTRY || this.userRole() === RolUsuario.SEGURIDAD_RECEPCION
+    this.esAdminLogica() || this.userRole() === RolUsuario.DATA_ENTRY
   );
 
   /**

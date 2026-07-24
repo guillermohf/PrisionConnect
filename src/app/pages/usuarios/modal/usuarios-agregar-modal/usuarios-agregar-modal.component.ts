@@ -35,7 +35,8 @@ export class UsuariosAgregarModalComponent {
     { valor: RolUsuario.SUPERVISOR, nombre: 'Supervisor' },
     { valor: RolUsuario.DATA_ENTRY, nombre: 'Data Entry' },
     { valor: RolUsuario.SEGURIDAD_RECEPCION, nombre: 'Seguridad Recepción' },
-    { valor: RolUsuario.SEGURIDAD_REQUISA, nombre: 'Seguridad Requisa' }
+    { valor: RolUsuario.SEGURIDAD_REQUISA, nombre: 'Seguridad Requisa' },
+    { valor: RolUsuario.SEGURIDAD_PUERTA, nombre: 'Seguridad Puerta (Control Entrada)' }
   ];
 
   constructor() {

@@ -184,7 +184,8 @@ export class UsuariosService {
       [RolUsuario.SUPERVISOR]: 'Supervisor',
       [RolUsuario.DATA_ENTRY]: 'Data Entry',
       [RolUsuario.SEGURIDAD_RECEPCION]: 'Seguridad Recepción',
-      [RolUsuario.SEGURIDAD_REQUISA]: 'Seguridad Requisa'
+      [RolUsuario.SEGURIDAD_REQUISA]: 'Seguridad Requisa',
+      [RolUsuario.SEGURIDAD_PUERTA]: 'Seguridad Puerta (Control Entrada)'
     };
     return nombres[rol] || rol;
   }
@@ -195,7 +196,8 @@ export class UsuariosService {
       [RolUsuario.SUPERVISOR]: 'bg-purple-100 text-purple-800 border-purple-200',
       [RolUsuario.DATA_ENTRY]: 'bg-blue-100 text-blue-800 border-blue-200',
       [RolUsuario.SEGURIDAD_RECEPCION]: 'bg-green-100 text-green-800 border-green-200',
-      [RolUsuario.SEGURIDAD_REQUISA]: 'bg-orange-100 text-orange-800 border-orange-200'
+      [RolUsuario.SEGURIDAD_REQUISA]: 'bg-orange-100 text-orange-800 border-orange-200',
+      [RolUsuario.SEGURIDAD_PUERTA]: 'bg-teal-100 text-teal-800 border-teal-200'
     };
     return colores[rol] || 'bg-gray-100 text-gray-800 border-gray-200';
   }

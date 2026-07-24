@@ -91,18 +91,48 @@ export default class VisitasActivasComponent implements OnInit {
   visitaSeleccionada: Visita | null = null;
 
   // Columnas para la tabla
-  columnas: ColumnaConfig[] = [
+  columnas = [
+    { key: 'codigoVisita', label: 'TICKET' },
     { key: 'visitanteNombre', label: 'VISITANTE' },
-    { key: 'cedula', label: 'CEDULA' },
+    { key: 'cedula', label: 'CÉDULA / PASAPORTE' },
     { key: 'tipo', label: 'TIPO' },
     { key: 'reclusoNombre', label: 'RECLUSO' },
-    { key: 'visitantesPresentes', label: 'VISITANTES' },
+    { key: 'visitantesPresentes', label: 'CANT.' },
+    { key: 'fechaVisita', label: 'FECHA' },
     { key: 'horaInicioProgramada', label: 'INICIO' },
     { key: 'horaFinProgramada', label: 'FIN' },
     { key: 'tiempoEnInstalacion', label: 'TIEMPO' },
     { key: 'estado', label: 'ESTADO' },
     { key: 'areaVisita', label: 'ÁREA' }
   ];
+
+  formatearFecha(fecha: any): string {
+    if (!fecha) return '---';
+    try {
+      let fechaObj: Date;
+      if (fecha instanceof Date) {
+        fechaObj = fecha;
+      } else if (typeof fecha.toDate === 'function') {
+        fechaObj = fecha.toDate();
+      } else if (fecha.seconds !== undefined) {
+        fechaObj = new Date(fecha.seconds * 1000);
+      } else {
+        const strFecha = String(fecha);
+        const matchT = strFecha.match(/Timestamp\(seconds=(\d+)/);
+        if (matchT) {
+          fechaObj = new Date(parseInt(matchT[1]) * 1000);
+        } else if (strFecha.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [y, m, d] = strFecha.split('-');
+          fechaObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+        } else {
+          fechaObj = new Date(fecha);
+        }
+      }
+      return fechaObj.toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch {
+      return '---';
+    }
+  }
 
   ngOnInit(): void {
     this.visitasService.cargarVisitas();

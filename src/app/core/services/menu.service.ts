@@ -27,7 +27,10 @@ export class MenuService {
       label: 'Dashboard',
       icon: 'dashboard',
       route: '/dashboard',
-      roles: Object.values(RolUsuario) // Todos los roles tienen acceso
+      roles: [
+        RolUsuario.SUPER_ADMINISTRADOR,
+        RolUsuario.SUPERVISOR
+      ]
     },
     {
       label: 'Recepción',
@@ -58,8 +61,7 @@ export class MenuService {
       roles: [
         RolUsuario.SUPER_ADMINISTRADOR,
         RolUsuario.SUPERVISOR,
-        RolUsuario.DATA_ENTRY,
-        RolUsuario.SEGURIDAD_RECEPCION
+        RolUsuario.DATA_ENTRY
       ]
     },
     {
@@ -89,8 +91,8 @@ export class MenuService {
       roles: [
         RolUsuario.SUPER_ADMINISTRADOR,
         RolUsuario.SUPERVISOR,
-        RolUsuario.SEGURIDAD_RECEPCION,
-        RolUsuario.SEGURIDAD_REQUISA
+        RolUsuario.SEGURIDAD_REQUISA,
+        RolUsuario.SEGURIDAD_PUERTA
       ],
       subLabel: 'Monitoreo en tiempo real'
     },

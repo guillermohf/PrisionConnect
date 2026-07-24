@@ -29,11 +29,18 @@ export const routes: Routes = [
       },
 
       // ============================================
-      // DASHBOARD - Acceso general para autenticados
+      // DASHBOARD - Solo para Supervisor y SuperAdministrador
       // ============================================
       {
         path: 'dashboard',
         loadComponent: () => import('./pages/dashboard/dashboard.component'),
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            RolUsuario.SUPER_ADMINISTRADOR,
+            RolUsuario.SUPERVISOR
+          ]
+        }
       },
 
       // ============================================
@@ -47,8 +54,7 @@ export const routes: Routes = [
           roles: [
             RolUsuario.SUPER_ADMINISTRADOR,
             RolUsuario.SUPERVISOR,
-            RolUsuario.DATA_ENTRY,
-            RolUsuario.SEGURIDAD_RECEPCION
+            RolUsuario.DATA_ENTRY
           ]
         }
       },
@@ -81,8 +87,8 @@ export const routes: Routes = [
           roles: [
             RolUsuario.SUPER_ADMINISTRADOR,
             RolUsuario.SUPERVISOR,
-            RolUsuario.SEGURIDAD_RECEPCION,
-            RolUsuario.SEGURIDAD_REQUISA
+            RolUsuario.SEGURIDAD_REQUISA,
+            RolUsuario.SEGURIDAD_PUERTA
           ]
         }
       },

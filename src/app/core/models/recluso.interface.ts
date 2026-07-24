@@ -12,6 +12,7 @@ export interface Recluso {
   // Identificación
   numeroIdentificacion: string;
   cedula?: string;
+  pasaporte?: string;
   numeroExpediente?: string;
   
   // Información Personal
@@ -99,6 +100,7 @@ export interface CrearReclusoDTO {
   
   // Campos adicionales
   cedula?: string;
+  pasaporte?: string;
   numeroExpediente?: string;
   sexo?: 'Masculino' | 'Femenino';
   nacionalidad?: string;
@@ -152,6 +154,7 @@ export interface ActualizarReclusoDTO {
   
   // Personal
   cedula?: string;
+  pasaporte?: string;
   sexo?: 'Masculino' | 'Femenino';
   nacionalidad?: string;
   estadoCivil?: EstadoCivil;

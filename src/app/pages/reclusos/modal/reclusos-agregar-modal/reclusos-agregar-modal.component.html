@@ -25,21 +25,37 @@
             placeholder="Número de expediente">
           </prisionConnect-input>
 
-          <prisionConnect-input label="Cédula" [mask]="'000-0000000-0'" [formControl]="$any(form.controls['cedula'])"
-            placeholder="001-0000000-0" [required]="true">
-          </prisionConnect-input>
+          @if (esDominicano()) {
+            <prisionConnect-input label="Cédula" [mask]="'000-0000000-0'" [formControl]="$any(form.controls['cedula'])"
+              placeholder="001-0000000-0" [required]="true">
+            </prisionConnect-input>
 
-          <!-- Errores de cédula -->
-          @if (form.controls['cedula'].touched) {
-          @if (form.controls['cedula'].errors?.['cedulaFormato']; as err) {
-          <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
-          }
-          @if (form.controls['cedula'].errors?.['cedulaPrefijo']; as err) {
-          <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
-          }
-          @if (form.controls['cedula'].errors?.['cedulaDigito']; as err) {
-          <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
-          }
+            <!-- Errores de cédula -->
+            @if (form.controls['cedula'].touched) {
+              @if (form.controls['cedula'].errors?.['cedulaFormato']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+              @if (form.controls['cedula'].errors?.['cedulaPrefijo']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+              @if (form.controls['cedula'].errors?.['cedulaDigito']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+            }
+          } @else {
+            <prisionConnect-input label="Pasaporte" [formControl]="$any(form.controls['pasaporte'])"
+              placeholder="Número de pasaporte" [required]="true">
+            </prisionConnect-input>
+
+            <!-- Errores de pasaporte -->
+            @if (form.controls['pasaporte'].touched) {
+              @if (form.controls['pasaporte'].errors?.['pasaporteInvalido']; as err) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ {{ err.message }}</p>
+              }
+              @if (form.controls['pasaporte'].errors?.['required']) {
+                <p class="text-xs text-red-600 -mt-3 md:col-span-2">⚠️ El pasaporte es obligatorio</p>
+              }
+            }
           }
 
           <prisionConnect-input label="Nombre" [formControl]="$any(form.controls['nombre'])" placeholder="Ingrese el nombre"

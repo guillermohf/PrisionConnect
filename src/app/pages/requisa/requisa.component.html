@@ -132,8 +132,8 @@
               </div>
 
               <div class="bg-gray-50 rounded-lg p-2.5 border border-gray-200">
-                <p class="text-xs text-gray-500 mb-0.5 font-medium">ID</p>
-                <p class="text-sm font-semibold text-gray-900">{{ visita.id }}</p>
+                <p class="text-xs text-gray-500 mb-0.5 font-medium">Ticket</p>
+                <p class="text-sm font-bold text-teal-700 font-mono">{{ visita.codigoVisita || 'N/A' }}</p>
               </div>
 
             </div>
@@ -225,6 +225,28 @@
           [showEdit]="false"
           [showDelete]="false"
           (detail)="verDetalle($event)">
+
+          <ng-template #columnBody let-visita let-column="column">
+            @if (column.key === 'codigoVisita') {
+              <span class="font-mono text-xs font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded border border-teal-200">
+                {{ visita.codigoVisita || 'N/A' }}
+              </span>
+            } @else if (column.key === 'visitanteNombre') {
+              <span class="text-gray-800 font-medium">
+                {{ visita.tipo === 'Legal' ? (visita.abogado?.nombre || 'N/A') : (visita.visitantes?.length ? visita.visitantes[0].nombre : 'N/A') }}
+              </span>
+            } @else if (column.key === 'estado') {
+              <span [ngClass]="obtenerColorEstado(visita.estado)" class="px-3 py-1 rounded-full text-[10px] font-black uppercase border">
+                {{ visita.estado }}
+              </span>
+            } @else if (column.key === 'totalVisitantes') {
+              <span class="text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                {{ visita.tipo === 'Legal' ? '1/1' : (tipoRequisa() === 'entrada' ? visita.totalVisitantes : (visita.visitantesPresentes + '/' + visita.totalVisitantes)) }}
+              </span>
+            } @else {
+              <span class="text-gray-600">{{ visita[column.key] || 'N/A' }}</span>
+            }
+          </ng-template>
 
           <ng-template #customActions let-visita>
             

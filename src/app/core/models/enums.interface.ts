@@ -8,7 +8,8 @@ export enum RolUsuario {
   SUPERVISOR = 'Supervisor',
   DATA_ENTRY = 'Data Entry',
   SEGURIDAD_RECEPCION = 'Seguridad de Recepción',
-  SEGURIDAD_REQUISA = 'Seguridad de Requisa'
+  SEGURIDAD_REQUISA = 'Seguridad de Requisa',
+  SEGURIDAD_PUERTA = 'Seguridad de Puerta'
 }
 
 /**

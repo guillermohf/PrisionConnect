@@ -26,6 +26,70 @@ export class VisitaDetalleModalComponent {
     this.isOpenChange.emit(false);
   }
 
+  imprimirTicket(): void {
+    if (!this.visita) return;
+    const v = this.visita;
+    const codigo = v.codigoVisita || '---';
+    const visitante = v.tipo === TipoVisita.LEGAL ? (v.abogado?.nombre || '---') : (v.visitantes?.length ? v.visitantes[0].nombre : '---');
+    const recluso = v.reclusoNombre || '---';
+    const area = v.areaVisita || '---';
+    const hora = v.horaInicioProgramada || '---';
+    const tipo = v.tipo || '---';
+    const fecha = this.formatearFecha(v.fechaVisita);
+
+    const ventana = window.open('', '_blank', 'width=400,height=600');
+    if (!ventana) return;
+    ventana.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Ticket ${codigo}</title>
+          <style>
+            body { font-family: monospace; font-size: 12px; display: flex; justify-content: center; padding: 20px; text-align: center; }
+            .ticket { width: 280px; border: 1px dashed #333; padding: 16px; border-radius: 8px; }
+            .header { font-size: 16px; font-weight: bold; margin-bottom: 4px; font-family: sans-serif; }
+            .sub { font-size: 10px; color: #555; margin-bottom: 10px; text-transform: uppercase; }
+            .code { font-size: 22px; font-weight: bold; color: #0f766e; margin: 8px 0; letter-spacing: 2px; }
+            .line { border: none; border-top: 1px dashed #666; margin: 10px 0; }
+            .info { text-align: left; font-size: 11px; line-height: 1.6; }
+            .footer { font-size: 9px; color: #777; margin-top: 12px; }
+            @media print {
+              body { padding: 0; }
+              .ticket { border: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="ticket">
+            <div class="header">PRISION CONNECT</div>
+            <div class="sub">Comprobante de Visita</div>
+            <div class="line"></div>
+            <div style="font-size: 10px; color: #555;">CÓDIGO TICKET</div>
+            <div class="code">${codigo}</div>
+            <div class="line"></div>
+            <div class="info">
+              <div><strong>Visitante:</strong> ${visitante}</div>
+              <div><strong>Recluso:</strong> ${recluso}</div>
+              <div><strong>Área:</strong> ${area}</div>
+              <div><strong>Hora:</strong> ${hora}</div>
+              <div><strong>Fecha:</strong> ${fecha}</div>
+              <div><strong>Tipo:</strong> ${tipo}</div>
+            </div>
+            <div class="line"></div>
+            <div class="footer">Conserve este comprobante durante su permanencia.</div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    ventana.document.close();
+  }
+
   formatearFecha(fecha: any): string {
     if (!fecha) return 'N/A';
     try {
