@@ -1,6 +1,7 @@
 // src/app/core/services/visitas-monitor.service.ts
 
 import { Injectable, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { VisitasService } from './visitas.service';
 import { ConfiguracionService } from './configuracion.service';
 import { AuthService } from './auth.service';
@@ -13,6 +14,7 @@ export class VisitasMonitorService {
   private visitasService    = inject(VisitasService);
   private configuracionService = inject(ConfiguracionService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   private timer: ReturnType<typeof setInterval> | null = null;
 
@@ -212,8 +214,7 @@ export class VisitasMonitorService {
       }
     }).then(result => {
       if (result.isConfirmed) {
-        // Navegar a la sección de requisa si el usuario confirma
-        window.location.href = '/requisa';
+        this.router.navigate(['/requisa']);
       }
     });
   }

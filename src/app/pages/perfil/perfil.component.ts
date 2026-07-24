@@ -119,7 +119,6 @@ export default class PerfilComponent implements OnInit {
       if (resultado.success) {
         this.notificacionService.success('Perfil actualizado exitosamente');
         this.editandoPerfil = false;
-        window.location.reload();
       } else {
         this.notificacionService.error(resultado.message || 'Error al actualizar el perfil');
       }

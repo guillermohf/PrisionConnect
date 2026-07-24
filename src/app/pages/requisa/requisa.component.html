@@ -12,6 +12,7 @@
   <div class="bg-white rounded-lg shadow-lg border-2 border-gray-200">
     <div class="flex">
       <button
+        type="button"
         (click)="cambiarTipoRequisa('entrada')"
         class="flex-1 py-3 font-medium border-b-2 transition-all duration-200"
         [class.border-[#006666]]="tipoRequisa() === 'entrada'"
@@ -25,6 +26,7 @@
       </button>
 
       <button
+        type="button"
         (click)="cambiarTipoRequisa('salida')"
         class="flex-1 py-3 font-medium border-b-2 transition-all duration-200"
         [class.border-[#006666]]="tipoRequisa() === 'salida'"
@@ -74,6 +76,7 @@
               }
             </div>
             <button
+              type="button"
               (click)="verDetalle(visita)"
               class="p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200">
               <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,6 +145,7 @@
             <div class="flex flex-wrap gap-2 pt-2.5 border-t border-gray-200">
               
               <button
+                type="button"
                 (click)="verDetalle(visita)"
                 class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -152,6 +156,7 @@
               </button>
 
               <button
+                type="button"
                 (click)="aprobarRequisa(visita)"
                 class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,6 +166,7 @@
               </button>
 
               <button
+                type="button"
                 (click)="rechazarRequisa(visita)"
                 class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,6 +176,7 @@
               </button>
 
               <button
+                type="button"
                 (click)="abrirIncidencia(visita)"
                 class="flex-1 min-w-[calc(50%-0.25rem)] px-3 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -179,6 +186,7 @@
               </button>
 
               <button
+                type="button"
                 (click)="abrirCambiarEstado(visita)"
                 class="flex-1 min-w-full px-3 py-2.5 bg-[#006666] hover:bg-[#008080] text-white rounded-lg transition-all duration-200 text-xs font-medium flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -259,6 +267,7 @@
             }
 
             <button
+              type="button"
               (click)="aprobarRequisa(visita)"
               class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
               title="Aprobar Requisa">
@@ -269,6 +278,7 @@
             </button>
 
             <button
+              type="button"
               (click)="rechazarRequisa(visita)"
               class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               title="Rechazar">
@@ -279,6 +289,7 @@
             </button>
 
             <button
+              type="button"
               (click)="abrirIncidencia(visita)"
               class="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
               title="Reportar Incidencia">
@@ -289,6 +300,7 @@
             </button>
 
             <button
+              type="button"
               (click)="abrirCambiarEstado(visita)"
               class="p-2 text-[#006666] hover:bg-teal-50 rounded-lg transition-colors"
               title="Cambiar Estado">
