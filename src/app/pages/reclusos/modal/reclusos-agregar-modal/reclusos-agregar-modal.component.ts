@@ -368,6 +368,8 @@ export class ReclusoAgregarModalComponent implements OnChanges {
         this.notificacionService.success(resultado.message);
         this.reclusoAgregado.emit();
         this.cerrar();
+      } else {
+        this.notificacionService.error(resultado.message || 'Error al guardar el recluso');
       }
     } catch (error) {
       this.notificacionService.error('Error inesperado al guardar');

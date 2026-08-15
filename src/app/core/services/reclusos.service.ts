@@ -4,6 +4,7 @@ import {
   collection,
   addDoc,
   updateDoc,
+  deleteField,
   doc,
   query,
   orderBy,
@@ -169,6 +170,10 @@ export class ReclusosService {
       if (payloadNombre || payloadApellido) {
         updateBody.nombreCompleto = getNombreCompleto(payloadNombre || actual?.nombre, payloadApellido || actual?.apellido);
       }
+
+      // Limpiar explícitamente cedula/pasaporte con deleteField() cuando vienen como undefined
+      if ('cedula' in datos && datos.cedula === undefined) updateBody.cedula = deleteField();
+      if ('pasaporte' in datos && datos.pasaporte === undefined) updateBody.pasaporte = deleteField();
 
       await updateDoc(reclusoRef, updateBody);
       await this.auditService.registrarAccion(

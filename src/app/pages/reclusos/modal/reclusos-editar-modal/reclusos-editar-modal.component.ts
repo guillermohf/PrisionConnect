@@ -196,6 +196,10 @@ export class ReclusoEditarModalComponent implements OnChanges {
   private cargarDatos(): void {
     if (!this.recluso) return;
     const nac = this.recluso.nacionalidad || 'Dominicana';
+
+    // Setear nacionalidad sin emitir evento para evitar que valueChanges
+    // llame actualizarCampoIdentificacion y borre cédula/pasaporte
+    this.form.get('nacionalidad')?.setValue(nac, { emitEvent: false });
     this.actualizarCampoIdentificacion(nac);
 
     // La dirección existente (string) se carga en _calle para no perder datos
@@ -208,7 +212,6 @@ export class ReclusoEditarModalComponent implements OnChanges {
       apellido: this.recluso.apellido,
       fechaNacimiento: this.formatDate(this.recluso.fechaNacimiento),
       sexo: this.recluso.sexo || '',
-      nacionalidad: this.recluso.nacionalidad || '',
       estadoCivil: this.recluso.estadoCivil || '',
       _calle: this.recluso.direccion || '',
       telefono: this.recluso.telefono || '',

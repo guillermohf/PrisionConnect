@@ -206,7 +206,12 @@
           <div class="md:col-span-2">
             <label class="block text-xs text-gray-600 mb-1">Calle y número *</label>
             <input type="text" formControlName="_calle" placeholder="Ingrese la calle y número"
-              class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-teal-600">
+              class="w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:border-teal-600"
+              [class.border-red-500]="form.controls['_calle'].touched && form.controls['_calle'].invalid"
+              [class.border-gray-300]="!(form.controls['_calle'].touched && form.controls['_calle'].invalid)">
+            @if (form.controls['_calle'].touched && form.controls['_calle'].errors?.['required']) {
+              <p class="text-xs text-red-600 mt-1">⚠️ La calle es obligatoria</p>
+            }
           </div>
 
         </div>
