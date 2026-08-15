@@ -338,30 +338,33 @@ export class ReclusoAgregarModalComponent implements OnChanges {
       ].filter(Boolean);
       const direccion = partesDireccion.join(', ');
 
-      const recluso = {
+      const reclusoBase = {
         numeroIdentificacion: fv.numeroIdentificacion,
-        numeroExpediente: fv.numeroExpediente,
-        cedula: this.esDominicano() ? (fv.cedula || undefined) : undefined,
-        pasaporte: !this.esDominicano() ? (fv.pasaporte || undefined) : undefined,
+        numeroExpediente: fv.numeroExpediente || '',
         nombre: fv.nombre,
         apellido: fv.apellido,
         fechaNacimiento: new Date(fv.fechaNacimiento),
         sexo: fv.sexo,
         nacionalidad: fv.nacionalidad,
-        estadoCivil: fv.estadoCivil,
+        estadoCivil: fv.estadoCivil || '',
         direccion,
-        telefono: fv.telefono,
+        telefono: fv.telefono || '',
         nombreContactoEmergencia: fv.nombreContactoEmergencia,
-        telefonoEmergencia: fv.telefonoEmergencia,
+        telefonoEmergencia: fv.telefonoEmergencia || '',
         pabellon: fv.pabellon,
         celda: fv.celda,
         fechaIngreso: new Date(fv.fechaIngreso),
         situacionLegal: fv.situacionLegal,
         estado: fv.estado,
-        delito: fv.delito,
-        sentencia: fv.sentencia ? Number(fv.sentencia) : undefined,
-        observaciones: fv.observaciones
+        delito: fv.delito || '',
+        observaciones: fv.observaciones || ''
       };
+
+      // Omitir cedula/pasaporte/sentencia si no aplican (Firestore rechaza undefined)
+      const recluso: any = { ...reclusoBase };
+      if (this.esDominicano() && fv.cedula) recluso['cedula'] = fv.cedula;
+      if (!this.esDominicano() && fv.pasaporte) recluso['pasaporte'] = fv.pasaporte;
+      if (fv.sentencia) recluso['sentencia'] = Number(fv.sentencia);
 
       const resultado = await this.reclusosService.agregarRecluso(recluso);
       if (resultado.success) {

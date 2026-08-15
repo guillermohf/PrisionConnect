@@ -1,0 +1,380 @@
+=== SLIDE 1 ===
+  [T] PRISIONCONNECT
+  [T] Sistema web para la gestión y seguimiento de visitas en el Centro de
+  [T] Corrección y Rehabilitación Najayo (Hombres y Mujeres)
+  [T] SUSTENTANTES
+  [T] Junior de la Cruz González — 17-2383
+  [T] Guillermo José Herrera Fígaro — 17-0520
+  [T] ASESOR
+  [T] Leonel Federico Savery Galarza
+  [T] Santo Domingo, D.N. · 2026
+  [T] UNIVERSIDAD NACIONAL PEDRO HENRÍQUEZ UREÑA
+  [T] Facultad de Ciencias y Tecnología
+  [T] Escuela de Informática
+  [T] Escanea y pruébalo en vivo
+=== SLIDE 2 ===
+  [T] CONTENIDO
+  [T] 01
+  [T] Problemática
+  [T] 02
+  [T] Solución
+  [T] 03
+  [T] Objetivo General
+  [T] 04
+  [T] Objetivos Específicos
+  [T] 05
+  [T] Alcance
+  [T] 06
+  [T] Marco Metodológico
+  [T] 07
+  [T] Análisis del Sistema
+  [T] 08
+  [T] Diseño del Sistema
+  [T] 09
+  [T] Resultados
+  [T] 10
+  [T] Presupuesto
+  [T] 11
+  [T] Recomendaciones
+  [T] 12
+  [T] Conclusión
+  [T] PrisionConnect · CCR Najayo
+  [T] 1
+=== SLIDE 3 ===
+  [T] Aspectos Generales
+  [T] PrisionConnect · CCR Najayo
+  [T] 2
+=== SLIDE 4 ===
+  [T] ANTECEDENTES
+  [T] Los sistemas de gestión de visitas en centros penitenciarios han evolucionado de procesos manuales a soluciones automatizadas basadas en tecnología web, mejorando la eficiencia operativa, reduciendo errores humanos y fortaleciendo los mecanismos de seguridad.
+  [T] MARCO LEGAL
+  [T] Ley No. 224-84
+  [T] Régimen Penitenciario: regula la administración de los centros y el régimen de visitas.
+  [T] Ley No. 172-13
+  [T] Protección de Datos Personales: exige cifrado y control de acceso a la información sensible.
+  [T] PrisionConnect · CCR Najayo
+  [T] 3
+=== SLIDE 5 ===
+  [T] 01
+  [T] PROBLEMÁTICA
+  [T] El Centro de Corrección y Rehabilitación Najayo (Hombres y Mujeres) gestiona sus visitas de forma manual, sin ningún sistema que centralice la información.
+  [T] 1
+  [T] Problema central
+  [T] La gestión manual es propensa a errores humanos, dificulta el seguimiento y la planificación efectiva de los recursos.
+  [T] 2
+  [T] Consecuencias
+  [T] Conflictos en la programación, problemas de seguridad y baja trazabilidad de los registros de visitas.
+  [T] 3
+  [T] Necesidad
+  [T] Un sistema centralizado que automatice el control de entradas, salidas y decisiones basadas en datos precisos.
+  [T] PrisionConnect · CCR Najayo
+  [T] 4
+=== SLIDE 6 ===
+  [T] 02
+  [T] SOLUCIÓN
+  [T] PrisionConnect centraliza en una sola plataforma web el registro, control y seguimiento de las visitas al CCR Najayo, sustituyendo los procesos manuales por flujos digitales auditables y accesibles en tiempo real.
+  [T] NUESTRA SOLUCIÓN PERMITE:
+  [T] 1
+  [T] Reducir tiempos
+  [T] Menos espera en recepción y menos trabajo administrativo manual.
+  [T] 2
+  [T] Centralizar la información
+  [T] Visitantes, reclusos y abogados en un único sistema conectado.
+  [T] 3
+  [T] Reforzar la seguridad
+  [T] Roles diferenciados, validación de requisa y auditoría de eventos.
+  [T] 4
+  [T] Trazabilidad completa
+  [T] Desde el registro de entrada hasta la salida del visitante.
+  [T] PrisionConnect · CCR Najayo
+  [T] 5
+=== SLIDE 7 ===
+  [T] 03
+  [T] OBJETIVO GENERAL
+  [T] Desarrollar un sistema web para gestionar y dar seguimiento a las visitas en el Centro de Corrección y Rehabilitación Najayo (Hombres y Mujeres), que optimice el control y aumente la eficiencia de los procesos administrativos, como una herramienta integrada y fácil de usar que mejore la organización, disminuya los tiempos de espera y garantice los derechos de los internos y visitantes.
+  [T] PrisionConnect · CCR Najayo
+  [T] 6
+=== SLIDE 8 ===
+  [T] 04
+  [T] OBJETIVOS ESPECÍFICOS
+  [T] 1
+  [T] Implementar un sistema de registro digital de visitas que automatice la entrada y salida de visitantes, reduciendo el tiempo de espera.
+  [T] 2
+  [T] Desarrollar una interfaz de usuario intuitiva que permita a los funcionarios gestionar y dar seguimiento a las visitas de forma eficiente.
+  [T] 3
+  [T] Integrar notificaciones y recordatorios automáticos sobre fechas y horarios de visita.
+  [T] 4
+  [T] Integrar herramientas de generación de informes personalizados para la toma de decisiones.
+  [T] 5
+  [T] Capacitar al personal del centro en el uso del sistema web para optimizar su implementación.
+  [T] PrisionConnect · CCR Najayo
+  [T] 7
+=== SLIDE 9 ===
+  [T] 05
+  [T] ALCANCE
+  [T] Plataforma web dirigida a tareas administrativas y operativas de gestión de visitantes, con frontend en Angular y base de datos en Firebase/Firestore.
+  [T] Recepción
+  [T] Check-In / Check-Out digital, control de tiempo de visita y alertas de vencimiento.
+  [T] Visitantes
+  [T] Registro, consulta y vínculo con uno o varios internos (parentesco, abogado, representante).
+  [T] Abogados
+  [T] Registro y validación de visitas legales, control de credenciales.
+  [T] Reclusos
+  [T] Ficha del interno, nivel de riesgo y visitas asociadas.
+  [T] Administración
+  [T] Dashboard, usuarios, roles y configuración general.
+  [T] Reportes y Auditoría
+  [T] Exportación a PDF/Excel y trazabilidad de eventos.
+  [T] PrisionConnect · CCR Najayo
+  [T] 8
+=== SLIDE 10 ===
+  [T] Marco Metodológico
+  [T] PrisionConnect · CCR Najayo
+  [T] 9
+=== SLIDE 11 ===
+  [T] 06
+  [T] METODOLOGÍA DE DESARROLLO: CASCADA
+  [T] Se optó por la metodología Cascada: etapas marcadas donde cada fase se completa antes de iniciar la siguiente, lo que facilita la planeación, el registro y el seguimiento del avance del proyecto.
+  [T] Planificación
+  [T] →
+  [T] Diseño
+  [T] →
+  [T] Desarrollo
+  [T] →
+  [T] Verificación
+  [T] →
+  [T] Implementación
+  [T] TIPO DE INVESTIGACIÓN E INSTRUMENTOS
+  [T] Investigación aplicada, de campo, combinando enfoque cuantitativo y cualitativo. Como instrumento principal se utilizó la entrevista y la observación directa al personal del CCR Najayo, lo que permitió definir con precisión los requerimientos, objetivos y el alcance real del sistema en el contexto penitenciario.
+  [T] PrisionConnect · CCR Najayo
+  [T] 10
+=== SLIDE 12 ===
+  [T] Análisis del Sistema
+  [T] PrisionConnect · CCR Najayo
+  [T] 11
+=== SLIDE 13 ===
+  [T] 07
+  [T] REQUERIMIENTOS FUNCIONALES
+  [TBL] ['Módulo', 'Requerimiento clave']
+  [TBL] ['Administración', 'Gestión de usuarios y roles (Súper Admin, Supervisor, Data Entry, Seguridad de Requisa).']
+  [TBL] ['Visitantes', 'Registro con cédula, datos de contacto y parentesco; asociación a uno o varios internos.']
+  [TBL] ['Recepción', 'Check-In / Check-Out con validación previa, bloqueo de duplicados y alerta por tiempo excedido.']
+  [TBL] ['Abogados', 'Registro y validación de visitas legales con estado pendiente → autorizado.']
+  [TBL] ['Reclusos', 'Ficha del interno, nivel de riesgo y vínculo con visitantes autorizados.']
+  [T] PrisionConnect · CCR Najayo
+  [T] 12
+=== SLIDE 14 ===
+  [T] 07
+  [T] REQUERIMIENTOS NO FUNCIONALES
+  [T] 1
+  [T] Seguridad
+  [T] Cifrado de datos personales de visitantes y reclusos para proteger la privacidad.
+  [T] 2
+  [T] Usabilidad
+  [T] Interfaz responsiva y accesible, con colores y tipografías fáciles de usar.
+  [T] 3
+  [T] Autenticación
+  [T] Autenticación multifactor para el acceso del personal penitenciario.
+  [T] 4
+  [T] Mantenibilidad
+  [T] Arquitectura modular que facilita futuras mejoras y escalamiento.
+  [T] PrisionConnect · CCR Najayo
+  [T] 13
+=== SLIDE 15 ===
+  [T] 07
+  [T] REGLAS DE NEGOCIO
+  [TBL] ['Regla', 'Descripción']
+  [TBL] ['Exclusión de alérgenos y validación', 'Los datos ingresados en el perfil deben ser numérica y clínicamente consistentes.']
+  [TBL] ['Correspondencia plan-objetivos', 'Toda visita debe corresponder a un recluso activo y un visitante autorizado.']
+  [TBL] ['Registro único', 'Cada cuenta de usuario debe ser única y estar asociada a un solo correo electrónico válido.']
+  [TBL] ['Bloqueo de edición histórica', 'El sistema impide modificar registros de visitas ya guardados, para preservar la integridad del historial.']
+  [T] PrisionConnect · CCR Najayo
+  [T] 14
+=== SLIDE 16 ===
+  [T] Diseño del Sistema
+  [T] PrisionConnect · CCR Najayo
+  [T] 15
+=== SLIDE 17 ===
+  [T] 08
+  [T] ARQUITECTURA DEL SISTEMA
+  [T] Arquitectura por capas que separa presentación, lógica de negocio y servicios en la nube.
+  [T] Presentación / UI
+  [T] Login, Dashboard, Visitantes, Visitas, Requisa, Reclusos, Abogados, Reportes y componentes compartidos.
+  [T] Lógica y Servicios
+  [T] Guards de seguridad (authGuard, roleGuard) y servicios especializados por módulo.
+  [T] Firebase SDK
+  [T] Firebase Authentication, Cloud Firestore y Firebase Hosting.
+  [T] Backend / Cloud
+  [T] Google Cloud: Cloud Functions, Firestore Security Rules y Authentication Providers.
+  [T] PrisionConnect · CCR Najayo
+  [T] 16
+=== SLIDE 18 ===
+  [T] 08
+  [T] DISEÑO DE BASE DE DATOS
+  [T] Modelo entidad-relación: gestiona usuarios, reclusos, visitantes y abogados, junto con sus relaciones autorizadas, el registro de visitas, incidencias, auditoría y configuración general del sistema.
+  [T] PrisionConnect · CCR Najayo
+  [T] 17
+=== SLIDE 19 ===
+  [T] 08
+  [T] TECNOLOGÍAS
+  [T] Angular
+  [T] Framework principal de la interfaz: estructura modular, componentes reutilizables y TypeScript.
+  [T] TypeScript
+  [T] Tipado estático que refuerza la calidad y mantenibilidad del código.
+  [T] Firebase
+  [T] Autenticación, base de datos Firestore en tiempo real y hosting con SSL.
+  [T] Git / GitHub
+  [T] Control de versiones y trabajo colaborativo entre los sustentantes.
+  [T] PrisionConnect · CCR Najayo
+  [T] 18
+=== SLIDE 20 ===
+  [T] Resultados / Demostración
+  [T] PrisionConnect · CCR Najayo
+  [T] 19
+=== SLIDE 21 ===
+  [T] 09
+  [T] RESULTADOS · ACCESO Y PANEL GENERAL
+  [T] Pantalla de Login
+  [T] Acceso seguro al sistema mediante correo y contraseña, con opción de inicio de sesión con Google.
+  [T] Dashboard General
+  [T] Resumen visual en tiempo real: visitas del día, visitantes dentro del centro, total de reclusos e incidencias.
+  [T] PrisionConnect · CCR Najayo
+  [T] 20
+=== SLIDE 22 ===
+  [T] 09
+  [T] RESULTADOS · RECEPCIÓN Y MONITOREO
+  [T] Módulo de Recepción
+  [T] Control y monitoreo de accesos en tiempo real, con filtros por área y estado de la visita.
+  [T] Módulo de Requisa
+  [T] Registro y control del proceso de revisión de visitantes antes de ingresar al área asignada.
+  [T] PrisionConnect · CCR Najayo
+  [T] 21
+=== SLIDE 23 ===
+  [T] 09
+  [T] RESULTADOS · VISITANTES Y RECLUSOS
+  [T] Módulo de Visitantes
+  [T] Registro, consulta y administración de la información de cada visitante y su relación con los reclusos.
+  [T] Módulo de Reclusos
+  [T] Registro, consulta y gestión de la información de los internos del centro y su situación legal.
+  [T] PrisionConnect · CCR Najayo
+  [T] 22
+=== SLIDE 24 ===
+  [T] 09
+  [T] RESULTADOS · ABOGADOS Y VISITAS ACTIVAS
+  [T] Módulo de Abogados
+  [T] Registro y administración de las visitas legales realizadas por los abogados de los reclusos.
+  [T] Visitas Activas
+  [T] Visualización y seguimiento en tiempo real de las visitas que se encuentran actualmente en curso.
+  [T] PrisionConnect · CCR Najayo
+  [T] 23
+=== SLIDE 25 ===
+  [T] 09
+  [T] RESULTADOS · REPORTES Y AUDITORÍA
+  [T] Módulo de Reportes
+  [T] Generación de reportes personalizados en PDF/Excel para el análisis administrativo.
+  [T] Módulo de Auditoría
+  [T] Visualización de cada modificación realizada dentro del sistema por cualquier usuario.
+  [T] PrisionConnect · CCR Najayo
+  [T] 24
+=== SLIDE 26 ===
+  [T] PLATAFORMA EN VIVO
+  [T] Escanea el código para acceder al sistema desplegado
+  [T] prisionconnect.web.app/login
+  [TBL] ['Rol', 'Correo electrónico', 'Contraseña']
+  [TBL] ['Administrador', 'admin@prisionconnect.com', 'Admin123!!']
+  [TBL] ['Supervisor', 'supervisor@prisionconnect.com', 'Supervisor123!!']
+  [TBL] ['Recepcionista', 'recepcion@prisionconnect.com', 'Recepcion123!!']
+  [TBL] ['Seguridad de Puerta', 'seguridad_de_puerta@prisionconnect.com', 'Password123!!']
+  [T] Nota: credenciales de demostración con datos de prueba, no información real de reclusos o visitantes.
+  [T] PrisionConnect · CCR Najayo
+  [T] 25
+=== SLIDE 27 ===
+  [T] Factibilidad y Presupuesto
+  [T] PrisionConnect · CCR Najayo
+  [T] 26
+=== SLIDE 28 ===
+  [T] ESTUDIO DE FACTIBILIDAD TÉCNICA
+  [T] Angular
+  [T] Framework de Google para la interfaz de usuario: estructura modular, TypeScript y desarrollo acelerado con Angular CLI.
+  [T] Firebase (BaaS)
+  [T] Backend-as-a-Service de Google: autenticación, base de datos en tiempo real (Firestore) y hosting con CDN + SSL automático.
+  [T] CONCLUSIÓN DE LA FACTIBILIDAD TÉCNICA
+  [T] El proyecto es técnicamente factible: Angular y Firebase ofrecen una arquitectura moderna, escalable y segura (autenticación JWT, hashing robusto de contraseñas). Existen limitaciones como el vendor lock-in y el control reducido de infraestructura, pero se compensan con la rapidez de desarrollo y la confiabilidad de los servicios. El equipo (un desarrollador senior y uno junior) cuenta con las competencias necesarias para la implementación.
+  [T] PrisionConnect · CCR Najayo
+  [T] 27
+=== SLIDE 29 ===
+  [T] 10
+  [T] PRESUPUESTO
+  [T] Costo Total
+  [T] $16,727.18 USD
+  [T] COSTO DEL EQUIPO Y RECURSOS
+  [T] Desarrollador Senior (6 meses)
+  [T] $10,143.70 USD
+  [T] Desarrollador Junior (6 meses)
+  [T] $4,057.48 USD
+  [T] Infraestructura y licencias (6 meses)
+  [T] $2,526.00 USD
+  [T] Mantenimiento anual (soporte y actualizaciones)
+  [T] $2,040.00 USD
+  [T] Inversión total estimada
+  [T] $18,767.18 USD
+  [T] PrisionConnect · CCR Najayo
+  [T] 28
+=== SLIDE 30 ===
+  [T] PRÓXIMOS PASOS
+  [T] Recomendaciones
+  [T] PrisionConnect · CCR Najayo
+  [T] 29
+=== SLIDE 31 ===
+  [T] 11
+  [T] RECOMENDACIONES · DESARROLLO
+  [T] 1
+  [T] Pruebas automatizadas (Unit Testing)
+  [T] Integrar Jasmine/Karma para validar cada módulo de forma aislada ante futuras actualizaciones.
+  [T] 2
+  [T] Arquitectura de microfrontends
+  [T] Desplegar módulos (seguridad, administración, trabajo social) de forma independiente.
+  [T] 3
+  [T] Integración de biometría
+  [T] Huella dactilar o reconocimiento facial para eliminar el riesgo de suplantación.
+  [T] 4
+  [T] PWA para dispositivos móviles
+  [T] Que el personal de vigilancia use la plataforma en tablets/teléfonos incluso con baja conectividad.
+  [T] PrisionConnect · CCR Najayo
+  [T] 30
+=== SLIDE 32 ===
+  [T] 11
+  [T] RECOMENDACIONES · INFRAESTRUCTURA
+  [T] 1
+  [T] Estrategia multi-cloud y redundancia
+  [T] Respaldo en otra nube (Azure/AWS) o servidor local para no detener la gestión ante caídas del proveedor.
+  [T] 2
+  [T] Firewall de aplicaciones web (WAF)
+  [T] Protección contra inyección SQL, XSS y ataques de denegación de servicio.
+  [T] 3
+  [T] Red LAN dedicada y segmentada
+  [T] Wi-Fi exclusivo para el sistema, aislado de la red administrativa general.
+  [T] 4
+  [T] Backups y plan de recuperación (DRP)
+  [T] Respaldos automatizados fuera del centro con tiempo de recuperación mínimo.
+  [T] PrisionConnect · CCR Najayo
+  [T] 31
+=== SLIDE 33 ===
+  [T] CIERRE
+  [T] Conclusiones
+  [T] PrisionConnect · CCR Najayo
+  [T] 32
+=== SLIDE 34 ===
+  [T] 12
+  [T] CONCLUSIÓN
+  [T] El objetivo general fue cumplido: PrisionConnect transformó un modelo de gestión manual en un flujo de trabajo digital que garantiza la integridad de la información desde el registro hasta la salida del visitante, representando un cambio de paradigma en la administración penitenciaria dominicana.
+  [T] Angular y Firebase permitieron una interfaz intuitiva y datos en tiempo real para el monitoreo de visitas activas.
+  [T] La seguridad se reforzó con JWT y cifrado, alineada a la Ley No. 172-13 de Protección de Datos Personales.
+  [T] Los módulos de Requisa, Abogados y Visitas Activas responden a la complejidad real del entorno penitenciario.
+  [T] El análisis financiero proyecta una inversión total de $18,767.18 USD para la puesta en marcha y primer año de operación.
+  [T] PrisionConnect · CCR Najayo
+  [T] 33
+=== SLIDE 35 ===
+  [T] MUCHAS GRACIAS
+  [T] POR SU ATENCIÓN
+  [T] PrisionConnect · Sistema web de gestión de visitas · CCR Najayo
