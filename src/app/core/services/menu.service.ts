@@ -110,8 +110,7 @@ export class MenuService {
       icon: 'history',
       route: '/auditoria',
       roles: [
-        RolUsuario.SUPER_ADMINISTRADOR,
-        RolUsuario.SUPERVISOR
+        RolUsuario.SUPER_ADMINISTRADOR
       ],
       subLabel: 'Registro de actividad'
     },
@@ -119,7 +118,10 @@ export class MenuService {
       label: 'Configuración',
       icon: 'settings',
       route: '/configuracion',
-      roles: [RolUsuario.SUPER_ADMINISTRADOR]
+      roles: [
+        RolUsuario.SUPER_ADMINISTRADOR,
+        RolUsuario.SUPERVISOR
+      ]
     },
     {
       label: 'Usuarios',

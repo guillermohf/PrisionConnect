@@ -76,15 +76,15 @@ service cloud.firestore {
     match /configuracion/{document=**} {
       // Todos leen configuración (parámetros del sistema)
       allow read: if true;
-      // Solo SuperAdmin edita configuración
-      allow write: if isSuperAdmin();
+      // SuperAdmin y Supervisor editan configuración
+      allow write: if isSuperAdmin() || isSupervisor();
     }
     
     match /auditLogs/{document=**} {
       // Cualquiera puede ESCRIBIR logs de auditoría si está logueado (el sistema loguea sus acciones)
       allow write: if isAuthenticated();
-      // Solo Admin y Supervisor pueden LEER auditoría
-      allow read: if isSuperAdmin() || isSupervisor();
+      // Solo Admin puede LEER auditoría
+      allow read: if isSuperAdmin();
     }
     
   }

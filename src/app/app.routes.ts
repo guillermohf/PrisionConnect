@@ -145,7 +145,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/auditoria/auditoria.component'),
         canActivate: [roleGuard],
         data: {
-          roles: [RolUsuario.SUPER_ADMINISTRADOR, RolUsuario.SUPERVISOR]
+          roles: [RolUsuario.SUPER_ADMINISTRADOR]
         }
       },
       {
@@ -159,7 +159,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/configuracion/configuracion.component'),
         canActivate: [roleGuard],
         data: {
-          roles: [RolUsuario.SUPER_ADMINISTRADOR]
+          roles: [RolUsuario.SUPER_ADMINISTRADOR, RolUsuario.SUPERVISOR]
         }
       },
 
